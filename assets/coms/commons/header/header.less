@@ -1,0 +1,105 @@
+@white-color: #fff;
+.admin-console-header {
+  z-index: 1001;
+  width: 100%;
+  background: #24292e;
+  font-size: 16px;
+  height: 55px;
+  position: fixed;
+  top: 0px;
+  @img-height: 36px;
+  .admin-console-logo {
+    float: left;
+    margin: (54px-@img-height)/2 0 (54px-@img-height)/2 18px;
+    img {
+      float: left;
+      height: @img-height;
+    }
+    .logo {
+      float: left;
+      height: 36px;
+      line-height: 36px;
+      font-size: 20px;
+      margin-left: 12px;
+      color: #fff;
+    }
+  }
+  .ant-menu-item-selected, .ant-menu-selected{
+    background-color: #108ee9 !important;
+    color:@white-color !important;
+    &:hover{
+      color: #108ee9 !important;
+    }
+  }
+  .ant-menu-item-selected > a, .ant-menu-item-selected > a:hover {
+    color:@white-color !important;
+  }
+  .admin-console-clusterName {
+    float: left;
+    margin-left: 50px;
+  }
+  .admin-console-clusterInfo {
+    float: left;
+    margin-left: 50px;
+    line-height: 53px;
+    color: #fff;
+    .clusterName {
+      color: red;
+    }
+  }
+  .ant-menu {
+    line-height: 53px;
+    float: right;
+    font-size: .875em;
+    a {
+      color: #fff;
+    }
+  }
+  .userinfo {
+    span {
+      padding-left: 5px;
+    }
+  }
+  .ant-menu-horizontal {
+    border-bottom: 0;
+    background: transparent;
+    color: #fff;
+  }
+  &:after {
+    content: '';
+    display: block;
+    clear: both;
+  }
+  .ant-menu-horizontal > .ant-menu-item,
+  .ant-menu-horizontal > .ant-menu-submenu {
+    &:hover {
+      background-color: transparent;
+    }
+    font-size: 16px;
+    a {
+      color: #fff;
+    }
+    .ant-menu-sub {
+      background: #000;
+      li {
+        a:hover {
+          color: #CCC;
+        }
+        &:hover {
+          background-color: transparent;
+        }
+      }
+    }
+  }
+  .ant-menu-horizontal > .ant-menu-submenu-active {
+    background-color: transparent;
+  }
+  .switch-cluster .ant-menu-sub{
+    max-height: 500px;
+    overflow: auto;
+  }
+}
+
+.ant-popover-inner-content {
+  padding: 5px 2px;
+}

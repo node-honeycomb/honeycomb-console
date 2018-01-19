@@ -1,0 +1,46 @@
+{
+  "author": "albin",
+  "name": "app-analysis-front",
+  "description": "a new way to write js in browser.",
+  "version": "1.1.1",
+  "dependencies": {
+    "antd": "^2.6.0",
+    "async": "~1.5.2",
+    "bluebird": "^3.4.6",
+    "classnames": "~2.2.5",
+    "diff": "~3.2.0",
+    "echarts": "^3.5.1",
+    "jquery": "~2.1.1",
+    "lodash": "~4.11.1",
+    "lodash.debounce": "~4.0.6",
+    "moment": "~2.13.0",
+    "normalizr": "~2.0.0",
+    "react": "~15.3.0",
+    "react-codemirror": "^0.3.0",
+    "react-dom": "~15.3.0",
+    "react-redux": "~4.4.5",
+    "react-router": "~2.5.1",
+    "react-router-redux": "~4.0.5",
+    "redux": "~3.5.2",
+    "redux-logger": "~2.6.1",
+    "redux-thunk": "~2.1.0",
+    "seamless-immutable": "^7.0.0",
+    "thunkify": "^2.1.2"
+  },
+  "devDependencies": {
+  },
+  "deps": {},
+  "ignore": [],
+  "browser": {
+    "ie": ">8"
+  },
+  "merge": [],
+  "main": "index.js",
+  "scripts": {
+    "start": "tnpm install && node ./node_modules/@ali/naza-server/bin/naza -r",
+    "dev": "tnpm install && node ./node_modules/@ali/naza-server/bin/naza -r",
+    "prop": "tnpm install && node ./node_modules/@ali/naza-server/bin/naza -p",
+    "build": "./node_modules/@ali/naza-server/bin/naza -b"
+  },
+  "license": "ISC"
+}

@@ -1,0 +1,35 @@
+<style>
+  .login {
+    font-family:"Helvetica Neue",Helvetica,"Hiragino Sans GB","STHeitiSC-Light","Microsoft YaHei","微软雅黑",Arial,sans-serif;
+    background: #eee;
+    width: 400px;
+    border-radius: 8px;
+    margin: 50px auto;
+    padding: 20px;
+    line-height: 24px;
+  }
+  p {
+    color: #666;
+    margin: 10px;
+  }
+  input {
+    width: 200px;
+    line-height: 24px;
+  }
+</style>
+<form action="<%= userCount > 0 ? '/loginAuth' : '/initUser'%>" class="login" method="POST">
+  <h3>Honeycomb-Console <%= userCount > 0 ? 'Login' : 'Init'%></h3>
+  <% if (errMsg) {%>
+    <p style="color:red; font-size: 12px"><%=errMsg%></p>
+  <% } %>
+  <p>
+    username: <input type="text" name="username"/>
+  </p>
+  <p>
+    password: <input type="password" name="password"/>
+  </p>
+  <p style="margin-left: 108px">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
+    <input type="submit" value="<%= userCount > 0 ? 'Login' : 'create root user'%>" />
+  </p>
+</form>
