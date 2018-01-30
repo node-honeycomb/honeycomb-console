@@ -27,8 +27,7 @@
     "seamless-immutable": "^7.0.0",
     "thunkify": "^2.1.2"
   },
-  "devDependencies": {
-  },
+  "devDependencies": {},
   "deps": {},
   "ignore": [],
   "browser": {

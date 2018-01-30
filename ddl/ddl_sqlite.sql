@@ -37,10 +37,8 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
 CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `id` INTEGER PRIMARY KEY,
   `user` varchar(50), -- COMMENT '用户名',
-  `cluster_id` INTEGER NOT NULL,
   `cluster_code` varchar(50) NOT NULL,
-  `cluster_name` varchar(50) NOT NULL,
-  `cluster_admin` INTEGER NOT NULL DEFAULT 0, -- COMMENT '0: cluster用户，1: cluster管理员',
+  `role` INTEGER NOT NULL DEFAULT 0, -- COMMENT '0: cluster用户，1: cluster管理员 2: cluster 创建者',
   `apps` text, -- COMMENT '用户app列表',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
   `gmt_modified` datetime NOT NULL, -- COMMENT '修改时间',

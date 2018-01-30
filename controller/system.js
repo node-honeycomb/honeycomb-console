@@ -9,8 +9,6 @@ const callremote = utils.callremote;
 /**
  * @api /logout
  * @nowrap
- * @param req
- * @param res
  */
 exports.logout = function (req, res) {
   if (req.session && req.session.user) {
@@ -21,8 +19,6 @@ exports.logout = function (req, res) {
 
 /**
  * @api {post} /loginAuth
- * @param req
- * @param callback
  */
 exports.loginAuth = function (req, callback) {
   let opt = req.body;
@@ -42,8 +38,6 @@ exports.loginAuth = function (req, callback) {
 
 /**
  * @api {get} /api/status
- * @param req
- * @param callback
  */
 exports.status = function (req, callback) {
   let clusterCode = req.query.clusterCode;

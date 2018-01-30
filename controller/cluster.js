@@ -4,7 +4,7 @@ const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
 
-function getFilterCluster (gClusterConfig, clusterAcl) {
+function getFilterCluster(gClusterConfig, clusterAcl) {
   if (!gClusterConfig || !clusterAcl) return {};
   let filterCluster = {};
   Object.keys(clusterAcl).map((authorizedCluster) => {
@@ -17,8 +17,6 @@ function getFilterCluster (gClusterConfig, clusterAcl) {
 
 /**
  * @api /api/cluster
- * @param req
- * @param callback
  */
 exports.getClusterCfg = function (req, callback) {
   cluster.getClusterCfg(function (err) {
@@ -33,8 +31,8 @@ exports.getClusterCfg = function (req, callback) {
 
 /**
  * @api /api/cluster_config/:clusterCode
- * @param req
- * @param callback
+ * @param
+ *   clusterCode
  */
 exports.getClusterCfgByCode = function (req, callback) {
   let clusterCode = req.params.clusterCode;
@@ -50,8 +48,6 @@ exports.getClusterCfgByCode = function (req, callback) {
 
 /**
  * @api {post} /api/cluster
- * @param req
- * @param callback
  */
 exports.addCluster = function (req, callback) {
   let clusterCode = req.body.code;
@@ -117,7 +113,7 @@ exports.addCluster = function (req, callback) {
           if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
           let newCluster = cluster.gClusterConfig[clusterCode];
           if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-          userAcl.addUserAcl(req.session.user.nickname, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
+          userAcl.addUserAcl(req.session.user.nickname, clusterCode, 1, '["*"]', function (err) {
             callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
           });
         });
@@ -128,11 +124,9 @@ exports.addCluster = function (req, callback) {
 
 /**
  * @api {delete} /api/cluster
- * @param req
- * @param callback
  */
 exports.removeCluster = function (req, callback) {
-  let clusterCode = req.body.clusterCode;
+  let clusterCode = req.query.clusterCode;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_CLUSTER',
@@ -153,8 +147,6 @@ exports.removeCluster = function (req, callback) {
 
 /**
  * @api {delete} /api/worker
- * @param req
- * @param callback
  */
 exports.removeWorker = function (req, callback) {
   let clusterCode = req.query.clusterCode || 'default';
@@ -179,8 +171,6 @@ exports.removeWorker = function (req, callback) {
 
 /**
  * @api {post} /api/worker
- * @param req
- * @param callback
  */
 exports.addWorker = function (req, callback) {
   let ip = req.body.ip;

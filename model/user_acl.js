@@ -1,12 +1,15 @@
 'use strict';
 
 const log = require('../common/log');
-const mysql = require('../common/db');
+const db = require('../common/db');
 
-const QUERY_SYSTEM_USER_ACL = `SELECT *
-  FROM hc_console_system_user_acl
+const QUERY_SYSTEM_USER_ACL = `
+  SELECT
+    *
+  FROM
+    hc_console_system_user_acl
   WHERE
-    user = ?`;
+    user = ? and status = 1`;
 
 const QUERY_ALL_CLUSTER = `SELECT *
   FROM hc_console_system_cluster
@@ -15,7 +18,7 @@ const QUERY_ALL_CLUSTER = `SELECT *
 
 exports.getUserAcl = function (user, callback) {
   if (user.role === 1) {
-    mysql.query(
+    db.query(
       QUERY_ALL_CLUSTER,
       function (err, data) {
         if (err) {
@@ -28,9 +31,8 @@ exports.getUserAcl = function (user, callback) {
           data.forEach((rowData) => {
             clusterList.push({
               id: rowData.id,
-              cluster_code: rowData.code,
-              cluster_name: rowData.name,
-              cluster_admin: 1
+              clusterCode: rowData.code,
+              clusterAdmin: 1
             });
           });
           callback(null, clusterList);
@@ -38,7 +40,7 @@ exports.getUserAcl = function (user, callback) {
       }
     );
   } else {
-    mysql.query(
+    db.query(
       QUERY_SYSTEM_USER_ACL,
       [user.name],
       function (err, data) {
@@ -53,8 +55,11 @@ exports.getUserAcl = function (user, callback) {
   }
 };
 
-const QUERY_CLUSTER_ACL = `SELECT *
-  FROM hc_console_system_user_acl
+const QUERY_CLUSTER_ACL = `
+  SELECT
+    *
+  FROM
+    hc_console_system_user_acl
   WHERE
     cluster_code in (?)`;
 
@@ -74,7 +79,7 @@ exports.getClusterAcl = function (user, callback) {
     return;
   }
 
-  mysql.query(
+  db.query(
     QUERY_CLUSTER_ACL,
     [adminClusterList],
     function (err, data) {
@@ -104,11 +109,13 @@ exports.getClusterAcl = function (user, callback) {
 };
 
 
-const INSERT_USER_ACL = `INSERT INTO
-  hc_console_system_user_acl(user, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
+const INSERT_USER_ACL = `
+  INSERT INTO hc_console_system_user_acl
+    (user, cluster_code, cluster_admin, apps, gmt_create, gmt_modified)
+  VALUES
+    (?, ?, ?, ?, ?, ?)`;
 
-exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, clusterAdmin, apps, callback) {
+exports.addUserAcl = function (name, clusterCode, clusterAdmin, apps, callback) {
   if (!apps) apps = '["*"]';
   try {
     JSON.parse(apps);
@@ -119,9 +126,9 @@ exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, cluste
     });
   }
   let d = new Date();
-  mysql.query(
+  db.query(
   INSERT_USER_ACL,
-  [name, clusterId, clusterCode, clusterName, clusterAdmin, apps, d, d],
+  [name, clusterCode, clusterAdmin, apps, d, d],
   function (err) {
     if (err) {
       log.error('Insert new user acl failed:', err);
@@ -147,7 +154,7 @@ exports.updateClusterAcl = function (userAcl, callback) {
       message: 'apps 参数异常'
     });
   }
-  mysql.query(UPDATE_USER_ACL,
+  db.query(UPDATE_USER_ACL,
     [userAcl.name, userAcl.cluster_admin, userAcl.apps, userAcl.id],
     function (err) {
       if (err) {
@@ -161,10 +168,10 @@ exports.updateClusterAcl = function (userAcl, callback) {
 };
 
 const DELETE_USER_ACL = `DELETE FROM hc_console_system_user_acl
-  WHERE user = ? and cluster_id = ? and cluster_code = ? and cluster_name = ?`;
+  WHERE user = ? and cluster_id = ? and cluster_code = ?`;
 exports.deleteClusterAcl = function (userAcl, callback) {
-  mysql.query(DELETE_USER_ACL,
-    [userAcl.user, userAcl.cluster_id, userAcl.cluster_code, userAcl.cluster_name],
+  db.query(DELETE_USER_ACL,
+    [userAcl.user, userAcl.cluster_id, userAcl.cluster_code],
     function (err) {
       if (err) {
         log.error('Delete user acl failed:', err);

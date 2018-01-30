@@ -2,7 +2,7 @@
 
 module.exports = {
   getCluster: {
-    url: '/api/cluster',
+    url: '/api/cluster?clusterCode=:xxx',
     headers: {
       'x-csrf-token': window.csrfToken
     },

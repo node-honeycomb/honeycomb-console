@@ -1,16 +1,9 @@
 'use strict';
-const config = require('../config');
-const log = require('../common/log');
-const utils = require('../common/utils');
-const cluster = require('../model/cluster');
-const user = require('../model/user');
 const userAcl = require('../model/user_acl');
 const async = require('async');
-
+const log = require('../common/log');
 /**
  * @api {post} /api/createAcl
- * @param req
- * @param res
  */
 exports.createAcl = function (req, callback) {
   var user = req.session.user;

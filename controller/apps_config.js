@@ -26,26 +26,11 @@ exports.getAppConfig = function (req, res) {
         message: err.message
       });
     } else {
-      // let data = results.data.success && results.data.success[0] && results.data.success[0].data;
-      // scanSensitiveInfo(data);
       res.json(results);
     }
   });
 };
 
-/* 过了敏感信息方法
-function scanSensitiveInfo(data) {
-  for (let m in data) {
-    let tmp = data[m];
-    if (typeof tmp === 'object') {
-      scanSensitiveInfo(tmp);
-    }
-    if (SENSITIVE_KEYS.indexOf(m) >= 0) {
-      data[m] = '****************';
-    }
-  }
-}
-*/
 
 /**
  * @api {post} /api/config/:type/:appName
@@ -79,14 +64,14 @@ exports.setAppConfig = function (req, res) {
       message: e.message
     });
   }
-  callremote(path, opt, function (err, result) {
+  callremote(path, opt, function (err) {
     if (err) {
       res.json({
         code: 'SET_APPS_CONFIG_FAILED',
         message: err.message
       });
     } else {
-      res.json(opt.data);
+      res.json({code: 'SUCCESS'});
     }
   });
 };
