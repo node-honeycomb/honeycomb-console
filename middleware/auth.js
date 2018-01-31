@@ -48,8 +48,8 @@ module.exports = function (req, res, next) {
         pwd = utils.sha256(pwd);
         if (user.password === pwd) {
           req.session.user = {
-            name: user,
-            nickname: user,
+            name: user.name,
+            nickname: user.nickname,
             role: user.role
           };
           return res.redirect('/');
