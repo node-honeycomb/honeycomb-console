@@ -14,7 +14,7 @@ const callremote = utils.callremote;
 
 const appUsageCachePath = PATH.join(config.serverRoot, './logs/_app_usage_cache_');
 if (!fs.existsSync(appUsageCachePath)) {
-  fs.mkdirSync(appUsageCachePath);
+  fs.sync().mkdir(appUsageCachePath);
 }
 
 /**
