@@ -7,6 +7,7 @@ let classnames = require('classnames');
 import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Tooltip, Spin, Icon} from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
+const ipRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 class AddClusterModal extends React.Component {
   state = {
     info: {
@@ -14,8 +15,8 @@ class AddClusterModal extends React.Component {
       endpoint:'',
       ips:[],
       name:'',
-      token:'',
-    },
+      token:''
+    }
   }
   onClusterInfoChange = function(name, value){
     let editInfo = _.cloneDeep(this.state.info);
@@ -25,10 +26,18 @@ class AddClusterModal extends React.Component {
   handleOk = (e) => {
     let editInfo = _.cloneDeep(this.state.info);
     editInfo.isUpdate = false;
-    editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/g);
-    editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));
+    if(typeof editInfo.ips === 'string'){
+      editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/g);
+      editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));  
+    }
+    if(editInfo.ips.length === 0){
+      this.setState({
+        isIpsError: true
+      });
+      return;
+    }
     let errorIps = editInfo.ips.find((item, key)=>{
-      if(!item.match('^[\w\.\-]+$')){
+      if(!item.match(ipRegex)){
         return item;
       }
     });
