@@ -3,6 +3,7 @@
 var React = require('react');
 var ReactRouter = require('react-router');
 var antd = require('antd');
+var Link = require('react-router').Link;
 var Menu = antd.Menu;
 var Icon = antd.Icon;
 var Popover = antd.Popover;
@@ -78,6 +79,12 @@ class Header extends React.Component {
         <div className="admin-console-clusterInfo">
           当前所在集群：
           <span className="clusterName">{clusterName}</span>
+        </div>
+        <div className="admin-console-clusterInfo" >
+          <span className="clusterName"> 
+            <Icon type="exclamation-circle-o" /> 
+            <Link to={'/pages/clusterMgr'}> 检测到存在安全隐患</Link>
+          </span>
         </div>
         <Menu mode="horizontal">
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
