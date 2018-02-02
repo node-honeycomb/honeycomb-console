@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(128),
   `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
@@ -14,33 +14,30 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
-  `id` INTEGER PRIMARY KEY,
-  `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `ip` varchar(128) NOT NULL DEFAULT '' UNIQUE, -- COMMENT 'worker ip地址',
   `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
   `status` tinyint(4) NOT NULL DEFAULT '1', -- COMMENT '0： 无效， 1：有效',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL, -- COMMENT '修改时间',
-  UNIQUE(`ip`,`cluster_code`)
+  `gmt_modified` datetime NOT NULL -- COMMENT '修改时间',
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
-  `id` INTEGER PRIMARY KEY,
-  `name` varchar(50), -- COMMENT '用户名',
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `name` varchar(50) UNIQUE, -- COMMENT '用户名',
   `password` varchar(64), -- COMMENT 'password',
   `status` INTEGER NOT NULL DEFAULT '1', -- COMMENT '0： 无效， 1：有效',
   `role` INTEGER NOT NULL DEFAULT '0', -- COMMENT '0： 用户， 1：管理员',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL, -- COMMENT '修改时间',
-  UNIQUE(`name`)
+  `gmt_modified` datetime NOT NULL -- COMMENT '修改时间',
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
-  `id` INTEGER PRIMARY KEY,
-  `user` varchar(50), -- COMMENT '用户名',
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `user` varchar(50) UNIQUE, -- COMMENT '用户名',
   `cluster_code` varchar(50) NOT NULL,
   `role` INTEGER NOT NULL DEFAULT 0, -- COMMENT '0: cluster用户，1: cluster管理员 2: cluster 创建者',
   `apps` text, -- COMMENT '用户app列表',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL, -- COMMENT '修改时间',
-  UNIQUE(`user`, `cluster_code`)
+  `gmt_modified` datetime NOT NULL -- COMMENT '修改时间',
 );
