@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `id` INTEGER PRIMARY KEY,
   `name` varchar(128),
+  `nickname` varchar(128),
   `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
   `env` varchar(128) DEFAULT '',  -- COMMENT '环境: dev, daily, pre, production'

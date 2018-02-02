@@ -113,7 +113,7 @@ exports.addCluster = function (req, callback) {
           if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
           let newCluster = cluster.gClusterConfig[clusterCode];
           if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-          userAcl.addUserAcl(req.session.user.nickname, clusterCode, 1, '["*"]', function (err) {
+          userAcl.addUserAcl(req.session.user.nickname, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
             callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
           });
         });

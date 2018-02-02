@@ -1,6 +1,7 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(128),
+  `nickname` varchar(128),
   `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
   `env` varchar(128) DEFAULT '',  -- COMMENT '环境: dev, daily, pre, production'
@@ -42,5 +43,6 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `cluster_admin` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0: cluster用户，1: cluster管理员',
   `apps` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '用户app列表',
   `gmt_create` datetime NOT NULL COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL COMMENT '修改时间'
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  UNIQUE KEY `user_cluster` (`nickname`,`cluster_code`)
 );
