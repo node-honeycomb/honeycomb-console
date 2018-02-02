@@ -19,6 +19,7 @@ pool.getConnection(function (err, conn) {
     conn.query(st, done);
   },(err) => {
     if(err) {
+      log.error(err);
       throw err;
     }
   });
