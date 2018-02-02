@@ -8,7 +8,6 @@ const config = require('./config');
 
 config.username = app.config.username;
 config.password = app.config.password;
-
 app.ready(true);
 
 module.exports = app;
