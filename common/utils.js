@@ -165,7 +165,7 @@ exports.sign = function (queryPath, options, token) {
   }
   stringToSign = `${options.method}\n${accept}\n${contentMd5}\n${contentType}\n${date}\n${queryPath}`;
   options.headers['Content-Type'] = contentType;
-  log.debug('String to be signed: ', stringToSign);
+  log.debug('String to be signed: ', stringToSign,queryPath);
   let signature = exports.sha1(stringToSign, token);
   options.headers.Authorization = `system admin:${signature}`;
   options.headers.Date = date;
@@ -199,6 +199,9 @@ exports.callremote = function (queryPath, options, callback) {
     queryPath += '?ips=' + ips;
   } else {
     queryPath += '&ips=' + ips;
+  }
+  if(endpoint.endsWith('/')){
+    endpoint = endpoint.substring(0, endpoint.length - 1);
   }
   delete options.endpoint;
   delete options.token;

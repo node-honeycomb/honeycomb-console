@@ -56,20 +56,20 @@ const QUERY_SYSTEM_USER = `
   FROM
     hc_console_system_user
   WHERE
-    name = ?;`;
-User.getUser = function (name, callback) {
+    nickname = ?;`;
+User.getUser = function (nickname, callback) {
   db.query(
     QUERY_SYSTEM_USER,
-    [name],
+    [nickname],
     function (err, data) {
       if (err) {
-        log.error('Qeury user failed:',  name, err);
+        log.error('Qeury user failed:',  nickname, err);
         return callback(err);
       }
       if (!data.length) {
         return callback(new Error('user not found'));
       }
-      callback(null, data[0]);
+      callback(null, data);
     }
   );
 };

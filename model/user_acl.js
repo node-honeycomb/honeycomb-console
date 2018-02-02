@@ -9,7 +9,7 @@ const QUERY_SYSTEM_USER_ACL = `
   FROM
     hc_console_system_user_acl
   WHERE
-    user = ? and status = 1`;
+    nickname = ?`;
 
 const QUERY_ALL_CLUSTER = `SELECT *
   FROM hc_console_system_cluster
@@ -31,8 +31,9 @@ exports.getUserAcl = function (user, callback) {
           data.forEach((rowData) => {
             clusterList.push({
               id: rowData.id,
-              clusterCode: rowData.code,
-              clusterAdmin: 1
+              cluster_code: rowData.code,
+              cluster_name: rowData.name,
+              cluster_admin: 1
             });
           });
           callback(null, clusterList);
