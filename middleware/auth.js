@@ -42,6 +42,7 @@ module.exports = function (req, res, next) {
         return res.redirect('/?error=user_or_pwd_empty');
       }
       User.getUser(user, (err, user) => {
+        console.log(err, user);
         if (err) {
           return res.redirect('/?error=' + err.message);
         }
@@ -49,7 +50,6 @@ module.exports = function (req, res, next) {
         if (user.password === pwd) {
           req.session.user = {
             name: user.name,
-            nickname: user.nickname,
             role: user.role
           };
           return res.redirect('/');

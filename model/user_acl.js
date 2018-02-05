@@ -9,7 +9,7 @@ const QUERY_SYSTEM_USER_ACL = `
   FROM
     hc_console_system_user_acl
   WHERE
-    nickname = ?`;
+   name = ?`;
 
 const QUERY_ALL_CLUSTER = `SELECT *
   FROM hc_console_system_cluster
@@ -111,10 +111,10 @@ exports.getClusterAcl = function (user, callback) {
 
 
 const INSERT_USER_ACL = `INSERT INTO 
-  hc_console_system_user_acl(nickname, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
+  hc_console_system_user_acl(name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
   VALUES(?, ?, ?, ?, ?, ?, now(), now())`;
 
-exports.addUserAcl = function (nickname, clusterId, clusterCode, clusterName, clusterAdmin, apps, callback) {
+exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, clusterAdmin, apps, callback) {
   if (!apps) apps = '["*"]';
   try {
     JSON.parse(apps);
@@ -126,7 +126,7 @@ exports.addUserAcl = function (nickname, clusterId, clusterCode, clusterName, cl
   }
   db.query(
   INSERT_USER_ACL,
-  [nickname, clusterId, clusterCode, clusterName, clusterAdmin, apps],
+  [name, clusterId, clusterCode, clusterName, clusterAdmin, apps],
   function (err) {
     if (err) {
       log.error('Insert new user acl failed:', err);
