@@ -57,7 +57,6 @@ exports.pages = function (req, callback) {
  * @api {get} /login
  */
 exports.login = function (req, callback) {
-  console.log('>>>>>>>', req.url, req.session);
   if (req.session && req.session.user) {
     return callback(null, '/pages/list', 'redirect');
   } else {

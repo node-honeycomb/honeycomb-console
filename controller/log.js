@@ -17,8 +17,9 @@ if (!fs.existsSync(appUsageCachePath)) {
   fs.sync().mkdir(appUsageCachePath);
 }
 
+
 /**
- * @api /api/log
+ * @api {get} /api/log
  * @nowrap
  * @param req
  * @param res
@@ -109,7 +110,7 @@ exports.queryLog = function (req, res) {
 };
 
 /**
- * @api /api/logs
+ * @api {get} /api/log/list
  * @nowrap
  * @param req
  * @param res

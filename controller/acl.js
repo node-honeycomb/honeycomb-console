@@ -3,7 +3,7 @@ const userAcl = require('../model/user_acl');
 const async = require('async');
 const log = require('../common/log');
 /**
- * @api {post} /api/createAcl
+ * @api {post} /api/acl/create
  */
 exports.createAcl = function (req, callback) {
   var user = req.session.user;
@@ -30,7 +30,7 @@ exports.createAcl = function (req, callback) {
 };
 
 /**
- * @api {post} /api/getAcl
+ * @api {get} /api/acl/list
  * @param req
  * @param res
  */
@@ -44,7 +44,7 @@ exports.getAcl = function (req, callback) {
 };
 
 /**
- * @api {post} /api/updateAcl
+ * @api {post} /api/acl/:id/update
  * @param req
  * @param res
  */
@@ -54,7 +54,7 @@ exports.updateAcl = function (req, callback) {
 };
 
 /**
- * @api {post} /api/deleteAcl
+ * @api {post} /api/acl/:id/delete
  * @param req
  * @param res
  */

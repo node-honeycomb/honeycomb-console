@@ -7,12 +7,13 @@ const utils = require('../common/utils');
 const cluster = require('../model/cluster');
 
 const callremote = utils.callremote;
+
 /**
- * @api {get} /api/apps
+ * @api {get} /api/app/list
  * @param req
  * @param callback
  */
-exports.listApps = function (req, callback) {
+exports.listApp = function (req, callback) {
   let clusterCode = req.query.clusterCode;
   log.info(req.session.user);
   if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
@@ -67,203 +68,13 @@ exports.listApps = function (req, callback) {
   });
 };
 
+
 /**
- * @api {post} /api/delete/:appid
+ * @api {post} /api/app/publish
  * @param req
  * @param callback
  */
-exports.deleteApp = function (req, callback) {
-  let appid = req.params && req.params.appid;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'DELETE_APP',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'RISKY', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
-    opItem: 'APP',
-    opItemId: appid
-  });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
-  if (opt.code === 'ERROR') {
-    return callback(opt);
-  }
-  let path = `/api/delete/${appid}`;
-  opt.method = 'POST';
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
-      log.error(`delete app ${appid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
-      return callback({
-        code: code,
-        message: errMsg
-      });
-    } else {
-      log.debug(`delete app ${appid} results:`, results);
-      return callback(null, results.data);
-    }
-  });
-};
-
-/**
- * @api {post} /api/restart/:appid
- */
-exports.restartApp = function (req, callback) {
-  let appid = req.params && req.params.appid;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'RESTART_APP',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'LIMIT',
-    opItem: 'APP',
-    opItemId: appid
-  });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
-  if (opt.code === 'ERROR') {
-    return callback(opt);
-  }
-  let path = `/api/restart/${appid}`;
-  opt.method = 'POST';
-  opt.timeout = 30000;
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
-      log.error(`restart app ${appid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
-      return callback({
-        code: code,
-        message: errMsg
-      });
-    } else {
-      log.debug(`restart app ${appid} results:`, results);
-      return callback(null, results.data);
-    }
-  });
-};
-
-/**
- * @api {post} /api/reload/:appid
- * @param req
- * @param callback
- */
-exports.reloadApp = function (req, callback) {
-  let appid = req.params && req.params.appid;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'RELOAD_APP',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'LIMIT',
-    opItem: 'APP',
-    opItemId: appid
-  });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
-  if (opt.code === 'ERROR') {
-    return callback(opt);
-  }
-  let path = `/api/reload/${appid}`;
-  opt.method = 'POST';
-  opt.timeout = 60000;
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
-      log.error(`reload app ${appid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
-      return callback({
-        code: code,
-        message: errMsg
-      });
-    } else {
-      log.debug(`reload app ${appid} results:`, results);
-      return callback(null, results.data);
-    }
-  });
-};
-
-/**
- * @api {post} /api/start/:appid
- * @param req
- * @param callback
- */
-exports.startApp = function (req, callback) {
-  let appid = req.params && req.params.appid;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'START_APP',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'LIMIT',
-    opItem: 'APP',
-    opItemId: appid
-  });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
-  if (opt.code === 'ERROR') {
-    return callback(opt);
-  }
-  let path = `/api/start/${appid}`;
-  opt.method = 'POST';
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
-      log.error(`start app ${appid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
-      return callback({
-        code: code,
-        message: errMsg
-      });
-    } else {
-      log.debug(`start app ${appid} results:`, results);
-      return callback(null, results.data);
-    }
-  });
-};
-
-/**
- * @api {post} /api/stop/:appid
- * @param req
- * @param callback
- */
-exports.stopApp = function (req, callback) {
-  let appid = req.params && req.params.appid;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'STOP_APP',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'RISKY',
-    opItem: 'APP',
-    opItemId: appid
-  });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
-  if (opt.code === 'ERROR') {
-    return callback(opt);
-  }
-  let path = `/api/stop/${appid}`;
-  opt.method = 'POST';
-  opt.timeout = 30000;
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
-      log.error(`stop app ${appid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
-      return callback({
-        code: code,
-        message: errMsg
-      });
-    } else {
-      log.debug(`stop app ${appid} results:`, results);
-      return callback(null, results.data);
-    }
-  });
-};
-
-/**
- * @api {post} /api/publish
- * @param req
- * @param callback
- */
-exports.publish = function (req, callback) {
+exports.publishApp = function (req, callback) {
   let clusterCode = req.query.clusterCode;
   async.waterfall([
     function (cb) {
@@ -320,7 +131,7 @@ exports.publish = function (req, callback) {
 };
 
 /**
- * @api {DELETE} /api/clean_exit_record/:appid
+ * @api {POST} /api/app/:appid/clean_exit_record
  * @param req
  * @param callback
  */
@@ -355,6 +166,197 @@ exports.cleanAppExitRecord = function (req, callback) {
       });
     } else {
       log.debug('clean appExitRecord results:', results);
+      return callback(null, results.data);
+    }
+  });
+};
+
+/**
+ * @api {post} /api/app/:appid/delete
+ * @param req
+ * @param callback
+ */
+exports.deleteApp = function (req, callback) {
+  let appid = req.params && req.params.appid;
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'DELETE_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'RISKY', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
+    opItem: 'APP',
+    opItemId: appid
+  });
+  let clusterCode = req.body.clusterCode;
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = `/api/delete/${appid}`;
+  opt.method = 'POST';
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error(`delete app ${appid} failed: `, errMsg);
+      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug(`delete app ${appid} results:`, results);
+      return callback(null, results.data);
+    }
+  });
+};
+
+/**
+ * @api {post} /api/app/:appid/restart
+ */
+exports.restartApp = function (req, callback) {
+  let appid = req.params && req.params.appid;
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'RESTART_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'LIMIT',
+    opItem: 'APP',
+    opItemId: appid
+  });
+  let clusterCode = req.body.clusterCode;
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = `/api/restart/${appid}`;
+  opt.method = 'POST';
+  opt.timeout = 30000;
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error(`restart app ${appid} failed: `, errMsg);
+      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug(`restart app ${appid} results:`, results);
+      return callback(null, results.data);
+    }
+  });
+};
+
+/**
+ * @api {post} /api/app/:appid/reload
+ * @param req
+ * @param callback
+ */
+exports.reloadApp = function (req, callback) {
+  let appid = req.params && req.params.appid;
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'RELOAD_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'LIMIT',
+    opItem: 'APP',
+    opItemId: appid
+  });
+  let clusterCode = req.body.clusterCode;
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = `/api/reload/${appid}`;
+  opt.method = 'POST';
+  opt.timeout = 60000;
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error(`reload app ${appid} failed: `, errMsg);
+      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug(`reload app ${appid} results:`, results);
+      return callback(null, results.data);
+    }
+  });
+};
+
+/**
+ * @api {post} /api/app/:appid/start
+ * @param req
+ * @param callback
+ */
+exports.startApp = function (req, callback) {
+  let appid = req.params && req.params.appid;
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'START_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'LIMIT',
+    opItem: 'APP',
+    opItemId: appid
+  });
+  let clusterCode = req.body.clusterCode;
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = `/api/start/${appid}`;
+  opt.method = 'POST';
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error(`start app ${appid} failed: `, errMsg);
+      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug(`start app ${appid} results:`, results);
+      return callback(null, results.data);
+    }
+  });
+};
+
+/**
+ * @api {post} /api/app/:appid/stop
+ * @param req
+ * @param callback
+ */
+exports.stopApp = function (req, callback) {
+  let appid = req.params && req.params.appid;
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'STOP_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'RISKY',
+    opItem: 'APP',
+    opItemId: appid
+  });
+  let clusterCode = req.body.clusterCode;
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = `/api/stop/${appid}`;
+  opt.method = 'POST';
+  opt.timeout = 30000;
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error(`stop app ${appid} failed: `, errMsg);
+      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug(`stop app ${appid} results:`, results);
       return callback(null, results.data);
     }
   });

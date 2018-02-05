@@ -16,9 +16,9 @@ function getFilterCluster(gClusterConfig, clusterAcl) {
 }
 
 /**
- * @api /api/cluster
+ * @api {GET} /api/cluster/list
  */
-exports.getClusterCfg = function (req, callback) {
+exports.listCluster = function (req, callback) {
   cluster.getClusterCfg(function (err) {
     if (err) {
       log.error('Get cluster config from db failed.', err);
@@ -29,25 +29,9 @@ exports.getClusterCfg = function (req, callback) {
   });
 };
 
-/**
- * @api /api/cluster_config/:clusterCode
- * @param
- *   clusterCode
- */
-exports.getClusterCfgByCode = function (req, callback) {
-  let clusterCode = req.params.clusterCode;
-  cluster.getClusterCfg(function (err) {
-    if (err) {
-      log.error('Get cluster config from db failed.', err);
-      let e = new Error('Get cluster config from db failed.' + err.message);
-      return callback(e);
-    }
-    callback(null, cluster.gClusterConfig[clusterCode]);
-  });
-};
 
 /**
- * @api {post} /api/cluster
+ * @api {post} /api/cluster/create
  */
 exports.addCluster = function (req, callback) {
   let clusterCode = req.body.code;
@@ -122,8 +106,9 @@ exports.addCluster = function (req, callback) {
   }
 };
 
+
 /**
- * @api {delete} /api/cluster
+ * @api {post} /api/cluster/:id/delete
  */
 exports.removeCluster = function (req, callback) {
   let clusterCode = req.query.clusterCode;
@@ -145,50 +130,3 @@ exports.removeCluster = function (req, callback) {
   });
 };
 
-/**
- * @api {delete} /api/worker
- */
-exports.removeWorker = function (req, callback) {
-  let clusterCode = req.query.clusterCode || 'default';
-  let ip = req.query.ip;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'REMOVE_WORKER',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
-    opItem: 'WORKER',
-    opItemId: ip
-  });
-  log.info('delete worker: ', ip, clusterCode);
-  cluster.deleteWorker(ip, clusterCode, function (err) {
-    if (err) {
-      log.error(`delete worker: ${ip} failed:`, err);
-      return callback({code: err.code || 'ERROR', message: err.message});
-    }
-    callback(null, 'remove worker success');
-  });
-};
-
-/**
- * @api {post} /api/worker
- */
-exports.addWorker = function (req, callback) {
-  let ip = req.body.ip;
-  let clusterCode = req.body.clusterCode || 'default';
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'ADD_WORKER',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
-    opItem: 'WORKER',
-    opItemId: ip
-  });
-  log.info('add worker: ', ip, clusterCode);
-  cluster.addWorker(ip, clusterCode, function (err) {
-    if (err) {
-      log.error(`add worker: ${ip} failed:`, err);
-      return callback({code: err.code || 'ERROR', message: err.message});
-    }
-    callback(null, 'add worker success');
-  });
-};

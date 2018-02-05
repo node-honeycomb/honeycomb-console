@@ -4,8 +4,9 @@ const cluster = require('../model/cluster');
 const jsonParser = require('editor-json-parser');
 const callremote = utils.callremote;
 
+
 /**
- * @api {get} /api/config/:type/:appName
+ * @api {get} /api/config/:appName
  * @nowrap
  * @param req
  * @param res
@@ -33,7 +34,7 @@ exports.getAppConfig = function (req, res) {
 
 
 /**
- * @api {post} /api/config/:type/:appName
+ * @api {post} /api/config/:appName
  * @nowrap
  * @param req
  * @param res
