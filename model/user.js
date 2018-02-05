@@ -56,7 +56,7 @@ const QUERY_SYSTEM_USER = `
   FROM
     hc_console_system_user
   WHERE
-    nickname = ?;`;
+    name = ?;`;
 User.getUser = function (nickname, callback) {
   db.query(
     QUERY_SYSTEM_USER,
@@ -69,7 +69,7 @@ User.getUser = function (nickname, callback) {
       if (!data.length) {
         return callback(new Error('user not found'));
       }
-      callback(null, data);
+      callback(null, data[0]);
     }
   );
 };

@@ -209,7 +209,6 @@ exports.callremote = function (queryPath, options, callback) {
 
   let signed = exports.sign(queryPath, options, token);
   let qpath = endpoint + signed.queryPath;
-
   urllib.request(qpath, options, function (err, data) {
     if (err) {
       callback(err);

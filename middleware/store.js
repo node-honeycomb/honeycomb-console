@@ -11,7 +11,7 @@ module.exports = function () {
           UserModel.getUser(user.name, cb);
         },
         function (data, cb) {
-          if (!data || data.length === 0) {
+          if (!data) {
             UserModel.addUser(user.name, 1, UserModel.RoleType.RoleUser, cb);
           } else {
             cb(null);

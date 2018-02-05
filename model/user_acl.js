@@ -25,7 +25,7 @@ exports.getUserAcl = function (user, callback) {
           log.error('Qeury cluster failed:', err);
           return callback(err);
         } else if (!data || data.length === 0) {
-          callback(null);
+          callback(null,null);
         } else {
           let clusterList = [];
           data.forEach((rowData) => {
