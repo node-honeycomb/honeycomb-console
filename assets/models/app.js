@@ -2,7 +2,7 @@
 
 module.exports = {
   getAppList: {
-    url: '/api/app/list',
+    url: '/api/apps',
     method: 'GET',
     headers: {
       'x-csrf-token': window.csrfToken

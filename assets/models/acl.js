@@ -2,7 +2,7 @@
 
 module.exports = {
   createAcl: {
-    url: '/api/acl/create',
+    url: '/api/createAcl',
     method: 'POST',
     headers: {
       'x-csrf-token': window.csrfToken
