@@ -190,7 +190,8 @@ exports.callremote = function (queryPath, options, callback) {
     method: 'GET',
     headers: {},
     timeout: 15000,
-    dataType: 'json'
+    dataType: 'json',
+    rejectUnauthorized: false
   };
 
   options = _.merge(defaultOptions, options);
