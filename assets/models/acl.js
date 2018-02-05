@@ -2,38 +2,38 @@
 
 module.exports = {
   createAcl: {
-    url: '/api/createAcl',
+    url: '/api/acl/create',
     method: 'POST',
     headers: {
       'x-csrf-token': window.csrfToken
     }
   },
   getAcl: {
-    url: '/api/getAcl',
-    method: 'POST',
+    url: '/api/acl/:id/get',
+    method: 'GET',
     headers: {
       'x-csrf-token': window.csrfToken
     }
   },
   updateAcl: {
-    url: '/api/updateAcl',
+    url: '/api/acl/:id/update',
     method: 'POST',
     headers: {
       'x-csrf-token': window.csrfToken
     }
   },
   deleteAcl: {
-    url: '/api/deleteAcl',
+    url: '/api/acl/:id/delete',
     method: 'POST',
     headers: {
       'x-csrf-token': window.csrfToken
     }
   },
-  getAppList: {
-    url: '/api/getAppList',
-    method: 'POST',
-    headers: {
-      'x-csrf-token': window.csrfToken
-    }
-  }
+  // getAppList: {
+  //   url: '/api/getAppList',
+  //   method: 'POST',
+  //   headers: {
+  //     'x-csrf-token': window.csrfToken
+  //   }
+  // }
 };

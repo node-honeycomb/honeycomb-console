@@ -14,5 +14,12 @@ module.exports = {
     headers: {
       'x-csrf-token': window.csrfToken
     }
+  },
+  publishApp: {
+    url: '/api/publish',
+    method: 'POST',
+    headers: {
+      'x-csrf-token': window.csrfToken
+    }
   }
 };
