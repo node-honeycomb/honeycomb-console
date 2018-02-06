@@ -46,5 +46,5 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `apps` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '用户app列表',
   `gmt_create` datetime NOT NULL COMMENT '创建时间',
   `gmt_modified` datetime NOT NULL COMMENT '修改时间'
-  UNIQUE(`user`, `cluster_code`)
+  UNIQUE(`name`, `cluster_code`)
 );

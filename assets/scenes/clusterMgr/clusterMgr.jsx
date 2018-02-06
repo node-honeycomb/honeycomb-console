@@ -5,6 +5,7 @@ let connect = require('react-redux').connect;
 let classnames = require('classnames');
 let AddClusterModal = require('./add-cluster-modal.jsx');
 let EditClusterModal = require('./edit-cluster-modal.jsx');
+let UpdateSafeTokenModal = require('./update-safeToken-modal');
 import { Modal, Button, Table, Icon, Tag } from 'antd';
 const confirm = Modal.confirm;
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
@@ -18,23 +19,48 @@ class Cluster extends React.Component {
     editClusterModalState: {
       isShow: false,
       info: {}
+    },
+    updateSafeTokenModalState: {
+      isShow: false,
+      info: {}
     }
   }
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
-    if(operation==="add"){
-      this.setState({
-        addClusterModalState:{
-          isShow:state
-        },
-      });
-    }else{
-      this.setState({
-        editClusterModalState:{
-          isShow:state,
-          info:data,
-        },
-      });
+    switch(operation){
+      case 'add':
+        this.setState({
+          addClusterModalState:{
+            isShow:state
+          },
+        });
+        break;
+      case 'edit':
+        this.setState({
+          editClusterModalState:{
+            isShow:state,
+            info:data,
+          },
+        });
+        break;
+      case 'updateToken':
+        // this.setState({
+        //   updateSafeTokenModalState:{
+        //     isShow:state,
+        //     info:data,
+        //   },
+        // });
+        let self = this;
+        confirm({
+          title: '安全修复',
+          content: '检测到该集群正在使用默认的token，这可能会造成安全隐患，是否自动修复?',
+          onOk() {
+            self.props.info.token = 'fdsfd';
+            self.props.addCluster(self.props.info);
+          },
+          onCancel() {},
+        });
     }
+
   }
   showConfirm = (record) => {
     let that = this;
@@ -57,7 +83,7 @@ class Cluster extends React.Component {
           <div key={index}>
             {record.name}
             {record.token === ORIGIN_TOKEN && 
-              (<a>
+              (<a onClick={this.clusterModal.bind(this,"updateToken",true)}>
                 <Icon type="exclamation-circle" style={{ marginLeft: 8,fontSize: 16, color: 'red' }} />
                </a>
               )}
@@ -136,6 +162,11 @@ class Cluster extends React.Component {
             addCluster={this.props.addCluster}
             visible={this.state.editClusterModalState.isShow}
             onHide={this.clusterModal.bind(this,"edit",false)}
+          />
+          <UpdateSafeTokenModal 
+            info={this.state.updateSafeTokenModalState.info}
+            visible={this.state.updateSafeTokenModalState.isShow}
+            onHide={this.clusterModal.bind(this,"updateToken",false)}
           />
         </div>
       )

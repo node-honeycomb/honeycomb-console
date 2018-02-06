@@ -27,22 +27,6 @@ const db = new Sqlite.Database(meta.dbfile, flag, function (err) {
       if (err) {
         return log.error(err);
       }
-      /*
-      let sql = `INSERT INTO hc_console_system_user(name, password, status, role, gmt_create, gmt_modified) VALUES (?, ?, ?, ?, ?, ?);`;
-      let data = [
-        'admin',
-        utils.sha256(config.initPwd + config.pwdSalt),
-        1,
-        1,
-        new Date(),
-        new Date()
-      ];
-      db.all(sql, data, (err, data) => {
-        if (err) {
-          log.error('init admin user err:', err);
-        }
-      });
-      */
     });
   }
 });
