@@ -2,6 +2,7 @@
 
 const log = require('../common/log');
 const db = require('../common/db');
+const config = require('../config');
 
 const QUERY_SYSTEM_USER_ACL = `
   SELECT
@@ -25,7 +26,7 @@ exports.getUserAcl = function (user, callback) {
           log.error('Qeury cluster failed:', err);
           return callback(err);
         } else if (!data || data.length === 0) {
-          callback(null);
+          callback(null, []);
         } else {
           let clusterList = [];
           data.forEach((rowData) => {
@@ -67,19 +68,16 @@ const QUERY_CLUSTER_ACL = `
 exports.getClusterAcl = function (user, callback) {
   var clusterCodeList = [];
   clusterCodeList = Object.keys(user.clusterAcl);
-
   var adminClusterList = [];
   clusterCodeList.forEach((clusterCode) => {
     if (user.clusterAcl[clusterCode].isAdmin === 1) {
       adminClusterList.push(clusterCode);
     }
   });
-
   if (adminClusterList.length === 0) {
     callback(null);
     return;
   }
-
   db.query(
     QUERY_CLUSTER_ACL,
     [adminClusterList],
@@ -109,10 +107,13 @@ exports.getClusterAcl = function (user, callback) {
   );
 };
 
-
-const INSERT_USER_ACL = `INSERT INTO 
+const INSERT_USER_ACL_MYSQL = `INSERT INTO 
   hc_console_system_user_acl(name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
   VALUES(?, ?, ?, ?, ?, ?, now(), now())`;
+
+const INSERT_USER_ACL_SQLITE = `INSERT INTO 
+hc_console_system_user_acl(name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
+VALUES(?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
 
 exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, clusterAdmin, apps, callback) {
   if (!apps) apps = '["*"]';
@@ -124,8 +125,17 @@ exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, cluste
       message: 'apps 参数异常'
     });
   }
+  let querySql = '';
+  switch (config.meta.driver) {
+    case 'mysql': c = INSERT_USER_ACL_MYSQL; break;
+    case 'sqlite': querySql = INSERT_USER_ACL_SQLITE; break;
+    default: break;
+  }
+  if (!querySql) {
+    callback(new Error('Invalid driver type'));
+  }
   db.query(
-  INSERT_USER_ACL,
+    querySql,
   [name, clusterId, clusterCode, clusterName, clusterAdmin, apps],
   function (err) {
     if (err) {
@@ -140,7 +150,7 @@ exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, cluste
 };
 
 const UPDATE_USER_ACL = `UPDATE hc_console_system_user_acl
-  SET user = ? , cluster_admin = ? , apps = ?
+  SET name = ? , cluster_admin = ? , apps = ?
   WHERE id = ?`;
 exports.updateClusterAcl = function (userAcl, callback) {
   if (!userAcl.apps) userAcl.apps = '["*"]';
@@ -166,10 +176,10 @@ exports.updateClusterAcl = function (userAcl, callback) {
 };
 
 const DELETE_USER_ACL = `DELETE FROM hc_console_system_user_acl
-  WHERE user = ? and cluster_id = ? and cluster_code = ?`;
+  WHERE name = ? and cluster_id = ? and cluster_code = ?`;
 exports.deleteClusterAcl = function (userAcl, callback) {
   db.query(DELETE_USER_ACL,
-    [userAcl.user, userAcl.cluster_id, userAcl.cluster_code],
+    [userAcl.name, userAcl.cluster_id, userAcl.cluster_code],
     function (err) {
       if (err) {
         log.error('Delete user acl failed:', err);

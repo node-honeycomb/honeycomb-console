@@ -134,7 +134,7 @@ class List extends React.Component {
         title = '确定要删除'+name+'吗?';
         content = '无法复原，请谨慎操作';
         handleApp = () => {
-          this.props.deleteApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.deleteApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.setState({ isDelete: true });
             this.props.getAppList({ clusterCode: clusterCode });
           })
@@ -147,7 +147,7 @@ class List extends React.Component {
             starting: 'stopping',
             index: name
           });
-          this.props.stopApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.stopApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -164,7 +164,7 @@ class List extends React.Component {
             starting: 'starting',
             index: name
           });
-          this.props.startApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.startApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -181,7 +181,7 @@ class List extends React.Component {
             starting: 'reloading',
             index: name
           });
-          this.props.reloadApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.reloadApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -287,7 +287,7 @@ class List extends React.Component {
         let errorflag = true;
         let errorExitMsg = [];
         let errorExitCountAll = 0;
-        let appKey = record.appId;
+        let appId = record.appId;
         record.cluster.forEach((value, key) => {
           if (record.cluster[key + 1] && value.status !== record.cluster[key + 1].status) {
             errorflag = false;
@@ -312,7 +312,7 @@ class List extends React.Component {
           if(errorflag){  
             return(
               <div className="status-inline">
-                <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appKey === that.state.index?that.state.starting:record.cluster[0].status}
+                <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appId === that.state.index?that.state.starting:record.cluster[0].status}
                 </Tag>
                 <span>
                   {record.isCurrWorking?<Icon className="workingBtn" type="check-circle-o" />:null}
@@ -329,7 +329,7 @@ class List extends React.Component {
               return(
                 <div className="status-block" key={"statusList"+key}>
                   <span>{value.ip}</span>
-                  <Tag color={colorChoose(value.status)}>{that.state.starting && appKey === that.state.index?that.state.starting:value.status}
+                  <Tag color={colorChoose(value.status)}>{that.state.starting && appId === that.state.index?that.state.starting:value.status}
                   </Tag>
                   <span>{record.isCurrWorking?<Icon className="workingBtn" type="check-circle-o" />:null}</span>
                   {value.errorExitCount?

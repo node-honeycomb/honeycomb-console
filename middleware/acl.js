@@ -7,7 +7,7 @@ module.exports = function (req, res, next) {
   if (req.session && req.session.user) {
     var user = req.session.user;
     async.waterfall([function (cb) {
-      User.getUser(user.nickname, cb);
+      User.getUser(user.name, cb);
     },
       function (data, cb) {
         if (!data || data.length === 0) {

@@ -67,9 +67,5 @@ exports.status = function (req, callback) {
  */
 exports.getUser = function (req, callback) {
   let user = req.session.user;
-  callback(null, {
-    userId: user.id,
-    name: user.name,
-    nickname: user.nickname
-  }, {ignoreCamel: true});
+  callback(null, req.session.user, {ignoreCamel: true});
 };

@@ -124,7 +124,6 @@ class AppsConfig extends React.Component {
     const formItemLayout = {
       wrapperCol: { span: 25 },
     };
-    if(window.whiteList.indexOf(localStorage.getItem('name'))>=0){
       return(
         <div className="appsconfig-wrap">
           <div className="appsconfig-select">
@@ -163,13 +162,6 @@ class AppsConfig extends React.Component {
           </div>
         </div>
       )
-    }else{
-    return(
-        <div className="cluster-wrap">
-          <div className="error-font"><span>您没有权限在此页面操作，请联系管理员</span></div>
-        </div>
-      )
-    }
   }
 }
 

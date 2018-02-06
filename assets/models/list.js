@@ -2,35 +2,35 @@
 
 module.exports = {
   deleteApps: {
-    url: '/api/app:/:id/delete',
+    url: '/api/app/:appId/delete',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   reloadApps: {
-    url: '/api/app/:id/reload',
+    url: '/api/app/:appId/reload',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   startApps: {
-    url: '/api/app/:id/start',
+    url: '/api/app/:appId/start',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   stopApps: {
-    url: '/api/app/:id/stop',
+    url: '/api/app/:appId/stop',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   cleanAppExitRecord: {
-    url: '/api/app/:id/clean_exit_record',
+    url: '/api/app/:appId/clean_exit_record',
     headers: {
       'x-csrf-token': window.csrfToken
     },

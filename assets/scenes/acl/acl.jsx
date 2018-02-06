@@ -58,10 +58,10 @@ class Acl extends React.Component {
     super(props, context);
     this.columns = [
       {
-        title: 'Nickname',
-        dataIndex: 'nickname',
+        title: 'Name',
+        dataIndex: 'name',
         render: (text, record, index) => {
-            return this.renderColumns(record, index, 'nickname', text);
+            return this.renderColumns(record, index, 'name', text);
         }
       },
       {
@@ -226,6 +226,8 @@ class Acl extends React.Component {
     var self = this;
     this.props.updateAcl({
       acl: this.state.selectedCluster.acls[index]
+    }, {
+      id: this.state.selectedCluster.acls[index].id
     }).then(() => {
       message.success('Update success.');
       self.props.getUserAclList();
@@ -237,6 +239,8 @@ class Acl extends React.Component {
     var self = this;
     this.props.deleteAcl({
         acl: this.state.selectedCluster.acls[index]
+      }, {
+        id: this.state.selectedCluster.acls[index].id
       }
     ).then(() => {
       message.success('Delete success.');
@@ -277,7 +281,6 @@ class Acl extends React.Component {
   addAcl() {
     this.state.selectedCluster.acls.push({
       id: -1,
-      nickname: '',
       name: '',
       cluster_admin: 0,
       apps: '',

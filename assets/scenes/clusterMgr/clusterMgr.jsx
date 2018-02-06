@@ -8,6 +8,8 @@ let EditClusterModal = require('./edit-cluster-modal.jsx');
 import { Modal, Button, Table, Icon, Tag } from 'antd';
 const confirm = Modal.confirm;
 require('./clusterMgr.less');
+
+let UserService = require('../../services/user');
 class Cluster extends React.Component {
   state = {
     addClusterModalState: {
@@ -100,7 +102,8 @@ class Cluster extends React.Component {
     let dataSource = _.map(this.props.clusterMeta.meta,function(value,key){
       return  _.assign({},value,{code:key},{key:key});
     });
-    if(window.whiteList.indexOf(localStorage.getItem('name'))>=0){
+    let user = UserService.getUserSync();
+    if (user.role === 1) {
       return(
         <div className="cluster-wrap">
           <div className="addbtn-wrap">
@@ -128,12 +131,12 @@ class Cluster extends React.Component {
           />
         </div>
       )
-    }else{
+    } else {
       return(
         <div className="cluster-wrap">
           <div className="error-font"><span>您没有权限在此页面操作，请联系管理员</span></div>
         </div>
-      )
+      );
     }
   }
 }

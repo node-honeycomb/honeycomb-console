@@ -9,7 +9,7 @@ module.exports = {
     }
   },
   getAcl: {
-    url: '/api/acl/:id/get',
+    url: '/api/acl/list',
     method: 'GET',
     headers: {
       'x-csrf-token': window.csrfToken

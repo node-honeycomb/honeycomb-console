@@ -7,7 +7,7 @@ const log = require('../common/log');
  */
 exports.createAcl = function (req, callback) {
   var user = req.session.user;
-  var nickname = req.body.nickname;
+  var name = req.body.name;
   var clusterId = req.body.cluster_id;
   var clusterCode = req.body.cluster_code;
   var clusterName = req.body.cluster_name;
@@ -16,7 +16,7 @@ exports.createAcl = function (req, callback) {
 
   async.waterfall([
     function (cb) {
-      userAcl.addUserAcl(nickname, clusterId, clusterCode, clusterName, clusterAdmin, apps, cb);
+      userAcl.addUserAcl(name, clusterId, clusterCode, clusterName, clusterAdmin, apps, cb);
     }
   ], function (err) {
     log.warn('createAcl', user, req.body);
