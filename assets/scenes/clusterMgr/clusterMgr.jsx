@@ -7,6 +7,7 @@ let AddClusterModal = require('./add-cluster-modal.jsx');
 let EditClusterModal = require('./edit-cluster-modal.jsx');
 import { Modal, Button, Table, Icon, Tag } from 'antd';
 const confirm = Modal.confirm;
+const ORIGIN_TOKEN = '***honeycomb-default-token***';
 require('./clusterMgr.less');
 class Cluster extends React.Component {
   state = {
@@ -51,8 +52,18 @@ class Cluster extends React.Component {
   generateColumns = () => {
     this.columns = [{
       title: 'name',
-      key:'name',
-      dataIndex: 'name'
+      render:(text,record,index)=>{
+        return(
+          <div key={index}>
+            {record.name}
+            {record.token === ORIGIN_TOKEN && 
+              (<a>
+                <Icon type="exclamation-circle" style={{ marginLeft: 8,fontSize: 16, color: 'red' }} />
+               </a>
+              )}
+          </div>
+        )
+      }
     },{
       title:'code',
       key:'code',
