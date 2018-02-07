@@ -5,30 +5,33 @@ const path = require('path');
 const config = require('../config');
 const Sequelize = require('sequelize');
 let sequelize = null;
-
-if (config.meta.driver === 'mysql') {
-  let database = config.meta.database;
-  let username = config.meta.username;
-  let password = config.meta.password;
-  let host = config.meta.host;
-  let dialect = 'mysql';
-  let port = config.meta.port;
-
-  sequelize = new Sequelize(database, username, password, {
-    host,
-    port,
-    dialect,
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 30000,
-      idle: 10000
-    }
-  });
-} else if (config.meta.driver === 'sqlite') {
-  let dbFilePath = path.resolve(config.meta.dbfile);
-  let sqliteConnectionString = `sqlite:` + dbFilePath;
-  sequelize = new Sequelize(sqliteConnectionString);
+switch(config.meta.driver){
+  case 'mysql':
+    let database = config.meta.database;
+    let username = config.meta.username;
+    let password = config.meta.password;
+    let host = config.meta.host;
+    let dialect = 'mysql';
+    let port = config.meta.port;
+    sequelize = new Sequelize(database, username, password, {
+      host,
+      port,
+      dialect,
+      pool: {
+        max: 5,
+        min: 0,
+        acquire: 30000,
+        idle: 10000
+      }
+    });
+    break;
+  case 'sqlite':
+    let dbFilePath = path.resolve(config.meta.dbfile);
+    let sqliteConnectionString = `sqlite:` + dbFilePath;
+    sequelize = new Sequelize(sqliteConnectionString);
+    break;
+  default:
+    throw new Error(`unsupport driver type for ${config.meta.driver}`);
 }
 
 sequelize.authenticate().then(() => {
