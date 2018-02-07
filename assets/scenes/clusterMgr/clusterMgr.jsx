@@ -90,6 +90,7 @@ class Cluster extends React.Component {
   generateColumns = () => {
     this.columns = [{
       title: 'name',
+      key:'name',
       render:(text,record,index)=>{
         return(
           <div key={index}>
