@@ -2,7 +2,7 @@
 
 module.exports = {
   loadLogFiles: {
-    url: '/api/logs',
+    url: '/api/log/list',
     method: 'GET',
     headers: {
       'x-csrf-token': window.csrfToken
