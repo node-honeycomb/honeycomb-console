@@ -16,7 +16,7 @@ module.exports = {
     method: 'POST'
   },
   deleteCluster: {
-    url: '/api/cluster/:id/delete',
+    url: '/api/cluster/:code/delete',
     headers: {
       'x-csrf-token': window.csrfToken
     },

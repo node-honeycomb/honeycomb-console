@@ -108,10 +108,10 @@ exports.addCluster = function (req, callback) {
 
 
 /**
- * @api {post} /api/cluster/:id/delete
+ * @api {post} /api/cluster/:code/delete
  */
 exports.removeCluster = function (req, callback) {
-  let clusterCode = req.query.clusterCode;
+  let clusterCode = req.params.code;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_CLUSTER',
@@ -126,7 +126,19 @@ exports.removeCluster = function (req, callback) {
       log.error('delete cluster failed:', err);
       return callback({code: err.code || 'ERROR', message: err.message});
     }
-    callback(null, 'delete cluster success');
+    cluster.deleteWorkers(clusterCode, function (err) {
+      if (err) {
+        log.error('delete cluster worker failed:', err);
+        return callback({code: err.code || 'ERROR', message: err.message});
+      }
+      userAcl.deleteClusterAllAcl(clusterCode,function (err) {
+        if (err) {
+          log.error('delete cluster acl failed:', err);
+          return callback({code: err.code || 'ERROR', message: err.message});
+        }
+        callback(null, 'delete cluster success');
+      });
+    });
   });
 };
 

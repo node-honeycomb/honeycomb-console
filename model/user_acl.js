@@ -190,3 +190,19 @@ exports.deleteClusterAcl = function (userAcl, callback) {
       }
     });
 };
+
+const DELETE_USER_ALL_ACL = `DELETE FROM hc_console_system_user_acl
+  WHERE cluster_code = ?`;
+exports.deleteClusterAllAcl = function (clusterCode, callback) {
+  db.query(DELETE_USER_ALL_ACL,
+    [clusterCode],
+    function (err) {
+      if (err) {
+        log.error('Delete user acl failed:', err);
+        return callback(err);
+      } else {
+        log.info('Delete user acl success');
+        callback();
+      }
+    });
+};

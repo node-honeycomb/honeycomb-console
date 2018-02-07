@@ -70,7 +70,7 @@ class Cluster extends React.Component {
       title: '确定要删除该集群吗？',
       content: '无法复原，请谨慎操作',
       onOk() {
-        that.props.deleteCluster({clusterCode:record.code}).then(()=>{
+        that.props.deleteCluster({},{code:record.code}).then(()=>{
           that.props.getCluster();
         })
       },
