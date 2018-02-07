@@ -10,11 +10,11 @@ module.exports = function (req, res, next) {
       User.getUser(user.name, cb);
     },
       function (data, cb) {
-        if (!data || data.length === 0) {
+        if (!data) {
           cb(null);
           return;
         }
-        user.role = data[0].role;
+        user.role = data.role;
         UserACLModel.getUserAcl(user, cb);
       },
       function (data, cb) {

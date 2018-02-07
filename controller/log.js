@@ -74,7 +74,7 @@ exports.queryLog = function (req, res) {
   let path = '/api/log';
 
   function processFileName(data) {
-    let tmp = data.fileName;
+    let tmp = data.fileName || '';
     let m = moment(data.logDate);
     return tmp.replace(/\{(\w+)\}/g, function (m0, m1) {
       let v;
