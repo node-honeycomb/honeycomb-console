@@ -69,7 +69,7 @@ User.getUser = function (name, callback) {
       if (!data.length) {
         return callback(new Error('user not found'));
       }
-      callback(null, data[0]);
+      callback(null, data);
     }
   );
 };

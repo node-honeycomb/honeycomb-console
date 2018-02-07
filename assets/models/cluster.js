@@ -2,14 +2,14 @@
 
 module.exports = {
   getCluster: {
-    url: '/api/cluster',
+    url: '/api/cluster/list',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'GET',
   },
   addCluster: {
-    url: '/api/cluster',
+    url: '/api/cluster/create',
     headers: {
       'x-csrf-token': window.csrfToken
     },
