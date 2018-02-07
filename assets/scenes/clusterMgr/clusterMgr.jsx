@@ -73,7 +73,6 @@ class Cluster extends React.Component {
     }).catch((err)=>{
       console.error(err);
     });
-
   }
   showConfirm = (record) => {
     let that = this;
@@ -148,6 +147,9 @@ class Cluster extends React.Component {
    render() {
     this.generateColumns();
     let dataSource = _.map(this.props.clusterMeta.meta,function(value,key){
+      if(value.token === ORIGIN_TOKEN){
+        window.dispatchEvent(new Event('warning'));
+      }
       return  _.assign({},value,{code:key},{key:key});
     });
     let user = UserService.getUserSync();

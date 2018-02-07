@@ -21,9 +21,13 @@ class Header extends React.Component {
       currentUser = user.nickname || user.name
     }
     this.state = {
+      warning: false,
       currentCluster: URL.parse(window.location.href, true).query.clusterCode,
       currentUser: currentUser || this.clusterMeta.meta[URL.parse(window.location.href, true).query.clusterCode].name,
     }
+    window.addEventListener('warning',()=>{
+      this.state.warning = true;
+    });
   }
   changeCluster = (e)=>{
     let clusterMeta = this.props.clusterMeta;
@@ -80,12 +84,12 @@ class Header extends React.Component {
           当前所在集群：
           <span className="clusterName">{clusterName}</span>
         </div>
-        <div className="admin-console-clusterInfo" >
+        {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName"> 
             <Icon type="exclamation-circle-o" /> 
             <Link to={'/pages/clusterMgr'}> 检测到存在安全隐患</Link>
           </span>
-        </div>
+        </div>)}
         <Menu mode="horizontal">
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
           </SubMenu>
