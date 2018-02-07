@@ -9,7 +9,7 @@ module.exports = {
     }
   },
   queryLog: {
-    url: '/api/log?fileName=:fileName',
+    url: '/api/log',
     method: 'GET',
     contentType: 'application/json; charset=utf-8',
     headers: {

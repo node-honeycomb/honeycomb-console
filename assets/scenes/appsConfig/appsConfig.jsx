@@ -40,14 +40,14 @@ class AppsConfig extends React.Component {
     let appName = this.state.currentApp;
     let tmp = value.split(':');
     let type = tmp[0];
-    let app = tmp[1];
+    let appId = tmp[1];
     let res = null;
     if(operation === 'get'){
       this.setState({
         loading: true,
         configName: value
       });
-      this.props.getAppsConfig({clusterCode:clusterCode},{app:app, type: type}).then((result)=>{
+      this.props.getAppsConfig({clusterCode:clusterCode},{appId:appId, type: type}).then((result)=>{
         try{
           res = JSON.stringify(this.props.appsConfigMeta.meta, null, 2);
           if(res){
@@ -82,8 +82,8 @@ class AppsConfig extends React.Component {
         width: 600,
         onOk: () => {
           let appConfig = this.state.newAppConfig;
-          this.props.setAppConfig({clusterCode:clusterCode,appConfig:appConfig},{app:app, type:type}).then((result)=>{
-            this.props.getAppsConfig({clusterCode:clusterCode},{app: app, type: type}).then((result)=>{
+          this.props.setAppConfig({clusterCode:clusterCode,appConfig:appConfig},{appId:appId, type:type}).then((result)=>{
+            this.props.getAppsConfig({clusterCode:clusterCode},{appId: appId, type: type}).then((result)=>{
               this.setState({loading: true})
               try{
                 res = JSON.stringify(this.props.appsConfigMeta.meta, null, 2);
