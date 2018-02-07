@@ -6,6 +6,8 @@ let classnames = require('classnames');
 let AddClusterModal = require('./add-cluster-modal.jsx');
 let EditClusterModal = require('./edit-cluster-modal.jsx');
 let UpdateSafeTokenModal = require('./update-safeToken-modal');
+const _ = require('lodash');
+const randomstring = require("randomstring");
 import { Modal, Button, Table, Icon, Tag } from 'antd';
 const confirm = Modal.confirm;
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
@@ -45,23 +47,32 @@ class Cluster extends React.Component {
         });
         break;
       case 'updateToken':
-        // this.setState({
-        //   updateSafeTokenModalState:{
-        //     isShow:state,
-        //     info:data,
-        //   },
-        // });
         let self = this;
         confirm({
           title: '安全修复',
           content: '检测到该集群正在使用默认的token，这可能会造成安全隐患，是否自动修复?',
           onOk() {
-            self.props.info.token = 'fdsfd';
-            self.props.addCluster(self.props.info);
+            self.changeUnSafeToken(data);
           },
           onCancel() {},
         });
     }
+
+  }
+  changeUnSafeToken = (data) => {
+    let newToken = randomstring.generate(64);
+    // call api change server config.admin.token
+    let info = _.cloneDeep(data);
+    this.props.getAppsConfig({clusterCode:info.code},{appId:'server',type:'server'}).then(({config})=>{
+      // call api change cluster config
+      config = _.merge(config,{admin:{token:newToken}});
+      return this.props.setAppConfig({clusterCode:info.code,appConfig:JSON.stringify(config)},{appId:'server',type:'server'});
+    }).then(()=>{
+      info = _.assign({},info,{isUpdate:true,token:newToken});
+      this.props.addCluster(info);
+    }).catch((err)=>{
+      console.error(err);
+    });
 
   }
   showConfirm = (record) => {
@@ -85,7 +96,7 @@ class Cluster extends React.Component {
           <div key={index}>
             {record.name}
             {record.token === ORIGIN_TOKEN && 
-              (<a onClick={this.clusterModal.bind(this,"updateToken",true)}>
+              (<a onClick={this.clusterModal.bind(this,"updateToken",true,record)}>
                 <Icon type="exclamation-circle" style={{ marginLeft: 8,fontSize: 16, color: 'red' }} />
                </a>
               )}
@@ -197,4 +208,6 @@ module.exports = connect(mapStateToProps,{
   deleteCluster:actions.cluster.deleteCluster,
   getCluster:actions.cluster.getCluster,
   addCluster:actions.cluster.addCluster,
+  getAppsConfig:actions.appsConfig.getAppsConfig,
+  setAppConfig:actions.appsConfig.setAppConfig,
 })(Cluster);
