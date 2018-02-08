@@ -18,7 +18,7 @@ exports.getAppConfig = function (req, res) {
     return res.json(opt);
   }
   let appId = req.params.appId;
-  let type = req.params.type;
+  let type = req.query.type;
   let path = `/api/config/${type}/${appId}`;
   callremote(path, opt, function (err, results) {
     if (err) {
@@ -41,7 +41,7 @@ exports.getAppConfig = function (req, res) {
  */
 exports.setAppConfig = function (req, res) {
   let appId = req.params.appId;
-  let type = req.params.type;
+  let type = req.body.type;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'SET_APP_CONFIG',
