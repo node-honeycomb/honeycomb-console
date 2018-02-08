@@ -4,16 +4,16 @@ const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
 
-function getFilterCluster(gClusterConfig, clusterAcl) {
-  if (!gClusterConfig || !clusterAcl) return {};
-  let filterCluster = {};
-  Object.keys(clusterAcl).map((authorizedCluster) => {
-    if (gClusterConfig[authorizedCluster]) {
-      filterCluster[authorizedCluster] = gClusterConfig[authorizedCluster];
+function getFilterCluster(gClusterConfig, req) {
+  let clusterConfig = {};
+  Object.keys(gClusterConfig).forEach((clusterCode) => {
+    if (req.user.containsCluster(clusterCode)) {
+      clusterConfig[clusterCode] = cluster.gClusterConfig[clusterCode];
     }
   });
-  return filterCluster;
+  return clusterConfig;
 }
+
 
 /**
  * @api {GET} /api/cluster/list
@@ -25,8 +25,7 @@ exports.listCluster = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    callback(null, cluster.gClusterConfig);
-    //callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+    callback(null, getFilterCluster(cluster.gClusterConfig, req));
   });
 };
 
@@ -77,8 +76,8 @@ exports.addCluster = function (req, callback) {
             log.error(err);
             return callback(err);
           }
-          callback(null, cluster.gClusterConfig);
-          //callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+          //callback(null, cluster.gClusterConfig);
+          callback(null, getFilterCluster(cluster.gClusterConfig, req));
         });
       });
     });
@@ -100,8 +99,8 @@ exports.addCluster = function (req, callback) {
           let newCluster = cluster.gClusterConfig[clusterCode];
           if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
           userAcl.addUserAcl(req.user.name, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
-            callback(err, cluster.gClusterConfig);
-            //callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+            //callback(err, cluster.gClusterConfig);
+            callback(err, getFilterCluster(cluster.gClusterConfig, req));
           });
         });
       });

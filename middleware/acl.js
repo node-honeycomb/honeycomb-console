@@ -14,6 +14,7 @@ class UserClass {
     return this.role === 1;
   }
   isClusterAdmin(clusterCode) {
+    console.log('isClusterAdmin', clusterCode, this.clusterAcl);
     return this.isSystemAdmin() || this.clusterAcl[clusterCode] && this.clusterAcl[clusterCode].isAdmin;
   }
   containsCluster(clusterCode) {

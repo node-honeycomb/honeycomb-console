@@ -5,12 +5,6 @@ let log = require('../common/log');
 let pathToRegex = require('path-to-regexp');
 let userAclModel = require('../model/user_acl');
 
-let authRegex = {
-  appAuth: [
-    ''
-  ]
-}
-
 module.exports = function (req, res, next) {
   let user = req.user || req.session.user;
   let pathname = req._parsedUrl.pathname;
@@ -26,8 +20,28 @@ module.exports = function (req, res, next) {
   }
 
   if (pathToRegex('/api/log').test(pathname)) {
-    // handle filename
-    return next();
+    let clusterCode = req.query.clusterCode || req.body.clusterCode;
+    let fileName = req.query.fileName;
+    if (!fileName || !clusterCode) {
+      return next();
+    }
+    if (fileName.indexOf('/') === -1) {
+      return next();  
+    }
+
+    let appName = '';
+    let logFile = fileName.match(/^([^/.]+).+/);
+    if (logFile && logFile[1]) {
+      appName = logFile[1];
+    }
+
+    let isPermitted = user.containsApp(clusterCode, appName);
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
+
+    return;
   }
 
   if (pathToRegex('/api/appUsages').test(pathname)) {
@@ -46,10 +60,12 @@ module.exports = function (req, res, next) {
 
   // list acl 需要集群管理权限
   if (pathToRegex('/api/acl/list').test(pathname)) {
-    let clusterCode = req.query.clusterCode || req.body.clusterCode;
-    let isPermitted = user.isClusterAdmin(clusterCode);
-    isPermitted ? next() : res.status(401).send('Unauthorized');
-    return;
+    // let clusterCode = req.query.clusterCode || req.body.clusterCode;
+    // let isPermitted = user.isClusterAdmin(clusterCode);
+    // console.log('/api/acl/list', isPermitted, user);
+    // isPermitted ? next() : res.status(401).send('Unauthorized');
+    // return;
+    return next();
   } 
 
   //用户可以 list 他有权限的集群,结果的过滤在 controller 里进行
@@ -57,20 +73,31 @@ module.exports = function (req, res, next) {
     let clusterCode = req.query.clusterCode || req.body.clusterCode;
     let isPermitted = user.containsCluster(clusterCode);
     console.log('containsCluster', isPermitted, req.user);
-    isPermitted ? next() : res.status(401).send('Unauthorized');
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
     return;
   }
 
-  //任何用户都可以创建新集群
+  //系统管理员可以创建新集群
   if (pathToRegex('/api/cluster/create').test(pathname)) {
-    return next();
+    let isPermitted = user.isSystemAdmin();
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
+    return;
   }
 
   // create、publish操作需要集群管理权限
   if (pathToRegex('/api/:entity/:action').test(pathname)) {
     let clusterCode = req.query.clusterCode || req.body.clusterCode;
     let isPermitted = user.isClusterAdmin(clusterCode);
-    isPermitted ? next() : res.status(401).send('Unauthorized');
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
     return;
   }
 
@@ -83,17 +110,24 @@ module.exports = function (req, res, next) {
       let appName = params[2];
       let action = params[3];
       let clusterCode = req.query.clusterCode || req.body.clusterCode;
-      console.log('ppppp', entity, appName, action);
       let isPermitted = user.containsApp(clusterCode, appName);
-      console.log('containsApp', isPermitted, req.user);
-      isPermitted ? next() : res.status(401).send('Unauthorized');
+      if (entity === 'config' && action === 'get' && ['common', 'server'].indexOf(appName) > -1) {
+        isPermitted = true;
+      }
+      isPermitted ? next() : res.status(401).json({
+        code: 'Error',
+        message: 'Unauthorized'
+      });
       return;
     }
 
     if (['cluster', 'acl', 'worker'].indexOf(entity) > -1) {
       let clusterCode = params[2];
       let isPermitted = user.isClusterAdmin(clusterCode);
-      isPermitted ? next() : res.status(401).send('Unauthorized');
+      isPermitted ? next() : res.status(401).json({
+        code: 'Error',
+        message: 'Unauthorized'
+      });
       return;
     }
   }

@@ -35,10 +35,6 @@ exports.createAcl = function (req, callback) {
  * @param res
  */
 exports.getAcl = function (req, callback) {
-  // if (!req.session.user) {
-  //   callback({code: 'ERROR', message: '获取权限列表异常'});
-  //   return;
-  // }
   var user = req.user;
   userAcl.getClusterAcl(user, callback);
 };

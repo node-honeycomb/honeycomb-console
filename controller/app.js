@@ -15,12 +15,6 @@ const callremote = utils.callremote;
  */
 exports.listApp = function (req, callback) {
   let clusterCode = req.query.clusterCode;
-  // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
-  //   return callback({
-  //     code: 'ERROR',
-  //     message: 'Cluster unauthorizied'
-  //   });
-  // }
   let opt = cluster.getClusterCfgByCode(clusterCode);
   if (opt.code === 'ERROR') {
     return callback(opt);
@@ -43,21 +37,9 @@ exports.listApp = function (req, callback) {
         apps = apps.concat(item.apps);
       });
 
-      // app filter
-      // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
-      //   let appAcl = req.session.user.clusterAcl[clusterCode].apps;
-      //   if (!appAcl || appAcl.length === 0) {
-      //     apps = [];
-      //   } else {
-      //     apps = apps.filter((app) => {
-      //       for (let i = 0; i < appAcl.length; i++) {
-      //         if (app.name === appAcl[i] || appAcl[i] === '*')
-      //           return true;
-      //       }
-      //       return false;
-      //     });
-      //   }
-      // }
+      apps = apps.filter((app) => {
+        return req.user.containsApp(clusterCode, app.name);
+      });
 
       return callback(null, {
         success: utils.mergeAppInfo(ips, apps),
