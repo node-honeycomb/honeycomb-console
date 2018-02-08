@@ -66,7 +66,7 @@ class Cluster extends React.Component {
     this.props.getAppsConfig({clusterCode:info.code},{appId:'server',type:'server'}).then(({config})=>{
       // call api change cluster config
       config = _.merge(config,{admin:{token:newToken}});
-      return this.props.setAppConfig({clusterCode:info.code,appConfig:JSON.stringify(config)},{appId:'server',type:'server'});
+      return this.props.setAppConfig({clusterCode:info.code,appConfig:JSON.stringify(config),type:'server'},{appId:'server'});
     }).then(()=>{
       info = _.assign({},info,{isUpdate:true,token:newToken});
       this.props.addCluster(info);
