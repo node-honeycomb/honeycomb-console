@@ -122,9 +122,9 @@ module.exports = function (req, res, next) {
       let action = params[3];
       let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
       let isPermitted = user.containsApp(clusterCode, appName);
-      if (entity === 'config' && action === 'get' && ['common', 'server'].indexOf(appName) > -1) {
-        isPermitted = true;
-      }
+      // if (entity === 'config' && action === 'get' && ['common', 'server'].indexOf(appName) > -1) {
+      //   isPermitted = true;
+      // }
       isPermitted ? next() : res.status(401).json({
         code: 'Error',
         message: 'Unauthorized'
