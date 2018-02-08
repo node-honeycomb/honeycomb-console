@@ -90,6 +90,17 @@ module.exports = function (req, res, next) {
     return;
   }
 
+  //发布要求有集群权限
+  if (pathToRegex('/api/app/publish').test(pathname)) {
+    let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
+    let isPermitted = user.containsCluster(clusterCode);
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
+    return;
+  }
+
   // create、publish操作需要集群管理权限
   if (pathToRegex('/api/:entity/:action').test(pathname)) {
     let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
