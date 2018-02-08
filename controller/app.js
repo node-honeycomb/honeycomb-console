@@ -15,13 +15,12 @@ const callremote = utils.callremote;
  */
 exports.listApp = function (req, callback) {
   let clusterCode = req.query.clusterCode;
-  log.info(req.session.user);
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
-    return callback({
-      code: 'ERROR',
-      message: 'Cluster unauthorizied'
-    });
-  }
+  // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
+  //   return callback({
+  //     code: 'ERROR',
+  //     message: 'Cluster unauthorizied'
+  //   });
+  // }
   let opt = cluster.getClusterCfgByCode(clusterCode);
   if (opt.code === 'ERROR') {
     return callback(opt);
@@ -45,20 +44,20 @@ exports.listApp = function (req, callback) {
       });
 
       // app filter
-      if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
-        let appAcl = req.session.user.clusterAcl[clusterCode].apps;
-        if (!appAcl || appAcl.length === 0) {
-          apps = [];
-        } else {
-          apps = apps.filter((app) => {
-            for (let i = 0; i < appAcl.length; i++) {
-              if (app.name === appAcl[i] || appAcl[i] === '*')
-                return true;
-            }
-            return false;
-          });
-        }
-      }
+      // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
+      //   let appAcl = req.session.user.clusterAcl[clusterCode].apps;
+      //   if (!appAcl || appAcl.length === 0) {
+      //     apps = [];
+      //   } else {
+      //     apps = apps.filter((app) => {
+      //       for (let i = 0; i < appAcl.length; i++) {
+      //         if (app.name === appAcl[i] || appAcl[i] === '*')
+      //           return true;
+      //       }
+      //       return false;
+      //     });
+      //   }
+      // }
 
       return callback(null, {
         success: utils.mergeAppInfo(ips, apps),

@@ -42,29 +42,29 @@ exports.queryLog = function (req, res) {
     });
   }
 
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
-    if (_.startsWith(logFileName, 'server.') || _.startsWith(logFileName, 'node_stdout.') || _.startsWith(logFileName, 'nodejs_stdout.')) {
-      //do not check app authority
-    } else {
-      let logAppFile = logFileName.match(/^([^/.]+).+/);
-      if (!logAppFile) {
-        return res.send({
-          code: 'ERROR',
-          message: '参数错误'
-        });
-      }
-      let logAppName = logAppFile[1];
+  // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
+  //   if (_.startsWith(logFileName, 'server.') || _.startsWith(logFileName, 'node_stdout.') || _.startsWith(logFileName, 'nodejs_stdout.')) {
+  //     //do not check app authority
+  //   } else {
+  //     let logAppFile = logFileName.match(/^([^/.]+).+/);
+  //     if (!logAppFile) {
+  //       return res.send({
+  //         code: 'ERROR',
+  //         message: '参数错误'
+  //       });
+  //     }
+  //     let logAppName = logAppFile[1];
 
-      let apps = req.session.user.clusterAcl[clusterCode].apps;
+  //     let apps = req.session.user.clusterAcl[clusterCode].apps;
 
-      if (apps.indexOf('*') === -1 && apps.indexOf(logAppName) === -1) {
-        return res.send({
-          code: 'ERROR',
-          message: 'App unauthorizied'
-        });
-      }
-    }
-  }
+  //     if (apps.indexOf('*') === -1 && apps.indexOf(logAppName) === -1) {
+  //       return res.send({
+  //         code: 'ERROR',
+  //         message: 'App unauthorizied'
+  //       });
+  //     }
+  //   }
+  // }
 
   let opt = cluster.getClusterCfgByCode(clusterCode);
   if (opt.code === 'ERROR') {
@@ -118,12 +118,12 @@ exports.queryLog = function (req, res) {
 exports.listLogs = function (req, res) {
   let clusterCode = req.query.clusterCode;
 
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
-    return res.send({
-      code: 'ERROR',
-      message: 'Cluster unauthorizied'
-    });
-  }
+  // if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
+  //   return res.send({
+  //     code: 'ERROR',
+  //     message: 'Cluster unauthorizied'
+  //   });
+  // }
 
   let opt = cluster.getClusterCfgByCode(clusterCode);
   // 取一台机器
@@ -150,7 +150,7 @@ exports.listLogs = function (req, res) {
       tmp.push(v);
     });
 
-    if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
+    if (false && !req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
       results.data = _.filter(tmp, function (logFileName) {
         if (_.startsWith(logFileName, 'server.') || _.startsWith(logFileName, 'node_stdout.') || _.startsWith(logFileName, 'nodejs_stdout.')) {
           return true;

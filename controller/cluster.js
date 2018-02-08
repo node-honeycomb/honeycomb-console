@@ -25,7 +25,8 @@ exports.listCluster = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+    callback(null, cluster.gClusterConfig);
+    //callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
   });
 };
 
@@ -76,7 +77,8 @@ exports.addCluster = function (req, callback) {
             log.error(err);
             return callback(err);
           }
-          callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+          callback(null, cluster.gClusterConfig);
+          //callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
         });
       });
     });
@@ -97,8 +99,9 @@ exports.addCluster = function (req, callback) {
           if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
           let newCluster = cluster.gClusterConfig[clusterCode];
           if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-          userAcl.addUserAcl(req.session.user.nickname, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
-            callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+          userAcl.addUserAcl(req.user.name, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
+            callback(err, cluster.gClusterConfig);
+            //callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
           });
         });
       });

@@ -47,6 +47,11 @@ module.exports = {
       enable: true,
       module: '../middleware/acl.js',
       config: {}
+    },
+    permission: {
+      enable: true,
+      module: '../middleware/permission.js',
+      config: {}
     }
   },
   extension: {

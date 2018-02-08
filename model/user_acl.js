@@ -68,12 +68,12 @@ const QUERY_CLUSTER_ACL = `
 exports.getClusterAcl = function (user, callback) {
   var clusterCodeList = [];
   clusterCodeList = Object.keys(user.clusterAcl);
-  var adminClusterList = [];
-  clusterCodeList.forEach((clusterCode) => {
-    if (user.clusterAcl[clusterCode].isAdmin === 1) {
-      adminClusterList.push(clusterCode);
-    }
-  });
+  var adminClusterList = user.getAdminClusterList();
+  // clusterCodeList.forEach((clusterCode) => {
+  //   if (user.clusterAcl[clusterCode].isAdmin === 1) {
+  //     adminClusterList.push(clusterCode);
+  //   }
+  // });
   if (adminClusterList.length === 0) {
     callback(null);
     return;

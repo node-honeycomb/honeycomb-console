@@ -6,7 +6,7 @@ const log = require('../common/log');
  * @api {post} /api/acl/create
  */
 exports.createAcl = function (req, callback) {
-  var user = req.session.user;
+  var user = req.user;
   var name = req.body.name;
   var clusterId = req.body.cluster_id;
   var clusterCode = req.body.cluster_code;
@@ -35,11 +35,11 @@ exports.createAcl = function (req, callback) {
  * @param res
  */
 exports.getAcl = function (req, callback) {
-  if (!req.session.user) {
-    callback({code: 'ERROR', message: '获取权限列表异常'});
-    return;
-  }
-  var user = req.session.user;
+  // if (!req.session.user) {
+  //   callback({code: 'ERROR', message: '获取权限列表异常'});
+  //   return;
+  // }
+  var user = req.user;
   userAcl.getClusterAcl(user, callback);
 };
 
