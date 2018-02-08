@@ -225,7 +225,8 @@ class Acl extends React.Component {
   update(index) {
     var self = this;
     this.props.updateAcl({
-      acl: this.state.selectedCluster.acls[index]
+      acl: this.state.selectedCluster.acls[index],
+      clusterCode: this.state.selectedCluster.cluster_code
     }, {
       id: this.state.selectedCluster.acls[index].id
     }).then(() => {
@@ -238,7 +239,8 @@ class Acl extends React.Component {
   serverDelete(index) {
     var self = this;
     this.props.deleteAcl({
-        acl: this.state.selectedCluster.acls[index]
+        acl: this.state.selectedCluster.acls[index],
+        clusterCode: this.state.selectedCluster.cluster_code
       }, {
         id: this.state.selectedCluster.acls[index].id
       }

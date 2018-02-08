@@ -14,7 +14,6 @@ class UserClass {
     return this.role === 1;
   }
   isClusterAdmin(clusterCode) {
-    console.log('isClusterAdmin', clusterCode, this.clusterAcl);
     return this.isSystemAdmin() || this.clusterAcl[clusterCode] && this.clusterAcl[clusterCode].isAdmin;
   }
   containsCluster(clusterCode) {
@@ -22,8 +21,7 @@ class UserClass {
     return this.isClusterAdmin(clusterCode) || !!this.clusterAcl[clusterCode];
   }
   containsApp(clusterCode, appName) {
-    console.log(this.clusterAcl, clusterCode)
-    return this.isSystemAdmin() || this.isClusterAdmin(clusterCode) || this.clusterAcl[clusterCode] && (this.clusterAcl[clusterCode].apps.indexOf('*') > -1 || this.clusterAcl[clusterCode].apps.indexOf(appName) > -1);
+    return this.isSystemAdmin() || this.isClusterAdmin(clusterCode) || ['server', 'common'].indexOf(appName) === -1 && this.clusterAcl[clusterCode] && (this.clusterAcl[clusterCode].apps.indexOf('*') > -1 || this.clusterAcl[clusterCode].apps.indexOf(appName) > -1);
   }
   getAdminClusterList() {
     return Object.keys(this.clusterAcl).map((clusterCode) => {

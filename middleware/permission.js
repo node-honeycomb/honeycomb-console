@@ -92,7 +92,7 @@ module.exports = function (req, res, next) {
 
   // create、publish操作需要集群管理权限
   if (pathToRegex('/api/:entity/:action').test(pathname)) {
-    let clusterCode = req.query.clusterCode || req.body.clusterCode;
+    let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
     let isPermitted = user.isClusterAdmin(clusterCode);
     isPermitted ? next() : res.status(401).json({
       code: 'Error',
@@ -109,7 +109,7 @@ module.exports = function (req, res, next) {
     if (['app', 'config'].indexOf(entity) > -1) {
       let appName = params[2];
       let action = params[3];
-      let clusterCode = req.query.clusterCode || req.body.clusterCode;
+      let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
       let isPermitted = user.containsApp(clusterCode, appName);
       if (entity === 'config' && action === 'get' && ['common', 'server'].indexOf(appName) > -1) {
         isPermitted = true;
@@ -122,7 +122,7 @@ module.exports = function (req, res, next) {
     }
 
     if (['cluster', 'acl', 'worker'].indexOf(entity) > -1) {
-      let clusterCode = params[2];
+      let clusterCode = req.query.clusterCode || req.body.clusterCode;
       let isPermitted = user.isClusterAdmin(clusterCode);
       isPermitted ? next() : res.status(401).json({
         code: 'Error',
