@@ -7,6 +7,7 @@ const Sequelize = require('sequelize');
 let sequelize = null;
 switch(config.meta.driver){
   case 'mysql':
+    require('./mysql');
     let database = config.meta.database;
     let username = config.meta.username;
     let password = config.meta.password;
@@ -26,6 +27,7 @@ switch(config.meta.driver){
     });
     break;
   case 'sqlite':
+    require('./sqlite');
     let dbFilePath = path.resolve(config.meta.dbfile);
     let sqliteConnectionString = `sqlite:` + dbFilePath;
     sequelize = new Sequelize(sqliteConnectionString);
