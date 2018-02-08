@@ -88,6 +88,9 @@ exports.listLogs = function (req, res) {
   let clusterCode = req.query.clusterCode;
 
   let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return res.json(opt);
+  }
   // 取一台机器
   opt.ips = [opt.ips[0]];
   if (opt.code === 'ERROR') {
