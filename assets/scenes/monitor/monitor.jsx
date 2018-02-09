@@ -26,7 +26,7 @@ class Monitor extends React.Component {
       loading: false,
     }
   }
-  
+
   changeMonitorData = (fromTime = moment(), gap = null) => {
     this.setState({loading: true});
     let toTime = moment().format("YYYY-MM-DD-HH");
@@ -173,7 +173,7 @@ class Monitor extends React.Component {
               onChange={this.handleMachineChange}
               getPopupContainer={() => document.getElementById('app-checkbox')}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-            > 
+            >
               {_.map(data, (value, key)=>{
                 return <Option key={key} value={key}>{key}</Option>
               })}
@@ -199,13 +199,13 @@ class Monitor extends React.Component {
               onChange={this.handleChange}
               getPopupContainer={() => document.getElementById('app-checkbox')}
               filterOption={(input, option) => option.props.children.toLowerCase().indexOf(input.toLowerCase()) >= 0}
-            > 
+            >
               {plainOptions.map((value, key)=>{
                 return <Option key={value} value={value}>{value}</Option>
               })}
             </Select>
           </div>
-        </div> 
+        </div>
           {
             _.map(data, (item, index) => {
               return(
@@ -213,26 +213,26 @@ class Monitor extends React.Component {
                   <span>机器：{index}</span>
                   {item.cpuUsageSys && item.cpuUsageSys.data.length > 0?
                   <div className={classnames({"display-none":!this.state.checkSystem, "sys-monitor":true})}>
-                    <Linechart 
+                    <Linechart
                       data={item.cpuUsageSys}
                     />
-                    <Linechart 
+                    <Linechart
                       data={item.memUsageSys}
                     />
                   </div> : <div>system数据为空，请检查</div>}
                   {item.cpuUsageAll && item.cpuUsageAll.data.length > 0?
                   <div className={classnames({"display-none":_.isEmpty(this.state.checkedList), "all-monitor":true})}>
-                    <Linechart 
+                    <Linechart
                       data={item.cpuUsageAll}
                     />
-                    <Linechart 
+                    <Linechart
                       data={item.memUsageAll}
                     />
                   </div> : null}
-                </div>  
-              )       
+                </div>
+              )
             })
-          }        
+          }
       </div>
       </Spin>
     )

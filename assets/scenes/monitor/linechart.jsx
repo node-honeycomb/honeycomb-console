@@ -73,7 +73,7 @@ class Linechart extends React.Component {
     _.map(data.data, (item, index) => {
       if (item.data.length < maxLen) {
         let sliceIndex = _.findKey(maxObj.data, (value, key) => {
-          return moment(value.x, 'YYYYMMDD HH:mm:ss').isAfter(moment(item.data[0].x, 'YYYYMMDD HH:mm:ss'));
+          return moment(value.x, 'HH:mm:ss').isAfter(moment(item.data[0].x, 'HH:mm:ss'));
         });
         let slice = _.map(_.slice(maxObj.data, 0, sliceIndex - 1), (value, key) => {
           return value = {x: value.x, y: 0};
@@ -133,7 +133,7 @@ class Linechart extends React.Component {
           show: false
         },
         data: maxObj.data.map((item, index) => {
-          return moment(item.x, 'YYYYMMDD HH:mm:ss.SSS').format('HH:mm:ss');
+          return moment(item.x, 'HH:mm:ss.SSS').format('HH:mm:ss');
         })
       },
       yAxis: {
