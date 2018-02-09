@@ -35,17 +35,13 @@ exports.pages = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    let whiteList = lodash.clone(config.whiteList);
-    if (req.session.user.role === 1) {
-      whiteList.push(req.session.user.nickname);
-    }
+
     callback(null, {
       tpl: 'index.html',
       data: {
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
-        user: req.session.user,
-        whiteList: whiteList,
+        user: req.user,
         env: config.env,
         publishPage: config.publishPage
       }
@@ -57,8 +53,7 @@ exports.pages = function (req, callback) {
  * @api {get} /login
  */
 exports.login = function (req, callback) {
-  console.log('>>>>>>>', req.url, req.session);
-  if (req.session && req.session.user) {
+  if (req.user) {
     return callback(null, '/pages/list', 'redirect');
   } else {
     callback(null, {
@@ -66,8 +61,7 @@ exports.login = function (req, callback) {
       data: {
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
-        user: req.session.user,
-        whiteList: config.whiteList,
+        user: req.user,
         publishPage: config.publishPage
       }
     }, 'html');

@@ -19,7 +19,7 @@ let User = require("./services/user");
 let rootElement = document.getElementById('server-admin');
 
 
-User.getUser().then(() => {
+User.getUser().then((user) => {
   ReactDOM.render(
     <Provider store={store}>
       <Router history={history} routes={routes(store,store.dispatch)}>

@@ -1,39 +1,39 @@
- 'use strict';
+'use strict';
 
 module.exports = {
   deleteApps: {
-    url: '/api/delete/:appkey',
+    url: '/api/app/:appId/delete',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   reloadApps: {
-    url: '/api/reload/:appkey',
+    url: '/api/app/:appId/reload',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   startApps: {
-    url: '/api/start/:appkey',
+    url: '/api/app/:appId/start',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   stopApps: {
-    url: '/api/stop/:appkey',
+    url: '/api/app/:appId/stop',
     headers: {
       'x-csrf-token': window.csrfToken
     },
     method: 'POST',
   },
   cleanAppExitRecord: {
-    url: '/api/clean_exit_record/:appid',
+    url: '/api/app/:appId/clean_exit_record',
     headers: {
       'x-csrf-token': window.csrfToken
     },
-    method: 'DELETE',
+    method: 'POST',
   },
 };

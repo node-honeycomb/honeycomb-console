@@ -8,7 +8,7 @@ const User = require('../model/user');
 module.exports = function (req, res, next) {
   let path = req.path;
   // if already login
-  if (req.session && req.session.user) {
+  if (req.session && req.session.username) {
     return next();
   }
 
@@ -47,11 +47,11 @@ module.exports = function (req, res, next) {
         }
         pwd = utils.sha256(pwd);
         if (user.password === pwd) {
-          req.session.user = {
-            name: user.name,
-            nickname: user.nickname,
-            role: user.role
-          };
+          // req.session.user = {
+          //   name: user.name,
+          //   role: user.role
+          // };
+          req.session.username = user.name;
           return res.redirect('/');
         } else {
           return res.redirect('/?error=login_failed');

@@ -15,6 +15,7 @@
     "lodash.debounce": "~4.0.6",
     "moment": "~2.13.0",
     "normalizr": "~2.0.0",
+    "randomstring": "^1.1.5",
     "react": "~15.3.0",
     "react-codemirror": "^0.3.0",
     "react-dom": "~15.3.0",

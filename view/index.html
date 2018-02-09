@@ -13,7 +13,6 @@
   <div id="server-admin"></div>
   <script>
     window.csrfToken = '<%=csrfToken%>';
-    window.whiteList = '<%=whiteList%>';
     window.publishPage = '<%= publishPage %>';
     window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');
     <% if(env === 'dev'){ %>

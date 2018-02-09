@@ -17,8 +17,9 @@ if (!fs.existsSync(appUsageCachePath)) {
   fs.sync().mkdir(appUsageCachePath);
 }
 
+
 /**
- * @api /api/log
+ * @api {get} /api/log
  * @nowrap
  * @param req
  * @param res
@@ -26,43 +27,12 @@ if (!fs.existsSync(appUsageCachePath)) {
 exports.queryLog = function (req, res) {
   let clusterCode = req.query.clusterCode;
 
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
-    return res.send({
-      code: 'ERROR',
-      message: 'Cluster unauthorizied'
-    });
-  }
-
   let logFileName = processFileName(req.query);
   if (!logFileName) {
     return res.send({
       code: 'ERROR',
       message: '参数错误'
     });
-  }
-
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
-    if (_.startsWith(logFileName, 'server.') || _.startsWith(logFileName, 'node_stdout.') || _.startsWith(logFileName, 'nodejs_stdout.')) {
-      //do not check app authority
-    } else {
-      let logAppFile = logFileName.match(/^([^/.]+).+/);
-      if (!logAppFile) {
-        return res.send({
-          code: 'ERROR',
-          message: '参数错误'
-        });
-      }
-      let logAppName = logAppFile[1];
-
-      let apps = req.session.user.clusterAcl[clusterCode].apps;
-
-      if (apps.indexOf('*') === -1 && apps.indexOf(logAppName) === -1) {
-        return res.send({
-          code: 'ERROR',
-          message: 'App unauthorizied'
-        });
-      }
-    }
   }
 
   let opt = cluster.getClusterCfgByCode(clusterCode);
@@ -73,7 +43,7 @@ exports.queryLog = function (req, res) {
   let path = '/api/log';
 
   function processFileName(data) {
-    let tmp = data.fileName;
+    let tmp = data.fileName || '';
     let m = moment(data.logDate);
     return tmp.replace(/\{(\w+)\}/g, function (m0, m1) {
       let v;
@@ -109,7 +79,7 @@ exports.queryLog = function (req, res) {
 };
 
 /**
- * @api /api/logs
+ * @api {get} /api/log/list
  * @nowrap
  * @param req
  * @param res
@@ -117,14 +87,10 @@ exports.queryLog = function (req, res) {
 exports.listLogs = function (req, res) {
   let clusterCode = req.query.clusterCode;
 
-  if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode]) {
-    return res.send({
-      code: 'ERROR',
-      message: 'Cluster unauthorizied'
-    });
-  }
-
   let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return res.json(opt);
+  }
   // 取一台机器
   opt.ips = [opt.ips[0]];
   if (opt.code === 'ERROR') {
@@ -149,18 +115,16 @@ exports.listLogs = function (req, res) {
       tmp.push(v);
     });
 
-    if (!req.session.user.role && !req.session.user.clusterAcl[clusterCode].isAdmin) {
+    if (!req.user.isClusterAdmin()) {
       results.data = _.filter(tmp, function (logFileName) {
-        if (_.startsWith(logFileName, 'server.') || _.startsWith(logFileName, 'node_stdout.') || _.startsWith(logFileName, 'nodejs_stdout.')) {
+        if (logFileName.indexOf('/') === -1) {
           return true;
         }
 
         let logAppFile = logFileName.match(/^([^/.]+).+/);
         if (!logAppFile) return false;
-        let logAppName = logAppFile[1];
-        let apps = req.session.user.clusterAcl[clusterCode].apps;
-
-        if (apps.indexOf('*') > -1 || apps.indexOf(logAppName) > -1) {
+        let appName = logAppFile[1];
+        if (req.user.containsApp(clusterCode, appName)) {
           return true;
         }
         return false;

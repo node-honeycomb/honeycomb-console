@@ -4,8 +4,9 @@ const cluster = require('../model/cluster');
 const jsonParser = require('editor-json-parser');
 const callremote = utils.callremote;
 
+
 /**
- * @api {get} /api/config/:type/:appName
+ * @api {get} /api/config/:appId/get
  * @nowrap
  * @param req
  * @param res
@@ -16,9 +17,9 @@ exports.getAppConfig = function (req, res) {
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let appName = req.params.appName;
-  let type = req.params.type;
-  let path = `/api/config/${type}/${appName}`;
+  let appId = req.params.appId;
+  let type = req.query.type;
+  let path = `/api/config/${type}/${appId}`;
   callremote(path, opt, function (err, results) {
     if (err) {
       res.json({
@@ -33,28 +34,28 @@ exports.getAppConfig = function (req, res) {
 
 
 /**
- * @api {post} /api/config/:type/:appName
+ * @api {post} /api/config/:appId/update
  * @nowrap
  * @param req
  * @param res
  */
 exports.setAppConfig = function (req, res) {
-  let appName = req.params.appName;
-  let type = req.params.type;
+  let appId = req.params.appId;
+  let type = req.body.type;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'SET_APP_CONFIG',
     opType: 'PAGE_MODEL',
     opLogLevel: 'NORMAL',
     opItem: 'APP_CONFIG',
-    opItemId: appName
+    opItemId: appId
   });
   let clusterCode = req.body.clusterCode;
   let opt = cluster.getClusterCfgByCode(clusterCode);
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let path = `/api/config/${type}/${appName}`;
+  let path = `/api/config/${type}/${appId}`;
   opt.method = 'POST';
   try {
     opt.data = jsonParser.parse(req.body.appConfig);

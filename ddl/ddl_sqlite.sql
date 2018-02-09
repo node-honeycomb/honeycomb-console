@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `id` INTEGER PRIMARY KEY,
   `name` varchar(128),
-  `nickname` varchar(128),
   `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
   `env` varchar(128) DEFAULT '',  -- COMMENT '环境: dev, daily, pre, production'
@@ -37,14 +36,13 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `id` INTEGER PRIMARY KEY,
-  `name` varchar(50) DEFAULT NULL COMMENT '用户名',
-  `nickname` varchar(50) NOT NULL COMMENT '用户昵称',
-  `cluster_id` int(11) unsigned NOT NULL,
+  `name` varchar(50) DEFAULT NULL, --COMMENT '用户名',
+  `cluster_id` INTEGER NOT NULL,
   `cluster_code` varchar(50) NOT NULL,
   `cluster_name` varchar(50) NOT NULL,
-  `cluster_admin` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0: cluster用户，1: cluster管理员',
-  `apps` text CHARACTER SET utf8 COLLATE utf8_bin COMMENT '用户app列表',
-  `gmt_create` datetime NOT NULL COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL COMMENT '修改时间'
-  UNIQUE(`user`, `cluster_code`)
+  `cluster_admin` INTEGER NOT NULL DEFAULT '0', --COMMENT '0: cluster用户，1: cluster管理员',
+  `apps` text CHARACTER utf8, --COMMENT '用户app列表',
+  `gmt_create` datetime NOT NULL, --COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL, --COMMENT '修改时间'
+  UNIQUE(`name`, `cluster_code`)
 );

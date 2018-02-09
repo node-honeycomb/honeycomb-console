@@ -11,30 +11,30 @@ const callremote = utils.callremote;
  * @nowrap
  */
 exports.logout = function (req, res) {
-  if (req.session && req.session.user) {
-    delete req.session.user;
+  if (req.session && req.session.username) {
+    delete req.session.username;
   }
   res.redirect('/');
 };
 
-/**
- * @api {post} /loginAuth
- */
-exports.loginAuth = function (req, callback) {
-  let opt = req.body;
-  if (opt.username === config.username &&
-    utils.sha256(opt.password) === config.password) {
-    req.session.user = {
-      id: opt.username,
-      name: opt.username,
-      nickname: opt.username
-    };
-    callback(null, {code: 'SUCCESS'});
-  } else {
-    log.error('用户名密码错误');
-    callback({code: 'ERROR', message: '用户名密码错误'});
-  }
-};
+// /**
+//  * @api {post} /loginAuth
+//  */
+// exports.loginAuth = function (req, callback) {
+//   let opt = req.body;
+//   if (opt.username === config.username &&
+//     utils.sha256(opt.password) === config.password) {
+//     req.session.user = {
+//       id: opt.username,
+//       name: opt.username,
+//       nickname: opt.username
+//     };
+//     callback(null, {code: 'SUCCESS'});
+//   } else {
+//     log.error('用户名密码错误');
+//     callback({code: 'ERROR', message: '用户名密码错误'});
+//   }
+// };
 
 /**
  * @api {get} /api/status
@@ -66,10 +66,9 @@ exports.status = function (req, callback) {
  * @api {get} /api/user
  */
 exports.getUser = function (req, callback) {
-  let user = req.session.user;
+  let user = req.user;
   callback(null, {
-    userId: user.id,
     name: user.name,
-    nickname: user.nickname
+    role: user.role
   }, {ignoreCamel: true});
 };
