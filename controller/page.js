@@ -35,7 +35,6 @@ exports.pages = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    console.log('config.publishPages', JSON.stringify(config.publishPages));
     callback(null, {
       tpl: 'index.html',
       data: {
