@@ -13,7 +13,7 @@
   <div id="server-admin"></div>
   <script>
     window.csrfToken = '<%=csrfToken%>';
-    window.publishPage = '<%= publishPage %>';
+    window.publishPages = JSON.parse('<%- JSON.stringify(publishPages) %>');
     window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');
     <% if(env === 'dev'){ %>
     document.write('<scrip' + 't src="/assets/.build/build.js"></s' + 'cript>');
