@@ -6,7 +6,9 @@ const fs = require('fs');
 const path = require('path');
 const async = require('async');
 
-config.meta.user = config.meta.username;
+if(!config.meta.user){
+  config.meta.user = config.meta.username;
+}
 if (!config.meta.connectionLimit) config.meta.connectionLimit = 3;
 const pool = mysql.createPool(config.meta);
 
