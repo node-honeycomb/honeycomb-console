@@ -123,7 +123,7 @@ class Publish extends React.Component {
     if (window.publishPages && window.publishPages.length > 0) {
       let tabs = window.publishPages.map((publishPage, pageIndex) => {
         return (
-          <TabPane tab={publishPage.tabName} key={pageIndex}>
+          <TabPane tab={publishPage.tabName} key={pageIndex + 1}>
             <div className={'iframe ' + publishPage.className}>
               <iframe src={publishPage.src + '?clusterCode=' + clusterCode}/>
             </div>
@@ -133,7 +133,7 @@ class Publish extends React.Component {
       publishTabs = publishTabs.concat(tabs);
     }
     publishTabs.push(
-    <TabPane tab="手动发布" key={publishTabs.length}>
+    <TabPane tab="手动发布" key={publishTabs.length + 1}>
     <div className="publish-update">
       <Upload {...props}>
         <button type="button" className="ant-btn ant-btn-ghost">
