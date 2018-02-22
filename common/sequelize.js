@@ -9,7 +9,7 @@ switch(config.meta.driver){
   case 'mysql':
     require('./mysql');
     let database = config.meta.database;
-    let username = config.meta.username;
+    let username = config.meta.user || config.meta.username;
     let password = config.meta.password;
     let host = config.meta.host;
     let dialect = 'mysql';

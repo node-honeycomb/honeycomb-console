@@ -49,7 +49,6 @@ exports.listApp = function (req, callback) {
   });
 };
 
-
 /**
  * @api {post} /api/app/publish
  * @param req
@@ -110,6 +109,13 @@ exports.publishApp = function (req, callback) {
     }
   });
 };
+
+/**
+ * @api {post} /service/app/publish
+ * @param req
+ * @param callback
+ */
+exports.publishAppService = exports.publishApp;
 
 /**
  * @api {POST} /api/app/:appId/clean_exit_record

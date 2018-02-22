@@ -14,6 +14,20 @@ function getFilterCluster(gClusterConfig, req) {
   return clusterConfig;
 }
 
+/**
+ * @api {GET} /service/cluster/:code
+ */
+exports.getClusterConfig = function (req, callback) {
+  let clusterCode = req.params.code;
+  cluster.getClusterCfg(function (err) {
+    if (err) {
+      log.error('Get cluster config from db failed.', err);
+      let e = new Error('Get cluster config from db failed.' + err.message);
+      return callback(e);
+    }
+    callback(null, cluster.gClusterConfig[clusterCode]);
+  });
+};
 
 /**
  * @api {GET} /api/cluster/list
