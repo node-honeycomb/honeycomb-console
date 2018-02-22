@@ -19,6 +19,14 @@ module.exports = function (req, res, next) {
     return next();
   }
 
+  if (!user) {
+    res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
+    return;
+  }
+
   if (pathToRegex('/api/log').test(pathname)) {
     let clusterCode = req.query.clusterCode || req.body.clusterCode;
     let fileName = req.query.fileName;
@@ -26,7 +34,7 @@ module.exports = function (req, res, next) {
       return next();
     }
     if (fileName.indexOf('/') === -1) {
-      return next();  
+      return next();
     }
 
     let appName = '';
@@ -92,7 +100,6 @@ module.exports = function (req, res, next) {
 
   //发布要求有集群权限
   if (pathToRegex('/api/app/publish').test(pathname)) {
-    return next();
     let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
     let isPermitted = user.containsCluster(clusterCode);
     isPermitted ? next() : res.status(401).json({
