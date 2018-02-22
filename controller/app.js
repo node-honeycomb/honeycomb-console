@@ -111,13 +111,6 @@ exports.publishApp = function (req, callback) {
 };
 
 /**
- * @api {post} /service/app/publish
- * @param req
- * @param callback
- */
-exports.publishAppService = exports.publishApp;
-
-/**
  * @api {POST} /api/app/:appId/clean_exit_record
  * @param req
  * @param callback
