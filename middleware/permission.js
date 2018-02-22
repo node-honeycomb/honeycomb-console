@@ -92,6 +92,7 @@ module.exports = function (req, res, next) {
 
   //发布要求有集群权限
   if (pathToRegex('/api/app/publish').test(pathname)) {
+    return next();
     let clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
     let isPermitted = user.containsCluster(clusterCode);
     isPermitted ? next() : res.status(401).json({
