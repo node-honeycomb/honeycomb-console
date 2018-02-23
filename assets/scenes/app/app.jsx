@@ -11,7 +11,7 @@ require('./app.less');
 class App extends React.Component {
   constructor(props, context) {
     super(props, context);
-    this.state = { 
+    this.state = {
       visible: false,
       chooseCluster: null,
     }
@@ -38,9 +38,16 @@ class App extends React.Component {
       visible: false,
     });
     localStorage.setItem('clusterCode', chooseCluster);
-    window.location.href = URL.parse(window.location.href, true).pathname + '?clusterCode=' + chooseCluster;
+    //window.location.href = URL.parse(window.location.href, true).pathname + '?clusterCode=' + chooseCluster;
+    let pathname = URL.parse(window.location.href, true).pathname
+    if(pathname.indexOf('pages/')>-1){
+      let pathArray = pathname.split('/');
+      pathArray.splice(_.findIndex(pathArray, 'pages')+1, 1, 'list');
+      pathname = pathArray.join('/');
+    }
+    window.history.pushState(null , null, pathname + '?clusterCode=' + chooseCluster);
   }
-  
+
   chooseCluster = (value) => {
     this.setState({
       chooseCluster: value,
@@ -52,6 +59,7 @@ class App extends React.Component {
   }
   render() {
     let meta = this.props.clusterMeta.meta;
+    debugger;
     return (
       <div className="app-main-div">
         <Modal title="请选择集群" visible={this.state.visible} width={600}
@@ -71,7 +79,7 @@ class App extends React.Component {
                   </Button>
                 )
               })
-            } 
+            }
           </div>
         </Modal>
         <Header
@@ -80,12 +88,12 @@ class App extends React.Component {
         />
         <div className="main-wrap">
           <div className="main-wrap-aside">
-            <SideBar 
+            <SideBar
               selectedKeys={this.getSelectedKeys()}
-            />         
+            />
           </div>
           <div className="main-wrap-main">
-            { this.props.children }           
+            { this.props.children }
           </div>
         </div>
       </div>

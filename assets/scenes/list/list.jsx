@@ -29,7 +29,7 @@ class List extends React.Component {
       filterList:{},
       dataSource: [],
       rowSpan:{},
-      deleteAppName: null
+      deleteAppName: null,
     }
   }
   genRowspan = (appList, data) => {
@@ -63,7 +63,7 @@ class List extends React.Component {
     let that = this;
     this.setListInterval(that);
   }
-  
+
   componentWillReceiveProps = (nextProps) => {
     let newState = _.cloneDeep(this.state);
     let newFilterList = _.cloneDeep(nextProps.appMeta.filterList);
@@ -259,7 +259,7 @@ class List extends React.Component {
       render: (text, record, index) => {
         return (
           <div className="version-text">
-            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li> 
+            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li>
           </div>
 
         )
@@ -309,7 +309,7 @@ class List extends React.Component {
           }
         }
         function errorFlag(that){
-          if(errorflag){  
+          if(errorflag){
             return(
               <div className="status-inline">
                 <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appId === that.state.index?that.state.starting:record.cluster[0].status}
@@ -338,13 +338,13 @@ class List extends React.Component {
                       <Icon type="exclamation-circle-o" /> [{value.errorExitCount}]
                     </a>
                   </span>:null}
-                </div>                     
+                </div>
               )
             })
           }
         }
         return (
-          <div key={"status"+index}>   
+          <div key={"status"+index}>
             {errorFlag(that)}
           </div>
         )
@@ -387,7 +387,7 @@ class List extends React.Component {
               <Button size="small" onClick={this.showConfirm.bind(this,"reload",record.appId)} className={reloadClass} type="primary" ghost>reload</Button>
             </li>
           )
-        }       
+        }
       }
     }, ]
     return columns;
@@ -425,7 +425,7 @@ class List extends React.Component {
     return (
       <div className="list-wrap">
         <div className="list-table-wrap">
-          <Table 
+          <Table
           pagination = {false}
           dataSource={data}
           columns={this.generateColumns(rowSpan)}

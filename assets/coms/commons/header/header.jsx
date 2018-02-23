@@ -10,6 +10,8 @@ var Popover = antd.Popover;
 var SubMenu = Menu.SubMenu;
 let User = require("../../../services/user");
 const URL = require("url");
+import { RouteContext } from 'react-router';
+
 require('./header.less');
 class Header extends React.Component {
   constructor(props, context){
@@ -35,7 +37,19 @@ class Header extends React.Component {
       currentCluster: e.key,
     });
     localStorage.setItem('clusterCode', e.key);
-    window.location.href = URL.parse(window.location.href, true).pathname + '?clusterCode=' + e.key;
+    //document.write = URL.parse(window.location.href, true).pathname + '?clusterCode=' + e.key;
+    //URL.parse(window.location.href, true).query.clusterCode = e.key;
+    let pathname = URL.parse(window.location.href, true).pathname
+    if(pathname.indexOf('pages/')>-1){
+      let pathArray = pathname.split('/');
+      pathArray.splice(pathArray.indexOf('pages') + 1, 1, 'list');
+      pathname = pathArray.join('/');
+    }
+    //window.history.pushState(null , null, pathname + '?clusterCode=' + e.key)
+    this.context.router.push('/pages' + '?clusterCode=' + e.key);
+    //this.props.getAppList({clusterCode: e.key});
+    //console.log(URL.parse(window.location.href, true))
+    //console.log(this.context)
   }
 
   componentDidMount() {
@@ -85,8 +99,8 @@ class Header extends React.Component {
           <span className="clusterName">{clusterName}</span>
         </div>
         {this.state.warning && (<div className="admin-console-clusterInfo" >
-          <span className="clusterName"> 
-            <Icon type="exclamation-circle-o" /> 
+          <span className="clusterName">
+            <Icon type="exclamation-circle-o" />
             <Link to={'/pages/clusterMgr'}> 检测到存在安全隐患</Link>
           </span>
         </div>)}

@@ -11,14 +11,13 @@ const PublishPage = require('./scenes/publish/publish.jsx');
 const MonitorPage = require('./scenes/monitor/monitor.jsx');
 const LogPage = require('./scenes/log/log.jsx');
 const AclPage = require('./scenes/acl/acl.jsx');
-const actions = require("./actions");
+const actions = require('./actions');
 const moment = require('moment');
 let User = require('./services/user');
-import { message } from 'antd';
+import {message} from 'antd';
 let _ = require('lodash');
-const URL = require("url");
+const URL = require('url');
 module.exports = (store, dispatch) => {
-  let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
   return [{
     path: '/',
     childRoutes: [{
@@ -37,6 +36,7 @@ module.exports = (store, dispatch) => {
         path: 'list',
         component: ListPage,
         onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
             dispatch(actions.app.getAppList({clusterCode: clusterCode}));
           }
@@ -45,6 +45,7 @@ module.exports = (store, dispatch) => {
         path: 'publish',
         component: PublishPage,
         onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
             dispatch(actions.app.getStatus({clusterCode: clusterCode}));
           }
@@ -62,6 +63,7 @@ module.exports = (store, dispatch) => {
         path: 'appsConfig',
         component: AppsConfigPage,
         onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
             dispatch(actions.app.getAppList({clusterCode: clusterCode}));
           }
@@ -70,14 +72,16 @@ module.exports = (store, dispatch) => {
         path: 'log',
         component: LogPage,
         onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
             dispatch(actions.log.loadLogFiles({clusterCode: clusterCode}));
           }
         }
       }, {
-        path: "acl",
+        path: 'acl',
         component: AclPage,
-        onEnter: function(nextState, replaceState) {
+        onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           dispatch(actions.acl.getAcl());
           dispatch(actions.app.getAppList({
             clusterCode: clusterCode

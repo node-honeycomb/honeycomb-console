@@ -1,5 +1,4 @@
 'use strict';
-
 module.exports = {
   getAppList: {
     url: '/api/app/list',
