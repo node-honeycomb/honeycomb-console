@@ -45,7 +45,6 @@ module.exports = (store, dispatch) => {
         path: 'publish',
         component: PublishPage,
         onEnter: function (nextState, replaceState) {
-          debugger;
           let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
             dispatch(actions.app.getStatus({clusterCode: clusterCode}));
