@@ -22,7 +22,7 @@ class DeleteAllModal extends React.Component {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     let that = this;
     (function deleteApp(i, deleteList) {
-      return that.props.deleteApps({ clusterCode: clusterCode }, { appkey: deleteList[i].appId})
+      return that.props.deleteApps({ clusterCode: clusterCode }, { appId: deleteList[i].appId})
       .then(()=>{
         let isDeleteSuccess = _.cloneDeep(that.state.isDeleteSuccess);
         isDeleteSuccess[deleteList[i].appId] = true;
