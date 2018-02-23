@@ -52,26 +52,26 @@ class Sider extends React.Component {
       <div className="admin-console-sidebar">
         <Menu theme="dark" mode="inline" onClick={this.handleClick} selectedKeys={[this.state.selectedKeys]}>
           <Menu.Item key="list" >
-            <Link to={'/pages/list?' + this.state.clusterCode}><span><Icon type="bars" />{'应用列表'}</span></Link>
+            <Link to={window.prefix + '/pages/list?' + this.state.clusterCode}><span><Icon type="bars" />{'应用列表'}</span></Link>
           </Menu.Item>
           <Menu.Item key="publish" >
-            <Link to={'/pages/publish?' + this.state.clusterCode}><span><Icon type="rocket" />{'应用发布'}</span></Link>
+            <Link to={window.prefix + '/pages/publish?' + this.state.clusterCode}><span><Icon type="rocket" />{'应用发布'}</span></Link>
           </Menu.Item>
           <Menu.Item key="monitor" >
-            <Link to={'/pages/monitor?' + this.state.clusterCode}><span><Icon type="line-chart" />{'系统监控'}</span></Link>
+            <Link to={window.prefix + '/pages/monitor?' + this.state.clusterCode}><span><Icon type="line-chart" />{'系统监控'}</span></Link>
           </Menu.Item>
           <Menu.Item key="appsConfig" >
-            <Link to={'/pages/appsConfig?'+ this.state.clusterCode}><span><Icon type="setting" />{'配置管理'}</span></Link>
+            <Link to={window.prefix + '/pages/appsConfig?'+ this.state.clusterCode}><span><Icon type="setting" />{'配置管理'}</span></Link>
           </Menu.Item>
           <Menu.Item className="log-menu" key="log">
-            <Link to={'/pages/log?'+ this.state.clusterCode}><span><Icon type="search" />{'日志查询'}</span></Link>
+            <Link to={window.prefix + '/pages/log?'+ this.state.clusterCode}><span><Icon type="search" />{'日志查询'}</span></Link>
           </Menu.Item>
           <div className='hr-wrap'></div>
           <Menu.Item key="clusterMgr" >
-            <Link to={'/pages/clusterMgr?'+ this.state.clusterCode}><span><Icon type="setting" />{'集群管理'}</span></Link>
+            <Link to={window.prefix + '/pages/clusterMgr?'+ this.state.clusterCode}><span><Icon type="setting" />{'集群管理'}</span></Link>
           </Menu.Item>
           <Menu.Item key="acl">
-            <Link to={'/pages/acl?' + this.state.clusterCode}><span><Icon type="usergroup-add" />{'应用授权'}</span></Link>
+            <Link to={window.prefix + '/pages/acl?' + this.state.clusterCode}><span><Icon type="usergroup-add" />{'应用授权'}</span></Link>
           </Menu.Item>
         </Menu>
       </div>

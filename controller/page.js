@@ -3,6 +3,7 @@ const log = require('../common/log');
 const cluster = require('../model/cluster');
 const config = require('../config');
 const lodash = require('lodash');
+const path = require('path');
 
 /**
  * @api  /pages/
@@ -22,7 +23,7 @@ const lodash = require('lodash');
  * @param callback
  */
 exports.redirect = function (req, callback) {
-  return callback(null, '/pages/list', 'redirect');
+  return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
 };
 
 /**
@@ -38,6 +39,7 @@ exports.pages = function (req, callback) {
     callback(null, {
       tpl: 'index.html',
       data: {
+        prefix: config.prefix !== '/' ? config.prefix : '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
         user: req.user,
@@ -53,11 +55,12 @@ exports.pages = function (req, callback) {
  */
 exports.login = function (req, callback) {
   if (req.user) {
-    return callback(null, '/pages/list', 'redirect');
+    return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
   } else {
     callback(null, {
       tpl: 'index.html',
       data: {
+        prefix: config.prefix !== '/' ? config.prefix : '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
         user: req.user,
