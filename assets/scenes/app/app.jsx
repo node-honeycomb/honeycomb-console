@@ -7,6 +7,8 @@ const URL = require("url");
 var SideBar = require('../../coms/commons/sidebar/sidebar.jsx');
 let User = require("../../services/user");
 import { Modal, Button} from 'antd';
+import { ReactContext } from 'react-router';
+
 require('./app.less');
 class App extends React.Component {
   constructor(props, context) {
@@ -19,10 +21,13 @@ class App extends React.Component {
     this.url = URL.parse(window.location.href, true);
     this.clusterCode = URL.parse(window.location.href, true).query.clusterCode || null;
   }
-
   componentDidMount = () => {
     if(_.isEmpty(this.clusterCode)&&_.isEmpty(this.localClusterCode)){
       this.showModal();
+    }
+    let clusterMeta = this.props.clusterMeta;
+    if (!Object.keys(clusterMeta.meta).length && location.pathname !== '/pages/clusterMgr') {
+      this.context.router.push({pathname: '/pages/clusterMgr', query:{clusterCode: this.clusterCode}});
     }
   }
 
@@ -38,14 +43,8 @@ class App extends React.Component {
       visible: false,
     });
     localStorage.setItem('clusterCode', chooseCluster);
-    //window.location.href = URL.parse(window.location.href, true).pathname + '?clusterCode=' + chooseCluster;
-    let pathname = URL.parse(window.location.href, true).pathname
-    if(pathname.indexOf('pages/')>-1){
-      let pathArray = pathname.split('/');
-      pathArray.splice(_.findIndex(pathArray, 'pages')+1, 1, 'list');
-      pathname = pathArray.join('/');
-    }
-    window.history.pushState(null , null, pathname + '?clusterCode=' + chooseCluster);
+    this.context.router.push({pathname: '/pages/list', query:{clusterCode: chooseCluster}});
+    debugger;
   }
 
   chooseCluster = (value) => {
@@ -59,7 +58,6 @@ class App extends React.Component {
   }
   render() {
     let meta = this.props.clusterMeta.meta;
-    debugger;
     return (
       <div className="app-main-div">
         <Modal title="请选择集群" visible={this.state.visible} width={600}
@@ -70,7 +68,7 @@ class App extends React.Component {
         }
         >
           <div className="choose-cluster-modal">
-            <p>已选集群:  <i>{this.state.chooseCluster?meta[this.state.chooseCluster].name: null}</i></p>
+            <p>已选集群:  <i>{_.get(meta, [this.state.chooseCluster, 'name'])}</i></p>
             {
               this.props.clusterMeta.result.map((value,key)=>{
                 return(
@@ -83,6 +81,7 @@ class App extends React.Component {
           </div>
         </Modal>
         <Header
+          chooseCluster={this.state.chooseCluster}
           clusterMeta={this.props.clusterMeta}
           getAppList={this.props.getAppList}
         />

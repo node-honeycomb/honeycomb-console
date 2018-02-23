@@ -52,10 +52,9 @@ class List extends React.Component {
   setListInterval = (that) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      let int = setInterval(function() {
+      window.int = setInterval(function() {
         that.props.getAppList({ clusterCode: clusterCode })
       }, 5000);
-      this.setState({ int: int });
     }
   }
 
@@ -76,10 +75,18 @@ class List extends React.Component {
     this.setState({
       filterList: newFilterList,
     })
+
+    if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
+      let that = this;
+      if(window.int){
+        clearInterval(window.int);
+      }
+      this.setListInterval(that);
+    }
   }
 
   componentWillUnmount = () => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
   }
   changeMonitorData = (gap = null) => {
     let fromTime = moment().format("YYYY-MM-DD-HH");

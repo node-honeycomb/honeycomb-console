@@ -10,7 +10,7 @@ var Popover = antd.Popover;
 var SubMenu = Menu.SubMenu;
 let User = require("../../../services/user");
 const URL = require("url");
-import { RouteContext } from 'react-router';
+import { ReactContext } from 'react-router';
 
 require('./header.less');
 class Header extends React.Component {
@@ -37,31 +37,13 @@ class Header extends React.Component {
       currentCluster: e.key,
     });
     localStorage.setItem('clusterCode', e.key);
-    //document.write = URL.parse(window.location.href, true).pathname + '?clusterCode=' + e.key;
-    //URL.parse(window.location.href, true).query.clusterCode = e.key;
-    let pathname = URL.parse(window.location.href, true).pathname
-    if(pathname.indexOf('pages/')>-1){
-      let pathArray = pathname.split('/');
-      pathArray.splice(pathArray.indexOf('pages') + 1, 1, 'list');
-      pathname = pathArray.join('/');
-    }
-    //window.history.pushState(null , null, pathname + '?clusterCode=' + e.key)
-    this.context.router.push('/pages' + '?clusterCode=' + e.key);
-    //this.props.getAppList({clusterCode: e.key});
-    //console.log(URL.parse(window.location.href, true))
-    //console.log(this.context)
+    this.context.router.push({pathname: '/pages/list', query:{clusterCode: e.key}});
   }
 
-  componentDidMount() {
-    let clusterMeta = this.props.clusterMeta;
-    if (!Object.keys(clusterMeta.meta).length && location.pathname !== '/pages/clusterMgr') {
-      location.pathname = '/pages/clusterMgr';
-    }
-  }
+
 
   render() {
     let clusterMeta = _.cloneDeep(this.props.clusterMeta);
-    let clusterName = "";
     _.map(clusterMeta.meta, (value, key)=>{
       return  value.code = key
     })
@@ -73,13 +55,7 @@ class Header extends React.Component {
           </Menu.Item>
       );
     });
-
-    if(clusterMeta.meta[this.state.currentCluster]){
-      clusterName = clusterMeta.meta[this.state.currentCluster].name;
-    }else{
-      clusterName = null;
-    }
-
+    let clusterName = _.get(clusterMeta.meta, [this.state.currentCluster, 'name']) || _.get(clusterMeta.meta, [this.props.chooseCluster, 'name']);
     return (
       <header className="admin-console-header">
        <a className="admin-console-logo">

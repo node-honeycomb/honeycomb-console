@@ -19,7 +19,7 @@ class Sider extends React.Component {
       clusterCode: window.location.href.split('/pages/')[1]? window.location.href.split('/pages/')[1].split('?')[1]:''
     }
   }
-  
+
   componentDidUpdate = () => {
     let selectedKey = '';
     let clusterCode = '';
@@ -39,7 +39,7 @@ class Sider extends React.Component {
         selectedKeys: '',
         clusterCode: ''
       })
-    } 
+    }
   }
 
   handleClick = (e)=> {
