@@ -20,12 +20,12 @@ const URL = require("url");
 module.exports = (store, dispatch) => {
   let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
   return [{
-    path: '/',
+    path: window.prefix + '/',
     childRoutes: [{
       path: '/login',
       component: LoginPage,
     }, {
-      path: '/pages',
+      path: window.prefix + '/pages',
       component: App,
       onEnter: function (nextState, replaceState) {
         dispatch(actions.cluster.getCluster());

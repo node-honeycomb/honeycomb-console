@@ -18,7 +18,7 @@ exports.request = function request(method, url, headers, data, callback) {
   // data如果包含函数的话,会在控制台报错,一般不会出现;
 
   var setting = {
-    url: url,
+    url: window.prefix + url,
     data: data,
     type: method,
     headers: headers,

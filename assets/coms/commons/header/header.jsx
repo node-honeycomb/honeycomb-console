@@ -40,8 +40,8 @@ class Header extends React.Component {
 
   componentDidMount() {
     let clusterMeta = this.props.clusterMeta;
-    if (!Object.keys(clusterMeta.meta).length && location.pathname !== '/pages/clusterMgr') {
-      location.pathname = '/pages/clusterMgr';
+    if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
+      location.pathname = window.prefix + '/pages/clusterMgr';
     }
   }
 
@@ -87,7 +87,7 @@ class Header extends React.Component {
         {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName"> 
             <Icon type="exclamation-circle-o" /> 
-            <Link to={'/pages/clusterMgr'}> 检测到存在安全隐患</Link>
+            <Link to={window.prefix + '/pages/clusterMgr'}> 检测到存在安全隐患</Link>
           </span>
         </div>)}
         <Menu mode="horizontal">

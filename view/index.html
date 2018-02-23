@@ -12,15 +12,16 @@
   </script>
   <div id="server-admin"></div>
   <script>
+    window.prefix = '<%=prefix%>';
     window.csrfToken = '<%=csrfToken%>';
     window.publishPages = JSON.parse('<%- JSON.stringify(publishPages) %>');
     window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');
     <% if(env === 'dev'){ %>
-    document.write('<scrip' + 't src="/assets/.build/build.js"></s' + 'cript>');
+    document.write('<scrip' + 't src="<%=prefix%>/assets/.build/build.js"></s' + 'cript>');
     <% } %>
-    document.write('<lin' + 'k rel="stylesheet" href="/assets/app.css">');
-    document.write('<scrip' + 't src="/assets/vendor.js"></s' + 'cript>');
-    document.write('<scrip' + 't src="/assets/app.js"></s' + 'cript>');
+    document.write('<lin' + 'k rel="stylesheet" href="<%=prefix%>/assets/app.css">');
+    document.write('<scrip' + 't src="<%=prefix%>/assets/vendor.js"></s' + 'cript>');
+    document.write('<scrip' + 't src="<%=prefix%>/assets/app.js"></s' + 'cript>');
   </script>
 </body>
 </html>

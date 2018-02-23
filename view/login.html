@@ -17,7 +17,10 @@
     line-height: 24px;
   }
 </style>
-<form action="<%= userCount > 0 ? '/loginAuth' : '/initUser'%>" class="login" method="POST">
+<script>
+  window.prefix = '<%=prefix%>';
+</script>
+<form action="<%= userCount > 0 ? prefix + '/loginAuth' : prefix + '/initUser'%>" class="login" method="POST">
   <h3>Honeycomb-Console <%= userCount > 0 ? 'Login' : 'Init'%></h3>
   <% if (errMsg) {%>
     <p style="color:red; font-size: 12px"><%=errMsg%></p>
