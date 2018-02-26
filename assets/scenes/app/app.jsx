@@ -44,7 +44,6 @@ class App extends React.Component {
     });
     localStorage.setItem('clusterCode', chooseCluster);
     this.context.router.push({pathname: '/pages/list', query:{clusterCode: chooseCluster}});
-    debugger;
   }
 
   chooseCluster = (value) => {
@@ -83,7 +82,6 @@ class App extends React.Component {
         <Header
           chooseCluster={this.state.chooseCluster}
           clusterMeta={this.props.clusterMeta}
-          getAppList={this.props.getAppList}
         />
         <div className="main-wrap">
           <div className="main-wrap-aside">

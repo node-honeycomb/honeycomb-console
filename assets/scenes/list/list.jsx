@@ -64,6 +64,16 @@ class List extends React.Component {
   }
 
   componentWillReceiveProps = (nextProps) => {
+    if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
+      let that = this;
+      this.setState({
+        filterList: {},
+      })
+      if(window.int){
+        clearInterval(window.int);
+      }
+      this.setListInterval(that);
+    }
     let newState = _.cloneDeep(this.state);
     let newFilterList = _.cloneDeep(nextProps.appMeta.filterList);
     let oldFilterList = newState.filterList;
@@ -76,13 +86,6 @@ class List extends React.Component {
       filterList: newFilterList,
     })
 
-    if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
-      let that = this;
-      if(window.int){
-        clearInterval(window.int);
-      }
-      this.setListInterval(that);
-    }
   }
 
   componentWillUnmount = () => {
