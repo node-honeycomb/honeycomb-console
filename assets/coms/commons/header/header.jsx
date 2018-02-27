@@ -65,15 +65,15 @@ class Header extends React.Component {
         </a>
         <div className="admin-console-clusterName">
           <Menu mode="horizontal" onClick={this.changeCluster}>
-            <SubMenu className="switch-cluster" key="workSpaces" title={<span><Icon type="setting" />切换集群</span>}>
+            <SubMenu className="switch-cluster" key="workSpaces" title={<span><Icon type="setting" />{clusterName}</span>}>
               {workspacesList}
             </SubMenu>
           </Menu>
         </div>
-        <div className="admin-console-clusterInfo">
+        {/* <div className="admin-console-clusterInfo">
           当前所在集群：
           <span className="clusterName">{clusterName}</span>
-        </div>
+        </div> */}
         {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName">
             <Icon type="exclamation-circle-o" />

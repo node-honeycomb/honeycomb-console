@@ -65,6 +65,7 @@ class List extends React.Component {
 
   componentWillReceiveProps = (nextProps) => {
     if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
+      let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
       let that = this;
       this.setState({
         filterList: {},
@@ -72,6 +73,7 @@ class List extends React.Component {
       if(window.int){
         clearInterval(window.int);
       }
+      this.props.getAppList({ clusterCode: clusterCode })
       this.setListInterval(that);
     }
     let newState = _.cloneDeep(this.state);
@@ -105,7 +107,7 @@ class List extends React.Component {
     return this.props.queryAppUsages(param);
   }
   showModal = (record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     let index = record.appId;
     this.setState({
       index: index
@@ -212,7 +214,7 @@ class List extends React.Component {
     });
   }
   showErrorMsg = (message,record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       message: message,
       name: record.name,
@@ -223,7 +225,7 @@ class List extends React.Component {
   }
 
   openDeleteAllModal = (appName) =>{
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       deleteAllVisible: true,
       deleteAppName: appName
