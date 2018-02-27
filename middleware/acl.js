@@ -17,7 +17,6 @@ class UserClass {
     return this.isSystemAdmin() || this.clusterAcl[clusterCode] && this.clusterAcl[clusterCode].isAdmin;
   }
   containsCluster(clusterCode) {
-    console.log('containsCluster', this.clusterAcl, clusterCode);
     return this.isClusterAdmin(clusterCode) || !!this.clusterAcl[clusterCode];
   }
   containsApp(clusterCode, appName) {

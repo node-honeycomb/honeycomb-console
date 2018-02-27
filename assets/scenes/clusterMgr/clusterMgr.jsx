@@ -154,46 +154,38 @@ class Cluster extends React.Component {
       return  _.assign({},value,{code:key},{key:key});
     });
     let user = UserService.getUserSync();
-    if (user.role === 1) {
-      return(
-        <div className="cluster-wrap">
-          <div className="addbtn-wrap">
-            <Button type="primary" onClick={this.clusterModal.bind(this,"add",true)}>新增集群</Button>
-          </div>
-          <div className="cluster-table-warp">
-            <Table
-              columns={this.columns}
-              dataSource={dataSource}
-              pagination={false}
-            />
-          </div>
-          <AddClusterModal
-            getCluster={this.props.getCluster}
-            addCluster={this.props.addCluster}
-            visible={this.state.addClusterModalState.isShow}
-            onHide={this.clusterModal.bind(this,"add",false)}
-          />
-          <EditClusterModal
-            info={this.state.editClusterModalState.info}
-            getCluster={this.props.getCluster}
-            addCluster={this.props.addCluster}
-            visible={this.state.editClusterModalState.isShow}
-            onHide={this.clusterModal.bind(this,"edit",false)}
-          />
-          <UpdateSafeTokenModal 
-            info={this.state.updateSafeTokenModalState.info}
-            visible={this.state.updateSafeTokenModalState.isShow}
-            onHide={this.clusterModal.bind(this,"updateToken",false)}
+    return(
+      <div className="cluster-wrap">
+        <div className="addbtn-wrap">
+          <Button type="primary" onClick={this.clusterModal.bind(this,"add",true)}>新增集群</Button>
+        </div>
+        <div className="cluster-table-warp">
+          <Table
+            columns={this.columns}
+            dataSource={dataSource}
+            pagination={false}
           />
         </div>
-      )
-    } else {
-      return(
-        <div className="cluster-wrap">
-          <div className="error-font"><span>您没有权限在此页面操作，请联系管理员</span></div>
-        </div>
-      );
-    }
+        <AddClusterModal
+          getCluster={this.props.getCluster}
+          addCluster={this.props.addCluster}
+          visible={this.state.addClusterModalState.isShow}
+          onHide={this.clusterModal.bind(this,"add",false)}
+        />
+        <EditClusterModal
+          info={this.state.editClusterModalState.info}
+          getCluster={this.props.getCluster}
+          addCluster={this.props.addCluster}
+          visible={this.state.editClusterModalState.isShow}
+          onHide={this.clusterModal.bind(this,"edit",false)}
+        />
+        <UpdateSafeTokenModal 
+          info={this.state.updateSafeTokenModalState.info}
+          visible={this.state.updateSafeTokenModalState.isShow}
+          onHide={this.clusterModal.bind(this,"updateToken",false)}
+        />
+      </div>
+    )
   }
 }
 
