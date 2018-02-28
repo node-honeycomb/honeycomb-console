@@ -88,14 +88,19 @@ module.exports = function (req, res, next) {
     return;
   }
 
-  //系统管理员可以创建新集群
+  //所有用户都可以创建新集群并成为该集群的管理员, 只有管理员才可以进行更新操作
   if (pathToRegex('/api/cluster/create').test(pathname)) {
-    let isPermitted = user.isSystemAdmin();
-    isPermitted ? next() : res.status(401).json({
-      code: 'Error',
-      message: 'Unauthorized'
-    });
-    return;
+    //更新集群
+    if (req.body.isUpdate) {
+      user.isClusterAdmin(req.body.code) ? next() : res.status(401).json({
+        code: 'Error',
+        message: 'Unauthorized'
+      });
+      return;
+    } else {
+      // 新建集群
+      return next();
+    }
   }
 
   //发布要求有集群权限
@@ -125,6 +130,8 @@ module.exports = function (req, res, next) {
   if (pathToRegex('/api/:entity/:id/:action').test(pathname)) {
     let params = pathname.match(pathToRegex('/api/:entity/:id/:action'));
     let entity = params[1];
+
+    //集群用户可以进行的操作
     if (['app', 'config'].indexOf(entity) > -1) {
       let appName = params[2];
       let action = params[3];
@@ -140,8 +147,19 @@ module.exports = function (req, res, next) {
       return;
     }
 
-    if (['cluster', 'acl', 'worker'].indexOf(entity) > -1) {
+    //集群管理员可以进行的操作
+    if (['acl', 'worker'].indexOf(entity) > -1) {
       let clusterCode = req.query.clusterCode || req.body.clusterCode;
+      let isPermitted = user.isClusterAdmin(clusterCode);
+      isPermitted ? next() : res.status(401).json({
+        code: 'Error',
+        message: 'Unauthorized'
+      });
+      return;
+    }
+
+    if (['cluster'].indexOf(entity) > -1) {
+      let clusterCode = params[2];
       let isPermitted = user.isClusterAdmin(clusterCode);
       isPermitted ? next() : res.status(401).json({
         code: 'Error',

@@ -69,5 +69,6 @@ module.exports = {
     }
   },
   whiteList: ['admin'],
-  ignoreLogFiles: [/_app_usage_cache_\/app-usage\./, /app-usage\.{year}-{month}-{day}-{hour}\.log/, /nodejs_stdout\.log\.2\d+/]
+  ignoreLogFiles: [/_app_usage_cache_\/app-usage\./, /app-usage\.{year}-{month}-{day}-{hour}\.log/, /nodejs_stdout\.log\.2\d+/],
+  logSqlQuery: true
 };

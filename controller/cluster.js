@@ -3,12 +3,20 @@ const async = require('async');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
+const lodash = require('lodash');
 
 function getFilterCluster(gClusterConfig, req) {
   let clusterConfig = {};
   Object.keys(gClusterConfig).forEach((clusterCode) => {
     if (req.user.containsCluster(clusterCode)) {
-      clusterConfig[clusterCode] = cluster.gClusterConfig[clusterCode];
+      clusterConfig[clusterCode] = lodash.cloneDeep(cluster.gClusterConfig[clusterCode]);
+    }
+  });
+  Object.keys(clusterConfig).forEach((clusterCode) => {
+    if (req.user.isClusterAdmin(clusterCode)) {
+      return;
+    } else {
+      clusterConfig[clusterCode].token = 'Unauthorized';
     }
   });
   return clusterConfig;

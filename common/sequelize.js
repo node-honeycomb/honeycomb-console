@@ -53,6 +53,7 @@ module.exports.query = function (sql, ...args) {
     callback = args[0];
   }
   sequelize.query(sql, {
+    logging: config.logSqlQuery || false,
     replacements: param
   }).then((data) => {
     callback(null, data[0]);
