@@ -29,7 +29,7 @@ class List extends React.Component {
       filterList:{},
       dataSource: [],
       rowSpan:{},
-      deleteAppName: null
+      deleteAppName: null,
     }
   }
   genRowspan = (appList, data) => {
@@ -52,10 +52,9 @@ class List extends React.Component {
   setListInterval = (that) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      let int = setInterval(function() {
+      window.int = setInterval(function() {
         that.props.getAppList({ clusterCode: clusterCode })
       }, 5000);
-      this.setState({ int: int });
     }
   }
 
@@ -63,8 +62,20 @@ class List extends React.Component {
     let that = this;
     this.setListInterval(that);
   }
-  
+
   componentWillReceiveProps = (nextProps) => {
+    if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
+      let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+      let that = this;
+      this.setState({
+        filterList: {},
+      })
+      if(window.int){
+        clearInterval(window.int);
+      }
+      this.props.getAppList({ clusterCode: clusterCode })
+      this.setListInterval(that);
+    }
     let newState = _.cloneDeep(this.state);
     let newFilterList = _.cloneDeep(nextProps.appMeta.filterList);
     let oldFilterList = newState.filterList;
@@ -76,10 +87,11 @@ class List extends React.Component {
     this.setState({
       filterList: newFilterList,
     })
+
   }
 
   componentWillUnmount = () => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
   }
   changeMonitorData = (gap = null) => {
     let fromTime = moment().format("YYYY-MM-DD-HH");
@@ -95,7 +107,7 @@ class List extends React.Component {
     return this.props.queryAppUsages(param);
   }
   showModal = (record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     let index = record.appId;
     this.setState({
       index: index
@@ -202,7 +214,7 @@ class List extends React.Component {
     });
   }
   showErrorMsg = (message,record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       message: message,
       name: record.name,
@@ -213,7 +225,7 @@ class List extends React.Component {
   }
 
   openDeleteAllModal = (appName) =>{
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       deleteAllVisible: true,
       deleteAppName: appName
@@ -259,7 +271,7 @@ class List extends React.Component {
       render: (text, record, index) => {
         return (
           <div className="version-text">
-            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li> 
+            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li>
           </div>
 
         )
@@ -309,7 +321,7 @@ class List extends React.Component {
           }
         }
         function errorFlag(that){
-          if(errorflag){  
+          if(errorflag){
             return(
               <div className="status-inline">
                 <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appId === that.state.index?that.state.starting:record.cluster[0].status}
@@ -338,13 +350,13 @@ class List extends React.Component {
                       <Icon type="exclamation-circle-o" /> [{value.errorExitCount}]
                     </a>
                   </span>:null}
-                </div>                     
+                </div>
               )
             })
           }
         }
         return (
-          <div key={"status"+index}>   
+          <div key={"status"+index}>
             {errorFlag(that)}
           </div>
         )
@@ -387,7 +399,7 @@ class List extends React.Component {
               <Button size="small" onClick={this.showConfirm.bind(this,"reload",record.appId)} className={reloadClass} type="primary" ghost>reload</Button>
             </li>
           )
-        }       
+        }
       }
     }, ]
     return columns;
@@ -425,7 +437,7 @@ class List extends React.Component {
     return (
       <div className="list-wrap">
         <div className="list-table-wrap">
-          <Table 
+          <Table
           pagination = {false}
           dataSource={data}
           columns={this.generateColumns(rowSpan)}

@@ -9,6 +9,7 @@ var Popover = antd.Popover;
 var Menu = antd.Menu;
 var SubMenu = Menu.SubMenu;
 var _ = require('lodash');
+const URL = require("url");
 require('./sidebar.less');
 
 class Sider extends React.Component {
@@ -19,7 +20,7 @@ class Sider extends React.Component {
       clusterCode: window.location.href.split('/pages/')[1]? window.location.href.split('/pages/')[1].split('?')[1]:''
     }
   }
-  
+
   componentDidUpdate = () => {
     let selectedKey = '';
     let clusterCode = '';
@@ -33,13 +34,18 @@ class Sider extends React.Component {
           selectedKeys: selectedKey,
           clusterCode: clusterCode
         })
+      }else if(this.state.clusterCode !== clusterCode){
+        this.setState({
+          clusterCode: clusterCode
+        })
       }
     }else{
       this.setState({
         selectedKeys: '',
         clusterCode: ''
       })
-    } 
+    }
+
   }
 
   handleClick = (e)=> {

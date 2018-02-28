@@ -10,6 +10,8 @@ var Popover = antd.Popover;
 var SubMenu = Menu.SubMenu;
 let User = require("../../../services/user");
 const URL = require("url");
+import { ReactContext } from 'react-router';
+
 require('./header.less');
 class Header extends React.Component {
   constructor(props, context){
@@ -35,7 +37,7 @@ class Header extends React.Component {
       currentCluster: e.key,
     });
     localStorage.setItem('clusterCode', e.key);
-    window.location.href = URL.parse(window.location.href, true).pathname + '?clusterCode=' + e.key;
+    this.context.router.push({pathname: '/pages/list', query:{clusterCode: e.key}});
   }
 
   componentDidMount() {
@@ -47,7 +49,6 @@ class Header extends React.Component {
 
   render() {
     let clusterMeta = _.cloneDeep(this.props.clusterMeta);
-    let clusterName = "";
     _.map(clusterMeta.meta, (value, key)=>{
       return  value.code = key
     })
@@ -59,13 +60,7 @@ class Header extends React.Component {
           </Menu.Item>
       );
     });
-
-    if(clusterMeta.meta[this.state.currentCluster]){
-      clusterName = clusterMeta.meta[this.state.currentCluster].name;
-    }else{
-      clusterName = null;
-    }
-
+    let clusterName = _.get(clusterMeta.meta, [this.state.currentCluster, 'name']) || _.get(clusterMeta.meta, [this.props.chooseCluster, 'name']);
     return (
       <header className="admin-console-header">
        <a className="admin-console-logo">
@@ -75,18 +70,18 @@ class Header extends React.Component {
         </a>
         <div className="admin-console-clusterName">
           <Menu mode="horizontal" onClick={this.changeCluster}>
-            <SubMenu className="switch-cluster" key="workSpaces" title={<span><Icon type="setting" />切换集群</span>}>
+            <SubMenu className="switch-cluster" key="workSpaces" title={<span><Icon type="setting" />{clusterName}</span>}>
               {workspacesList}
             </SubMenu>
           </Menu>
         </div>
-        <div className="admin-console-clusterInfo">
+        {/* <div className="admin-console-clusterInfo">
           当前所在集群：
           <span className="clusterName">{clusterName}</span>
-        </div>
+        </div> */}
         {this.state.warning && (<div className="admin-console-clusterInfo" >
-          <span className="clusterName"> 
-            <Icon type="exclamation-circle-o" /> 
+          <span className="clusterName">
+            <Icon type="exclamation-circle-o" />
             <Link to={window.prefix + '/pages/clusterMgr'}> 检测到存在安全隐患</Link>
           </span>
         </div>)}
