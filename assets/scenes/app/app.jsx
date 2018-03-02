@@ -26,8 +26,8 @@ class App extends React.Component {
       this.showModal();
     }
     let clusterMeta = this.props.clusterMeta;
-    if (!Object.keys(clusterMeta.meta).length && location.pathname !== '/pages/clusterMgr') {
-      this.context.router.push({pathname: '/pages/clusterMgr', query:{clusterCode: this.clusterCode}});
+    if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
+      this.context.router.push({pathname: window.prefix + '/pages/clusterMgr', query:{clusterCode: this.clusterCode}});
     }
   }
 
@@ -43,7 +43,7 @@ class App extends React.Component {
       visible: false,
     });
     localStorage.setItem('clusterCode', chooseCluster);
-    this.context.router.push({pathname: '/pages/list', query:{clusterCode: chooseCluster}});
+    this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: chooseCluster}});
   }
 
   chooseCluster = (value) => {
