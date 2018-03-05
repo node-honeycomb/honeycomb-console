@@ -37,7 +37,7 @@ class Header extends React.Component {
       currentCluster: e.key,
     });
     localStorage.setItem('clusterCode', e.key);
-    this.context.router.push({pathname: '/pages/list', query:{clusterCode: e.key}});
+    this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
   }
 
   componentDidMount() {
