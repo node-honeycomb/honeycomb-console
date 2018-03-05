@@ -127,7 +127,7 @@ exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, cluste
   }
   let querySql = '';
   switch (config.meta.driver) {
-    case 'mysql': c = INSERT_USER_ACL_MYSQL; break;
+    case 'mysql': querySql = INSERT_USER_ACL_MYSQL; break;
     case 'sqlite': querySql = INSERT_USER_ACL_SQLITE; break;
     default: break;
   }
