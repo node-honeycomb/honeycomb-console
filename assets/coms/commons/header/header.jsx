@@ -11,6 +11,7 @@ var SubMenu = Menu.SubMenu;
 let User = require("../../../services/user");
 const URL = require("url");
 import { ReactContext } from 'react-router';
+var connect = require('react-redux').connect;
 
 require('./header.less');
 class Header extends React.Component {
@@ -22,23 +23,44 @@ class Header extends React.Component {
     if (user) {
       currentUser = user.nickname || user.name
     }
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     this.state = {
       warning: false,
-      currentCluster: URL.parse(window.location.href, true).query.clusterCode,
+      serverSecure: true,
+      currentCluster: clusterCode,
       currentUser: currentUser || this.clusterMeta.meta[URL.parse(window.location.href, true).query.clusterCode].name,
-    }
+    };
+    this.checkServerVersion(clusterCode);
     window.addEventListener('warning',()=>{
       this.state.warning = true;
     });
   }
+  checkServerVersion = (clusterCode) => {
+    this.props.getStatus({clusterCode: clusterCode}).then((result) => {
+      let serverSecure = true;
+      let serverList = result.success;
+      serverList.forEach((server) => {
+        if (server.data.serverVersion < window.secureServerVersion) {
+          serverSecure = false;
+        }
+      });
+      this.setState({
+        serverSecure: serverSecure
+      });
+    }).catch(err => {
+      console.log(err);
+    });
+  } 
   changeCluster = (e)=>{
     let clusterMeta = this.props.clusterMeta;
     this.setState({
       currentCluster: e.key,
     });
+    this.checkServerVersion(e.key);
     localStorage.setItem('clusterCode', e.key);
     this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
   }
+
   componentDidMount() {
     let clusterMeta = this.props.clusterMeta;
     if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
@@ -84,6 +106,12 @@ class Header extends React.Component {
             <Link to={window.prefix + '/pages/clusterMgr'}> 检测到存在安全隐患</Link>
           </span>
         </div>)}
+        {!this.state.serverSecure && (<div className="admin-console-serverSecureInfo" >
+          <span className="clusterName">
+            <Icon type="info-circle-o" />
+            <Link to={window.prefix + '/pages/clusterMgr'}> Server版本过低</Link>
+          </span>
+        </div>)}
         <Menu mode="horizontal">
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
           </SubMenu>
@@ -94,7 +122,21 @@ class Header extends React.Component {
     );
   }
 };
+
+
+let mapStateToProps = (store) => {
+  let appMeta = store.app;
+  return {
+    appMeta
+  }
+}
+
 Header.contextTypes = {
   router: React.PropTypes.object
 }
-module.exports = Header;
+
+let actions = require("../../../actions");
+
+module.exports = connect(mapStateToProps,{
+  getStatus : actions.app.getStatus
+})(Header);

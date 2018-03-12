@@ -28,16 +28,9 @@ class App extends React.Component {
     let clusterMeta = this.props.clusterMeta;
     if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
       this.context.router.push({pathname: window.prefix + '/pages/clusterMgr', query:{clusterCode: this.clusterCode}});
-    } else {
-      this.checkServerVersion(this.clusterCode);
     }
   }
 
-  checkServerVersion = (clusterCode) => {
-    this.props.getStatus({clusterCode: clusterCode}).then((serverStatus) => {
-      console.log('serverStatus', serverStatus);
-    });
-  }
   showModal = () => {
     this.setState({
       visible: true,
