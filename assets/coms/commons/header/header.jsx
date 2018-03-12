@@ -39,7 +39,6 @@ class Header extends React.Component {
     localStorage.setItem('clusterCode', e.key);
     this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
   }
-
   componentDidMount() {
     let clusterMeta = this.props.clusterMeta;
     if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {

@@ -13,6 +13,7 @@
   <div id="server-admin"></div>
   <script>
     window.prefix = '<%=prefix%>';
+    window.secureServerVersion = '<%=secureServerVersion%>';
     window.csrfToken = '<%=csrfToken%>';
     window.publishPages = JSON.parse('<%- JSON.stringify(publishPages) %>');
     window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');

@@ -27,6 +27,7 @@ module.exports = {
   // },
   port: 9000,
   prefix: '/',
+  dumpConfig: true,
   middleware: {
     cookieSession: {
       config: {
@@ -70,5 +71,6 @@ module.exports = {
   },
   whiteList: ['admin'],
   ignoreLogFiles: [/_app_usage_cache_\/app-usage\./, /app-usage\.{year}-{month}-{day}-{hour}\.log/, /nodejs_stdout\.log\.2\d+/],
-  logSqlQuery: true
+  logSqlQuery: true,
+  secureServerVersion: '1.0.3_3'
 };

@@ -28,9 +28,16 @@ class App extends React.Component {
     let clusterMeta = this.props.clusterMeta;
     if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
       this.context.router.push({pathname: window.prefix + '/pages/clusterMgr', query:{clusterCode: this.clusterCode}});
+    } else {
+      this.checkServerVersion(this.clusterCode);
     }
   }
 
+  checkServerVersion = (clusterCode) => {
+    this.props.getStatus({clusterCode: clusterCode}).then((serverStatus) => {
+      console.log('serverStatus', serverStatus);
+    });
+  }
   showModal = () => {
     this.setState({
       visible: true,
@@ -49,7 +56,7 @@ class App extends React.Component {
   chooseCluster = (value) => {
     this.setState({
       chooseCluster: value,
-    })
+    });
   }
   getSelectedKeys = () =>{
     let selectedKeys =_.last(window.location.pathname.split('/'));
@@ -110,6 +117,7 @@ App.contextTypes = {
 let actions = require("../../actions");
 
 module.exports = connect(mapStateToProps,{
-  getAppList : actions.app.getAppList
+  getAppList : actions.app.getAppList,
+  getStatus : actions.app.getStatus
 })(App);
 
