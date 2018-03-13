@@ -49,7 +49,7 @@ class App extends React.Component {
   chooseCluster = (value) => {
     this.setState({
       chooseCluster: value,
-    })
+    });
   }
   getSelectedKeys = () =>{
     let selectedKeys =_.last(window.location.pathname.split('/'));
