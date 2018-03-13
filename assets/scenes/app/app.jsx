@@ -110,7 +110,6 @@ App.contextTypes = {
 let actions = require("../../actions");
 
 module.exports = connect(mapStateToProps,{
-  getAppList : actions.app.getAppList,
-  getStatus : actions.app.getStatus
+  getAppList : actions.app.getAppList
 })(App);
 

@@ -11,7 +11,7 @@ var SubMenu = Menu.SubMenu;
 let User = require("../../../services/user");
 const URL = require("url");
 import { ReactContext } from 'react-router';
-var connect = require('react-redux').connect;
+const connect = require('react-redux').connect;
 
 require('./header.less');
 class Header extends React.Component {
