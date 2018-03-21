@@ -56,7 +56,7 @@ class Publish extends React.Component {
     let that = this;
     var props = {
       name: 'pkg',
-      action: '/api/app/publish?clusterCode='+clusterCode+'&_csrf='+window.csrfToken,
+      action: window.prefix + '/api/app/publish?clusterCode='+clusterCode+'&_csrf='+window.csrfToken,
       beforeUpload(file,fileList) {
         return new Promise((resolve, reject) => {
           Modal.confirm({
