@@ -25,8 +25,8 @@ module.exports = {
   //     "group_concat_max_len": 1048576
   //   }]
   // },
-  port: 9000,
-  prefix: '/',
+  // port: 9000,
+  // prefix: '/',
   dumpConfig: true,
   middleware: {
     cookieSession: {
