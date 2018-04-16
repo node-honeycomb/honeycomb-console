@@ -113,6 +113,8 @@ class Header extends React.Component {
           </span>
         </div>)}
         <Menu mode="horizontal">
+          {window.oldConsole && <SubMenu key="retweet" title={<span><Icon type="retweet" /><a href={window.oldConsole}>{'返回旧版'}</a></span>}>
+          </SubMenu>}
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
           </SubMenu>
           <SubMenu key="logout" title={<span><Icon type="logout" /><a href="/logout">{'退出登录'}</a></span>}>

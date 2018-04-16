@@ -41,6 +41,7 @@ exports.pages = function (req, callback) {
       data: {
         prefix: config.prefix !== '/' ? config.prefix : '',
         secureServerVersion: config.secureServerVersion || '0.0.0',
+        oldConsole: config.oldConsole || '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
         user: req.user,
