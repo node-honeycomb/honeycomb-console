@@ -26,7 +26,7 @@ module.exports = {
   //   }]
   // },
   // port: 9000,
-  // prefix: '/',
+  prefix: '/honeycomb-console',
   dumpConfig: true,
   middleware: {
     cookieSession: {
