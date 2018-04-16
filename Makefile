@@ -47,7 +47,7 @@ package: release
 daily: release
 	@cd out/release/config && cat config_daily.js > config.js
 	@cd out && mv release admin_$(VERSION)_$(BUILD_NO)
-	@cd out && tar -czf admin_$(VERSION)_$(BUILD_NO).tgz admin_$(VERSION)_$(BUILD_NO)
+	@cd out && tar -czf honeycomb-console_$(VERSION)_$(BUILD_NO).tgz admin_$(VERSION)_$(BUILD_NO)
 
 clean:
 	@rm -rf ./out
@@ -56,5 +56,5 @@ tag:
 	@cat package.json | awk -F '"' '/version" *: *"/{print "v"$$4}' | xargs -I {} git tag {}
 release-linux:
 	docker run -it --rm -v $(shell pwd):/workspace centos/nodejs-8-centos7 /bin/bash -c \
-	"cd /workspace  && registry=https://registry.npm.taobao.org make release"
+	"cd /workspace  && registry=https://registry.npm.taobao.org make package"
 .PHONY: install
