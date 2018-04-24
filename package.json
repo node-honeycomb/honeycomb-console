@@ -27,6 +27,7 @@
     "urllib": "2.20.0"
   },
   "devDependencies": {
+    "babel-eslint": "^8.2.3",
     "eslint": "3.16.1",
     "eslint-config-aliyun": "1.0.4",
     "eslint-plugin-react": "6.10.0",

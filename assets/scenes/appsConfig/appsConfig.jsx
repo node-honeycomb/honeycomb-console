@@ -14,6 +14,8 @@ let User = require("../../services/user");
 require('codemirror/lib/codemirror.css');
 require('codemirror/mode/javascript/javascript');
 const URL = require("url");
+import ConfigDiff from './config-diff';
+
 class AppsConfig extends React.Component {
   state = {
     isEdit: false,
@@ -22,11 +24,22 @@ class AppsConfig extends React.Component {
     newAppConfig:' ',
     loading: false,
     code: '',
+    showDiff: false,
   }
   showEditConfig = () => {
     this.setState({
       isEdit : true
     })
+  }
+  showDiff = () => {
+    this.setState({
+      showDiff: true
+    });
+  }
+  hideDiff = () => {
+    this.setState({
+      showDiff: false,
+    });
   }
   closeEditConfig = () => {
     let currentAppConfig = this.state.currentAppConfig
@@ -114,6 +127,11 @@ class AppsConfig extends React.Component {
     })
   }
   render() {
+
+    if(this.state.showDiff){
+      return <ConfigDiff onFinish={this.hideDiff}/>
+    }
+
     let membersList = [];
     let appList = _.filter(this.props.appMeta.appList,(value,key)=>{
       return value.name.indexOf("__ADMIN__") < 0 && value.name.indexOf("__PROXY__")
@@ -156,6 +174,8 @@ class AppsConfig extends React.Component {
                 </Spin>
                 <div>
                   <Button type="primary" onClick={this.showEditConfig}>编辑配置</Button>
+                  &nbsp;&nbsp;
+                  <Button type="primary" onClick={this.showDiff}>配置对比</Button>
                 </div>
             </div>
             }
