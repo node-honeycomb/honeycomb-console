@@ -4,6 +4,7 @@
   "description": "a new way to write js in browser.",
   "version": "1.1.1",
   "dependencies": {
+    "alpha-order": "^1.0.1",
     "antd": "^2.6.0",
     "async": "~1.5.2",
     "bluebird": "^3.4.6",
@@ -14,6 +15,7 @@
     "lodash": "~4.11.1",
     "lodash.debounce": "~4.0.6",
     "moment": "~2.13.0",
+    "monaco-editor": "^0.12.0",
     "normalizr": "~2.0.0",
     "randomstring": "^1.1.5",
     "react": "~15.3.0",
