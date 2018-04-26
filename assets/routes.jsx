@@ -1,6 +1,7 @@
 'use strict';
 
 const React = require('react');
+const ReactRouter = require('react-router');
 const Route = require('react-router').Route;
 const App = require('./scenes/app/app.jsx');
 const LoginPage = require('./scenes/login/login.jsx');
@@ -20,6 +21,17 @@ const URL = require('url');
 module.exports = (store, dispatch) => {
   return [{
     path: window.prefix + '/',
+    onEnter: function (nextState, replaceState) {
+      let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+      if (!clusterCode && localStorage.getItem('clusterCode')) {
+        ReactRouter.browserHistory.push({
+          pathname: window.location.pathname,
+          query:{
+            clusterCode: localStorage.getItem('clusterCode')
+          }
+        });
+      }
+    },
     childRoutes: [{
       path: '/login',
       component: LoginPage,

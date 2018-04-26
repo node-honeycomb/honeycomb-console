@@ -5,11 +5,6 @@
   <title>App Admin</title>
 </head>
 <body>
-  <script>
-    if (!window.location.href.split('?clusterCode=')[1] && localStorage.getItem('clusterCode')) {
-      window.location.href = window.location.href + '?clusterCode=' + localStorage.getItem('clusterCode');
-    }
-  </script>
   <div id="server-admin"></div>
   <script>
     window.prefix = '<%=prefix%>';
