@@ -61,13 +61,6 @@ class Header extends React.Component {
     this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
   }
 
-  componentDidMount() {
-    let clusterMeta = this.props.clusterMeta;
-    if (!Object.keys(clusterMeta.meta).length && location.pathname !== window.prefix + '/pages/clusterMgr') {
-      location.pathname = window.prefix + '/pages/clusterMgr';
-    }
-  }
-
   render() {
     let clusterMeta = _.cloneDeep(this.props.clusterMeta);
     _.map(clusterMeta.meta, (value, key)=>{
@@ -82,6 +75,7 @@ class Header extends React.Component {
       );
     });
     let clusterName = _.get(clusterMeta.meta, [this.state.currentCluster, 'name']) || _.get(clusterMeta.meta, [this.props.chooseCluster, 'name']);
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode || '';  
     return (
       <header className="admin-console-header">
        <a className="admin-console-logo">
@@ -103,13 +97,13 @@ class Header extends React.Component {
         {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName">
             <Icon type="exclamation-circle-o" />
-            <Link to={window.prefix + '/pages/clusterMgr'}> 检测到存在安全隐患</Link>
+            <Link to={window.prefix + '/pages/clusterMgr' + (clusterCode ? '?clusterCode=' + clusterCode : '')}> 检测到存在安全隐患</Link>
           </span>
         </div>)}
         {!this.state.serverSecure && (<div className="admin-console-serverSecureInfo" >
           <span className="clusterName">
             <Icon type="info-circle-o" />
-            <Link to={window.prefix + '/pages/clusterMgr'}> Server版本过低</Link>
+            <Link to={window.prefix + '/pages/clusterMgr' + (clusterCode ? '?clusterCode=' + clusterCode : '')}> Server版本过低</Link>
           </span>
         </div>)}
         <Menu mode="horizontal">
