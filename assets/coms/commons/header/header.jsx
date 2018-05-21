@@ -111,7 +111,7 @@ class Header extends React.Component {
           </SubMenu>}
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
           </SubMenu>
-          <SubMenu key="logout" title={<span><Icon type="logout" /><a href="/logout">{'退出登录'}</a></span>}>
+          <SubMenu key="logout" title={<span><Icon type="logout" /><a href={window.prefix + '/logout'}>{'退出登录'}</a></span>}>
           </SubMenu>
         </Menu>
       </header>
