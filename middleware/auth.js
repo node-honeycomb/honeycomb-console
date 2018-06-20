@@ -10,6 +10,12 @@ module.exports = function (req, res, next) {
   let path = req.path;
   // if already login
   if (req.session && req.session.username) {
+    if (path === '/logout') {
+      req.session.user = null;
+      req.session = null;
+      res.redirect(req.headers.referer || config.prefix);
+      return;
+    }
     return next();
   }
 
@@ -58,10 +64,6 @@ module.exports = function (req, res, next) {
           return res.redirect(config.prefix + '?error=login_failed');
         }
       });
-      break;
-    case '/logout':
-      req.session.user = null;
-      res.redirect(config.prefix);
       break;
     default:
       User.countUser((err, count) => {

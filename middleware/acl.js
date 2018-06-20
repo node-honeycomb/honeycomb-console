@@ -36,13 +36,13 @@ module.exports = function (req, res, next) {
     var username = req.session.username;
     var user = {};
     user.name = username;
-    async.waterfall([function (cb) {
-      User.getUser(username, cb);
-    },
+    async.waterfall([
+      function (cb) {
+        User.getUser(username, cb);
+      },
       function (data, cb) {
         if (!data) {
-          cb(null);
-          return;
+          return cb(null);
         }
         user.id = data.id;
         user.role = data.role;

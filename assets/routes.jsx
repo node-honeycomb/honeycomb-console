@@ -12,6 +12,7 @@ const PublishPage = require('./scenes/publish/publish.jsx');
 const MonitorPage = require('./scenes/monitor/monitor.jsx');
 const LogPage = require('./scenes/log/log.jsx');
 const AclPage = require('./scenes/acl/acl.jsx');
+const UserPage = require('./scenes/user/index.jsx');
 const actions = require('./actions');
 const moment = require('moment');
 let User = require('./services/user');
@@ -95,6 +96,15 @@ module.exports = (store, dispatch) => {
         onEnter: function (nextState, replaceState) {
           let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           dispatch(actions.acl.getAcl());
+          dispatch(actions.app.getAppList({
+            clusterCode: clusterCode
+          }));
+        }
+      }, {
+        path: 'userMgr',
+        component: UserPage,
+        onEnter: function (nextState, replaceState) {
+          let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           dispatch(actions.app.getAppList({
             clusterCode: clusterCode
           }));

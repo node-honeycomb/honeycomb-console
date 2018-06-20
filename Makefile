@@ -8,7 +8,7 @@ BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 TESTS_ENV = tests/env.js
 
 install:
-	@echo "using npm registry, you need: make install registry=$registry_addr"
+	@echo 'using npm registry, you need: make install registry=$$registry_addr'
 	@npm install --registry=${registry}
 	@cd assets && npm install --registry=${registry}
 

@@ -35,6 +35,46 @@ User.addUser = function (name, pwd, status, role, callback) {
   );
 };
 
+const UPDATE_SYSTEM_USER = `
+  UPDATE
+    hc_console_system_user
+  SET status = ?, password = ?, role = ?, gmt_modified = ?
+  WHERE name = ?;
+`;
+
+User.updateUser = function (name, pwd, status, role, callback) {
+  let d = new Date();
+  db.query(
+    UPDATE_SYSTEM_USER,
+    [status, pwd, role, d, name],
+    function (err) {
+      if (err) {
+        log.error('update user new user failed:', err);
+        return callback(err);
+      } else {
+        log.info('Add user success');
+        callback();
+      }
+    }
+  );
+};
+
+
+const LIST_USER = `
+  SELECT
+    name,
+    role,
+    status
+  FROM
+    hc_console_system_user
+  WHERE
+    status = 1
+  limit 10000;
+`;
+User.listUser = function (cb) {
+  db.query(LIST_USER, cb);
+};
+
 /**
  * 获取系统用户数
  */

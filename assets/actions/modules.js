@@ -9,5 +9,6 @@ module.exports = [
   "publish",
   "monitor",
   "login",
-  "acl"
+  "acl",
+  "user"
 ];
