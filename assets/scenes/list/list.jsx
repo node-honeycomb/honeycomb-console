@@ -29,7 +29,7 @@ class List extends React.Component {
       filterList:{},
       dataSource: [],
       rowSpan:{},
-      deleteAppName: null
+      deleteAppName: null,
     }
   }
   genRowspan = (appList, data) => {
@@ -52,10 +52,9 @@ class List extends React.Component {
   setListInterval = (that) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      let int = setInterval(function() {
+      window.int = setInterval(function() {
         that.props.getAppList({ clusterCode: clusterCode })
       }, 5000);
-      this.setState({ int: int });
     }
   }
 
@@ -63,8 +62,20 @@ class List extends React.Component {
     let that = this;
     this.setListInterval(that);
   }
-  
+
   componentWillReceiveProps = (nextProps) => {
+    if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
+      let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+      let that = this;
+      this.setState({
+        filterList: {},
+      })
+      if(window.int){
+        clearInterval(window.int);
+      }
+      this.props.getAppList({ clusterCode: clusterCode })
+      this.setListInterval(that);
+    }
     let newState = _.cloneDeep(this.state);
     let newFilterList = _.cloneDeep(nextProps.appMeta.filterList);
     let oldFilterList = newState.filterList;
@@ -76,10 +87,11 @@ class List extends React.Component {
     this.setState({
       filterList: newFilterList,
     })
+
   }
 
   componentWillUnmount = () => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
   }
   changeMonitorData = (gap = null) => {
     let fromTime = moment().format("YYYY-MM-DD-HH");
@@ -95,7 +107,7 @@ class List extends React.Component {
     return this.props.queryAppUsages(param);
   }
   showModal = (record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     let index = record.appId;
     this.setState({
       index: index
@@ -134,7 +146,7 @@ class List extends React.Component {
         title = '确定要删除'+name+'吗?';
         content = '无法复原，请谨慎操作';
         handleApp = () => {
-          this.props.deleteApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.deleteApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.setState({ isDelete: true });
             this.props.getAppList({ clusterCode: clusterCode });
           })
@@ -147,7 +159,7 @@ class List extends React.Component {
             starting: 'stopping',
             index: name
           });
-          this.props.stopApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.stopApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -164,7 +176,7 @@ class List extends React.Component {
             starting: 'starting',
             index: name
           });
-          this.props.startApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.startApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -181,7 +193,7 @@ class List extends React.Component {
             starting: 'reloading',
             index: name
           });
-          this.props.reloadApps({ clusterCode: clusterCode }, { appkey: name }).then(() => {
+          this.props.reloadApps({ clusterCode: clusterCode }, { appId: name }).then(() => {
             this.props.getAppList({ clusterCode: clusterCode }).then(() => {
               this.setState({
                 starting: null,
@@ -202,7 +214,7 @@ class List extends React.Component {
     });
   }
   showErrorMsg = (message,record) => {
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       message: message,
       name: record.name,
@@ -213,7 +225,7 @@ class List extends React.Component {
   }
 
   openDeleteAllModal = (appName) =>{
-    clearInterval(this.state.int);
+    clearInterval(window.int);
     this.setState({
       deleteAllVisible: true,
       deleteAppName: appName
@@ -259,7 +271,7 @@ class List extends React.Component {
       render: (text, record, index) => {
         return (
           <div className="version-text">
-            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li> 
+            <li onClick={this.showModal.bind(this,record)}>{record.version}_{record.buildNum}</li>
           </div>
 
         )
@@ -287,7 +299,7 @@ class List extends React.Component {
         let errorflag = true;
         let errorExitMsg = [];
         let errorExitCountAll = 0;
-        let appKey = record.appId;
+        let appId = record.appId;
         record.cluster.forEach((value, key) => {
           if (record.cluster[key + 1] && value.status !== record.cluster[key + 1].status) {
             errorflag = false;
@@ -309,10 +321,10 @@ class List extends React.Component {
           }
         }
         function errorFlag(that){
-          if(errorflag){  
+          if(errorflag){
             return(
               <div className="status-inline">
-                <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appKey === that.state.index?that.state.starting:record.cluster[0].status}
+                <Tag color={colorChoose(record.cluster[0].status)}>{that.state.starting && appId === that.state.index?that.state.starting:record.cluster[0].status}
                 </Tag>
                 <span>
                   {record.isCurrWorking?<Icon className="workingBtn" type="check-circle-o" />:null}
@@ -329,7 +341,7 @@ class List extends React.Component {
               return(
                 <div className="status-block" key={"statusList"+key}>
                   <span>{value.ip}</span>
-                  <Tag color={colorChoose(value.status)}>{that.state.starting && appKey === that.state.index?that.state.starting:value.status}
+                  <Tag color={colorChoose(value.status)}>{that.state.starting && appId === that.state.index?that.state.starting:value.status}
                   </Tag>
                   <span>{record.isCurrWorking?<Icon className="workingBtn" type="check-circle-o" />:null}</span>
                   {value.errorExitCount?
@@ -338,13 +350,13 @@ class List extends React.Component {
                       <Icon type="exclamation-circle-o" /> [{value.errorExitCount}]
                     </a>
                   </span>:null}
-                </div>                     
+                </div>
               )
             })
           }
         }
         return (
-          <div key={"status"+index}>   
+          <div key={"status"+index}>
             {errorFlag(that)}
           </div>
         )
@@ -387,7 +399,7 @@ class List extends React.Component {
               <Button size="small" onClick={this.showConfirm.bind(this,"reload",record.appId)} className={reloadClass} type="primary" ghost>reload</Button>
             </li>
           )
-        }       
+        }
       }
     }, ]
     return columns;
@@ -425,7 +437,7 @@ class List extends React.Component {
     return (
       <div className="list-wrap">
         <div className="list-table-wrap">
-          <Table 
+          <Table
           pagination = {false}
           dataSource={data}
           columns={this.generateColumns(rowSpan)}

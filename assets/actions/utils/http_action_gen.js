@@ -8,7 +8,6 @@ const actionNameGen = require('./action_name_gen');
 module.exports = (urlCfg) => {
   return (param, urlParam, options) => {
     return (dispatch) => {
-
       let url = urlCfg.url;
       let mock = urlCfg.mock;
       let method = urlCfg.method;
@@ -22,7 +21,7 @@ module.exports = (urlCfg) => {
       }
 
       urlParam = urlParam || {};
-      let grep = /\/:([\w\.\-\+]+)/;
+      let grep = /:([\w\.\-\+]+)/g;
       let m = grep.exec(url);
       while (m) {
         url = url.replace(':' + m[1], '' + urlParam[m[1]]);

@@ -14,6 +14,8 @@ let User = require("../../services/user");
 require('codemirror/lib/codemirror.css');
 require('codemirror/mode/javascript/javascript');
 const URL = require("url");
+import ConfigDiff from './config-diff';
+
 class AppsConfig extends React.Component {
   state = {
     isEdit: false,
@@ -22,11 +24,22 @@ class AppsConfig extends React.Component {
     newAppConfig:' ',
     loading: false,
     code: '',
+    showDiff: false,
   }
   showEditConfig = () => {
     this.setState({
       isEdit : true
     })
+  }
+  showDiff = () => {
+    this.setState({
+      showDiff: true
+    });
+  }
+  hideDiff = () => {
+    this.setState({
+      showDiff: false,
+    });
   }
   closeEditConfig = () => {
     let currentAppConfig = this.state.currentAppConfig
@@ -40,14 +53,14 @@ class AppsConfig extends React.Component {
     let appName = this.state.currentApp;
     let tmp = value.split(':');
     let type = tmp[0];
-    let app = tmp[1];
+    let appId = tmp[1];
     let res = null;
     if(operation === 'get'){
       this.setState({
         loading: true,
         configName: value
       });
-      this.props.getAppsConfig({clusterCode:clusterCode},{app:app, type: type}).then((result)=>{
+      this.props.getAppsConfig({clusterCode:clusterCode,type:type},{appId:appId}).then((result)=>{
         try{
           res = JSON.stringify(this.props.appsConfigMeta.meta, null, 2);
           if(res){
@@ -82,8 +95,8 @@ class AppsConfig extends React.Component {
         width: 600,
         onOk: () => {
           let appConfig = this.state.newAppConfig;
-          this.props.setAppConfig({clusterCode:clusterCode,appConfig:appConfig},{app:app, type:type}).then((result)=>{
-            this.props.getAppsConfig({clusterCode:clusterCode},{app: app, type: type}).then((result)=>{
+          this.props.setAppConfig({clusterCode:clusterCode,appConfig:appConfig,type:type},{appId:appId}).then((result)=>{
+            this.props.getAppsConfig({clusterCode:clusterCode,type: type},{appId: appId}).then((result)=>{
               this.setState({loading: true})
               try{
                 res = JSON.stringify(this.props.appsConfigMeta.meta, null, 2);
@@ -114,6 +127,11 @@ class AppsConfig extends React.Component {
     })
   }
   render() {
+
+    if(this.state.showDiff){
+      return <ConfigDiff onFinish={this.hideDiff}/>
+    }
+
     let membersList = [];
     let appList = _.filter(this.props.appMeta.appList,(value,key)=>{
       return value.name.indexOf("__ADMIN__") < 0 && value.name.indexOf("__PROXY__")
@@ -124,7 +142,6 @@ class AppsConfig extends React.Component {
     const formItemLayout = {
       wrapperCol: { span: 25 },
     };
-    if(window.whiteList.indexOf(localStorage.getItem('name'))>=0){
       return(
         <div className="appsconfig-wrap">
           <div className="appsconfig-select">
@@ -157,19 +174,14 @@ class AppsConfig extends React.Component {
                 </Spin>
                 <div>
                   <Button type="primary" onClick={this.showEditConfig}>编辑配置</Button>
+                  &nbsp;&nbsp;
+                  <Button type="primary" onClick={this.showDiff}>配置对比</Button>
                 </div>
             </div>
             }
           </div>
         </div>
       )
-    }else{
-    return(
-        <div className="cluster-wrap">
-          <div className="error-font"><span>您没有权限在此页面操作，请联系管理员</span></div>
-        </div>
-      )
-    }
   }
 }
 

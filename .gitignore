@@ -16,3 +16,4 @@ $Recycle.Bin/
 runtime_config.json
 auto_router.js
 .package
+.*.swp

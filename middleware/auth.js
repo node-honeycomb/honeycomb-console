@@ -1,6 +1,7 @@
 'use strict';
 const utils = require('../common/utils');
-const userModel = require('../model/user');
+const User = require('../model/user');
+const config = require('../config');
 /**
  * [exports description]
  * @return {[type]} [description]
@@ -8,7 +9,7 @@ const userModel = require('../model/user');
 module.exports = function (req, res, next) {
   let path = req.path;
   // if already login
-  if (req.session && req.session.user) {
+  if (req.session && req.session.username) {
     return next();
   }
 
@@ -18,18 +19,18 @@ module.exports = function (req, res, next) {
   switch (path) {
     case '/initUser':
       if (!user || !pwd) {
-        return res.redirect('/?error=user_or_pwd_empty');
+        return res.redirect(config.prefix + '?error=user_or_pwd_empty');
       }
       pwd = utils.sha256(pwd);
-      userModel.countUser((err, data) => {
+      User.countUser((err, data) => {
         if (err) {
           return next(err);
         }
         if (data.length) {
           return next(new Error('root user all ready inited'));
         }
-        userModel.addUser(user, pwd, 1, 1, (err) => {
-          let target = '/';
+        User.addUser(user, pwd, 1, 1, (err) => {
+          let target = config.prefix;
           if (err) {
             target += '?error=' + err.message;
           }
@@ -39,35 +40,31 @@ module.exports = function (req, res, next) {
       break;
     case '/loginAuth':
       if (!user || !pwd) {
-        return res.redirect('/?error=user_or_pwd_empty');
+        return res.redirect(config.prefix + '?error=user_or_pwd_empty');
       }
-      userModel.getUser(user, (err, data) => {
+      User.getUser(user, (err, user) => {
         if (err) {
-          return res.redirect('/?error=' + err.message);
+          return res.redirect(config.prefix + '?error=' + err.message);
         }
-        if (!data || !data.length) {
-          return res.redirect('/?error=user_not_found');
-        }
-        data = data[0];
         pwd = utils.sha256(pwd);
-        if (data.password === pwd) {
-          req.session.user = {
-            name: user,
-            nickname: user,
-            role: data.role
-          };
-          return res.redirect('/');
+        if (user.password === pwd) {
+          // req.session.user = {
+          //   name: user.name,
+          //   role: user.role
+          // };
+          req.session.username = user.name;
+          return res.redirect(config.prefix);
         } else {
-          return res.redirect('/?error=login_failed');
+          return res.redirect(config.prefix + '?error=login_failed');
         }
       });
       break;
     case '/logout':
       req.session.user = null;
-      res.redirect('/');
+      res.redirect(config.prefix);
       break;
     default:
-      userModel.countUser((err, data) => {
+      User.countUser((err, count) => {
         let errmsg;
         if (err) {
           errmsg = err.message;
@@ -75,28 +72,11 @@ module.exports = function (req, res, next) {
           errmsg = req.query.error || '';
         }
         res.render('login.html', {
-          userCount: data.length ? data[0].count : 0,
+          prefix: config.prefix !== '/' ? config.prefix : '',
+          userCount: count,
           errMsg: errmsg,
           csrfToken: req.csrfToken()
         });
       });
   }
-  //let user = req.session.user;
-  /*
-  if (config.whiteList.indexOf(user.nickname) >= 0) {
-    next();
-  } else {
-    switch (path) {
-      case '/pages/clusterMgr':
-      case '/api/clusterCfg':
-      case '/api/worker':
-      case '/api/config':
-      case '/pages/appsConfig':
-        res.end('forbidden');
-        break;
-      default:
-        next();
-    }
-  }
-  */
 };

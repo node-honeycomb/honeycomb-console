@@ -23,13 +23,13 @@ class ErrorMsgModal extends React.Component {
   }
   handleCancel = (e) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
-    let appid = this.props.name+'_'+this.props.version;
+    let appId = this.props.name+'_'+this.props.version;
     let that = this;
     confirm({
       title: "确定要清空抛错记录(ExitRecord)吗？",
       content: "无法复原，请谨慎操作",
       onOk() {
-        that.props.cleanAppExitRecord({clusterCode: clusterCode},{appid: appid}).then(()=>{
+        that.props.cleanAppExitRecord({clusterCode: clusterCode},{appId: appId}).then(()=>{
           that.props.onHide && that.props.onHide.call({});
         })
       },

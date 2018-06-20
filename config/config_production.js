@@ -2,7 +2,6 @@
 module.exports = {
   env: 'production',
   debug: false,
-  prefix: '/',
   logs: {
     oplog: {
       level: 'INFO',

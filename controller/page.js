@@ -3,6 +3,7 @@ const log = require('../common/log');
 const cluster = require('../model/cluster');
 const config = require('../config');
 const lodash = require('lodash');
+const path = require('path');
 
 /**
  * @api  /pages/
@@ -22,7 +23,7 @@ const lodash = require('lodash');
  * @param callback
  */
 exports.redirect = function (req, callback) {
-  return callback(null, '/pages/list', 'redirect');
+  return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
 };
 
 /**
@@ -35,19 +36,17 @@ exports.pages = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    let whiteList = lodash.clone(config.whiteList);
-    if (req.session.user.role === 1) {
-      whiteList.push(req.session.user.nickname);
-    }
     callback(null, {
       tpl: 'index.html',
       data: {
+        prefix: config.prefix !== '/' ? config.prefix : '',
+        secureServerVersion: config.secureServerVersion || '0.0.0',
+        oldConsole: config.oldConsole || '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
-        user: req.session.user,
-        whiteList: whiteList,
+        user: req.user,
         env: config.env,
-        publishPage: config.publishPage
+        publishPages: Array.isArray(config.publishPages) ? config.publishPages : []
       }
     }, 'html');
   });
@@ -57,17 +56,16 @@ exports.pages = function (req, callback) {
  * @api {get} /login
  */
 exports.login = function (req, callback) {
-  console.log('>>>>>>>', req.url, req.session);
-  if (req.session && req.session.user) {
-    return callback(null, '/pages/list', 'redirect');
+  if (req.user) {
+    return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
   } else {
     callback(null, {
       tpl: 'index.html',
       data: {
+        prefix: config.prefix !== '/' ? config.prefix : '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
-        user: req.session.user,
-        whiteList: config.whiteList,
+        user: req.user,
         publishPage: config.publishPage
       }
     }, 'html');

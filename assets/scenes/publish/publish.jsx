@@ -56,7 +56,7 @@ class Publish extends React.Component {
     let that = this;
     var props = {
       name: 'pkg',
-      action: '/api/publish?clusterCode='+clusterCode+'&_csrf='+window.csrfToken,
+      action: window.prefix + '/api/app/publish?clusterCode='+clusterCode+'&_csrf='+window.csrfToken,
       beforeUpload(file,fileList) {
         return new Promise((resolve, reject) => {
           Modal.confirm({
@@ -118,47 +118,63 @@ class Publish extends React.Component {
       ipStatus = this.props.appMeta.status;
       ipStatus = _.chunk(ipStatus, 4);
     }
-    return(
-      <div className="publish-wrap">
-        <Tabs className="tab-wrap" defaultActiveKey={'1'}>
-          <TabPane tab="手动发布" key="4">
-            <div className="publish-update">
-              <Upload {...props}>
-                <button type="button" className="ant-btn ant-btn-ghost">
-                  <i className="anticon anticon-upload"></i> 发布应用
-                </button>
-              </Upload>
+
+    let publishTabs = [];
+    if (window.publishPages && window.publishPages.length > 0) {
+      let tabs = window.publishPages.map((publishPage, pageIndex) => {
+        return (
+          <TabPane tab={publishPage.tabName} key={pageIndex + 1}>
+            <div className={'iframe ' + publishPage.className}>
+              <iframe src={publishPage.src + '?clusterCode=' + clusterCode}/>
             </div>
-            <div className="publish-list">
-              <div className="app-status-wrap">
+          </TabPane>
+          );
+      });
+      publishTabs = publishTabs.concat(tabs);
+    }
+    publishTabs.push(
+    <TabPane tab="手动发布" key={publishTabs.length + 1}>
+    <div className="publish-update">
+      <Upload {...props}>
+        <button type="button" className="ant-btn ant-btn-ghost">
+          <i className="anticon anticon-upload"></i> 发布应用
+        </button>
+      </Upload>
+    </div>
+    <div className="publish-list">
+      <div className="app-status-wrap">
+      {
+        ipStatus.map((item, index)=>{
+          return(
+            <row key={index}>
               {
-                ipStatus.map((item, index)=>{
-                  return(
-                    <row key={index}>
+                item.map((value, key)=>{
+                   return(
+                  <Col key={key} span={6}>
+                    <Card title={"机器："+value.ip} >
                       {
-                        item.map((value, key)=>{
-                           return(
-                          <Col key={key} span={6}>
-                            <Card title={"机器："+value.ip} >
-                              {
-                                _.map(value.data, (v, k)=>{
-                                  return(
-                                    <p key={k}>{k} : {v}</p>
-                                  )
-                                })
-                              }
-                            </Card>
-                          </Col>
+                        _.map(value.data, (v, k)=>{
+                          return(
+                            <p key={k}>{k} : {v}</p>
                           )
                         })
                       }
-                    </row>
+                    </Card>
+                  </Col>
                   )
                 })
               }
-              </div>
-            </div>
-          </TabPane>
+            </row>
+          )
+        })
+      }
+      </div>
+    </div>
+  </TabPane>);
+    return(
+      <div className="publish-wrap">
+        <Tabs className="tab-wrap" defaultActiveKey={'1'}>
+          {publishTabs}
         </Tabs>
       </div>
     )

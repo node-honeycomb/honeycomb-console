@@ -165,7 +165,7 @@ exports.sign = function (queryPath, options, token) {
   }
   stringToSign = `${options.method}\n${accept}\n${contentMd5}\n${contentType}\n${date}\n${queryPath}`;
   options.headers['Content-Type'] = contentType;
-  log.debug('String to be signed: ', stringToSign);
+  log.debug('String to be signed: ', stringToSign,queryPath);
   let signature = exports.sha1(stringToSign, token);
   options.headers.Authorization = `system admin:${signature}`;
   options.headers.Date = date;
@@ -190,7 +190,8 @@ exports.callremote = function (queryPath, options, callback) {
     method: 'GET',
     headers: {},
     timeout: 15000,
-    dataType: 'json'
+    dataType: 'json',
+    rejectUnauthorized: false
   };
 
   options = _.merge(defaultOptions, options);
@@ -200,13 +201,16 @@ exports.callremote = function (queryPath, options, callback) {
   } else {
     queryPath += '&ips=' + ips;
   }
+  if(endpoint.endsWith('/')){
+    endpoint = endpoint.substring(0, endpoint.length - 1);
+  }
   delete options.endpoint;
   delete options.token;
   delete options.ips;
 
   let signed = exports.sign(queryPath, options, token);
   let qpath = endpoint + signed.queryPath;
-
+  log.debug(`${options.method} ${qpath}`);
   urllib.request(qpath, options, function (err, data) {
     if (err) {
       callback(err);

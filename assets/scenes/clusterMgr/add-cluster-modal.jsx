@@ -7,6 +7,7 @@ let classnames = require('classnames');
 import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Tooltip, Spin, Icon} from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
+const ipRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 class AddClusterModal extends React.Component {
   state = {
     info: {
@@ -14,37 +15,55 @@ class AddClusterModal extends React.Component {
       endpoint:'',
       ips:[],
       name:'',
-      token:'',
-    },
+      token:''
+    }
   }
   onClusterInfoChange = function(name, value){
-    let editInfo = _.cloneDeep(this.state.info) || {};
+    let editInfo = _.cloneDeep(this.state.info);
     editInfo[name] = value.target.value;
     this.setState({info: editInfo});
   }
   handleOk = (e) => {
     let editInfo = _.cloneDeep(this.state.info);
-    editInfo = _.assign({},editInfo,{isUpdate:false});
-    editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/);
-    editInfo.ips =  _.compact(editInfo.ips.map((item, index)=> item.trim()));
-    let errorIps = editInfo.ips.find((item, key)=>{
-      if(!item.match('^[0-9a-zA-Z\.\\?]+$')){
-        return item;
-      }
-    })
-    if(_.isEmpty(errorIps)){
-      this.setState({
-        isIpsError: false
-      })
-      this.props.addCluster(editInfo).then(()=>{
-        this.props.onHide && this.props.onHide.call({});
-        this.setState({info:{}});
-      })
-    }else{
+    editInfo.isUpdate = false;
+    if(typeof editInfo.ips === 'string'){
+      editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/g);
+      editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));  
+    }
+    if(editInfo.ips.length === 0){
       this.setState({
         isIpsError: true
-      })
+      });
+      return;
     }
+    let errorIps = editInfo.ips.find((item, key)=>{
+      if(!item.match(ipRegex)){
+        return item;
+      }
+    });
+    if(!_.isEmpty(errorIps)){
+      this.setState({
+        isIpsError: true
+      });
+      return;
+    }
+
+    if (!editInfo.token) {
+      editInfo.token = '***honeycomb-default-token***';
+    }
+    if (!editInfo.endpoint) {
+      editInfo.endpoint = 'http://' + editInfo.ips[0] + ':9999';
+    }
+
+    this.setState({
+      isIpsError: false
+    })
+    this.props.addCluster(editInfo).then(()=>{
+      this.props.onHide && this.props.onHide.call({});
+      this.setState({info:{}});
+    });
+
+
   }
   handleCancel = (e) => {
     this.props.onHide && this.props.onHide.call({});
@@ -69,34 +88,35 @@ class AddClusterModal extends React.Component {
           <Form>
             <FormItem
               {...formItemLayout}
-              label="集群中文名(name):"
+              label="集群显示名:"
               >
-              <Input onChange={this.onClusterInfoChange.bind(this,"name")} value={this.state.info.name} placeholder="请填写集群中文名" />
+              <Input onChange={this.onClusterInfoChange.bind(this,"name")} value={this.state.info.name} placeholder="请填写集群显示名" />
             </FormItem>
             <FormItem
               {...formItemLayout}
-              label="集群英文名(code):"
+              label="集群Code:"
               >
-              <Input onChange={this.onClusterInfoChange.bind(this,"code")} value={this.state.info.code} placeholder="请填写集群英文名" />
+              <Input onChange={this.onClusterInfoChange.bind(this,"code")} value={this.state.info.code} placeholder="请填写集群Code，英文字母" />
             </FormItem>
             <FormItem
               {...formItemLayout}
               label="endpoint:"
               >
-              <Input onChange={this.onClusterInfoChange.bind(this,"endpoint")} value={this.state.info.endpoint} placeholder="请填写endpoint" />
+              <Input onChange={this.onClusterInfoChange.bind(this,"endpoint")} value={this.state.info.endpoint} placeholder="集群中任意一台机器都可以, 格式: 'http://$ip:9999'" />
             </FormItem>
             <FormItem
               {...formItemLayout}
               label="token:"
               >
-              <Input onChange={this.onClusterInfoChange.bind(this,"token")} value={this.state.info.token} placeholder="请填写token" />
+              <Input onChange={this.onClusterInfoChange.bind(this,"token")} value={this.state.info.token} placeholder="请填写token，来自server.config.admin.token" />
             </FormItem>
             <FormItem
               {...formItemLayout}
               label="ip 列表:"
               >
-              <Input className={classnames({'ips-error': this.state.isIpsError})} onChange={this.onClusterInfoChange.bind(this,"ips")} value={this.state.info.ips} type="textarea" rows={4} placeholder="请填写ip列表" />
+              <Input className={classnames({'ips-error': this.state.isIpsError})} onChange={this.onClusterInfoChange.bind(this,"ips")} value={this.state.info.ips} type="textarea" rows={4} placeholder="集群机器的ip列表，每行一个或逗号间隔" />
             </FormItem>
+            <p>注：新安装的honeycomb-server，token默认值为: ***honeycomb-default-token***</p>
           </Form>
         </Modal>
       </div>

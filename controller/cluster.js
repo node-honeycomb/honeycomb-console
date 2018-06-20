@@ -3,41 +3,30 @@ const async = require('async');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
+const lodash = require('lodash');
 
-function getFilterCluster (gClusterConfig, clusterAcl) {
-  if (!gClusterConfig || !clusterAcl) return {};
-  let filterCluster = {};
-  Object.keys(clusterAcl).map((authorizedCluster) => {
-    if (gClusterConfig[authorizedCluster]) {
-      filterCluster[authorizedCluster] = gClusterConfig[authorizedCluster];
+function getFilterCluster(gClusterConfig, req) {
+  let clusterConfig = {};
+  Object.keys(gClusterConfig).forEach((clusterCode) => {
+    if (req.user.containsCluster(clusterCode)) {
+      clusterConfig[clusterCode] = lodash.cloneDeep(cluster.gClusterConfig[clusterCode]);
     }
   });
-  return filterCluster;
+  Object.keys(clusterConfig).forEach((clusterCode) => {
+    if (req.user.isClusterAdmin(clusterCode)) {
+      return;
+    } else {
+      clusterConfig[clusterCode].token = 'Unauthorized';
+    }
+  });
+  return clusterConfig;
 }
 
 /**
- * @api /api/cluster
- * @param req
- * @param callback
+ * @api {GET} /service/cluster/:code
  */
-exports.getClusterCfg = function (req, callback) {
-  cluster.getClusterCfg(function (err) {
-    if (err) {
-      log.error('Get cluster config from db failed.', err);
-      let e = new Error('Get cluster config from db failed.' + err.message);
-      return callback(e);
-    }
-    callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
-  });
-};
-
-/**
- * @api /api/cluster_config/:clusterCode
- * @param req
- * @param callback
- */
-exports.getClusterCfgByCode = function (req, callback) {
-  let clusterCode = req.params.clusterCode;
+exports.getClusterConfig = function (req, callback) {
+  let clusterCode = req.params.code;
   cluster.getClusterCfg(function (err) {
     if (err) {
       log.error('Get cluster config from db failed.', err);
@@ -49,9 +38,22 @@ exports.getClusterCfgByCode = function (req, callback) {
 };
 
 /**
- * @api {post} /api/cluster
- * @param req
- * @param callback
+ * @api {GET} /api/cluster/list
+ */
+exports.listCluster = function (req, callback) {
+  cluster.getClusterCfg(function (err) {
+    if (err) {
+      log.error('Get cluster config from db failed.', err);
+      let e = new Error('Get cluster config from db failed.' + err.message);
+      return callback(e);
+    }
+    callback(null, getFilterCluster(cluster.gClusterConfig, req));
+  });
+};
+
+
+/**
+ * @api {post} /api/cluster/create
  */
 exports.addCluster = function (req, callback) {
   let clusterCode = req.body.code;
@@ -96,7 +98,8 @@ exports.addCluster = function (req, callback) {
             log.error(err);
             return callback(err);
           }
-          callback(null, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+          //callback(null, cluster.gClusterConfig);
+          callback(null, getFilterCluster(cluster.gClusterConfig, req));
         });
       });
     });
@@ -117,8 +120,9 @@ exports.addCluster = function (req, callback) {
           if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
           let newCluster = cluster.gClusterConfig[clusterCode];
           if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-          userAcl.addUserAcl(req.session.user.nickname, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
-            callback(err, getFilterCluster(cluster.gClusterConfig, req.session.user.clusterAcl));
+          userAcl.addUserAcl(req.user.name, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
+            //callback(err, cluster.gClusterConfig);
+            callback(err, getFilterCluster(cluster.gClusterConfig, req));
           });
         });
       });
@@ -126,13 +130,12 @@ exports.addCluster = function (req, callback) {
   }
 };
 
+
 /**
- * @api {delete} /api/cluster
- * @param req
- * @param callback
+ * @api {post} /api/cluster/:code/delete
  */
 exports.removeCluster = function (req, callback) {
-  let clusterCode = req.body.clusterCode;
+  let clusterCode = req.params.code;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_CLUSTER',
@@ -147,58 +150,19 @@ exports.removeCluster = function (req, callback) {
       log.error('delete cluster failed:', err);
       return callback({code: err.code || 'ERROR', message: err.message});
     }
-    callback(null, 'delete cluster success');
+    cluster.deleteWorkers(clusterCode, function (err) {
+      if (err) {
+        log.error('delete cluster worker failed:', err);
+        return callback({code: err.code || 'ERROR', message: err.message});
+      }
+      userAcl.deleteClusterAllAcl(clusterCode,function (err) {
+        if (err) {
+          log.error('delete cluster acl failed:', err);
+          return callback({code: err.code || 'ERROR', message: err.message});
+        }
+        callback(null, 'delete cluster success');
+      });
+    });
   });
 };
 
-/**
- * @api {delete} /api/worker
- * @param req
- * @param callback
- */
-exports.removeWorker = function (req, callback) {
-  let clusterCode = req.query.clusterCode || 'default';
-  let ip = req.query.ip;
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'REMOVE_WORKER',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
-    opItem: 'WORKER',
-    opItemId: ip
-  });
-  log.info('delete worker: ', ip, clusterCode);
-  cluster.deleteWorker(ip, clusterCode, function (err) {
-    if (err) {
-      log.error(`delete worker: ${ip} failed:`, err);
-      return callback({code: err.code || 'ERROR', message: err.message});
-    }
-    callback(null, 'remove worker success');
-  });
-};
-
-/**
- * @api {post} /api/worker
- * @param req
- * @param callback
- */
-exports.addWorker = function (req, callback) {
-  let ip = req.body.ip;
-  let clusterCode = req.body.clusterCode || 'default';
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'ADD_WORKER',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
-    opItem: 'WORKER',
-    opItemId: ip
-  });
-  log.info('add worker: ', ip, clusterCode);
-  cluster.addWorker(ip, clusterCode, function (err) {
-    if (err) {
-      log.error(`add worker: ${ip} failed:`, err);
-      return callback({code: err.code || 'ERROR', message: err.message});
-    }
-    callback(null, 'add worker success');
-  });
-};

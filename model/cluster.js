@@ -1,15 +1,17 @@
 'use strict';
 
 const log = require('../common/log');
-const mysql = require('../common/db');
+const db = require('../common/db');
 
-const INSERT_SYSTEM_CLUSTER = `INSERT INTO
-    hc_console_system_cluster (name, code, token, endpoint, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?, ?, ?) ;`;
+const INSERT_SYSTEM_CLUSTER = `
+  INSERT INTO hc_console_system_cluster
+    (name, code, token, endpoint, gmt_create, gmt_modified)
+  VALUES
+    (?, ?, ?, ?, ?, ?) ;`;
 
 exports.addCluster = function (name, code, token, endpoint, callback) {
   let d = new Date();
-  mysql.query(
+  db.query(
     INSERT_SYSTEM_CLUSTER,
     [name, code, token, endpoint, d, d],
     function (err) {
@@ -24,13 +26,14 @@ exports.addCluster = function (name, code, token, endpoint, callback) {
   );
 };
 
-const UPDATE_SYSTEM_CLUSTER = `UPDATE
-    hc_console_system_cluster
+const UPDATE_SYSTEM_CLUSTER = `
+  UPDATE hc_console_system_cluster
   SET status = 1, name = ?, token = ?, endpoint = ?, gmt_modified = ?
-  WHERE code = ?;`;
+  WHERE code = ?;
+`;
 exports.updateCluster = function (name, code, token, endpoint, callback) {
   let d = new Date();
-  mysql.query(
+  db.query(
     UPDATE_SYSTEM_CLUSTER,
     [name, token, endpoint, d, code],
     function (err) {
@@ -50,7 +53,7 @@ const DELETE_SYSTEM_CLUSTER = `
     hc_console_system_cluster
   WHERE code = ?;`;
 exports.deleteCluster = function (code, callback) {
-  mysql.query(
+  db.query(
     DELETE_SYSTEM_CLUSTER,
     [code],
     function (err) {
@@ -65,13 +68,15 @@ exports.deleteCluster = function (code, callback) {
   );
 };
 
-const INSERT_SYSTEM_WORKER = `INSERT INTO
-    hc_console_system_worker (ip, cluster_code, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?);`;
+const INSERT_SYSTEM_WORKER = `
+  INSERT INTO hc_console_system_worker
+    (ip, cluster_code, gmt_create, gmt_modified)
+  VALUES
+    (?, ?, ?, ?);`;
 
 exports.addWorker = function (ipAddress, clusterCode, callback) {
   let d = new Date();
-  mysql.query(
+  db.query(
     INSERT_SYSTEM_WORKER,
     [ipAddress, clusterCode, d, d],
     function (err) {
@@ -94,7 +99,7 @@ const DELETE_SYSTEM_WORKER = `
 `;
 
 exports.deleteWorker = function (ipAddress, clusterCode, callback) {
-  mysql.query(
+  db.query(
     DELETE_SYSTEM_WORKER,
     [ipAddress, clusterCode],
     callback
@@ -109,7 +114,7 @@ const DELETE_SYSTEM_WORKERS = `
 `;
 
 exports.deleteWorkers = function (clusterCode, callback) {
-  mysql.query(
+  db.query(
     DELETE_SYSTEM_WORKERS,
     [clusterCode],
     callback
@@ -123,7 +128,7 @@ const QUERY_SYSTEM_WORKER = `
     cluster_code = ? AND status = 1;`;
 
 exports.queryWorker = function (clusterCode, callback) {
-  mysql.query(
+  db.query(
     QUERY_SYSTEM_WORKER,
     [clusterCode],
     callback
@@ -145,7 +150,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
   group by a.cluster_code`;
 
 exports.getClusterCfg = function (cb) {
-  mysql.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
+  db.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
     if (err || !data) {
       let e = new Error('SELECT_SYSTEM_CLUSTER failed: ' + err.message);
       log.error(err.message);
@@ -168,6 +173,7 @@ exports.getClusterCfg = function (cb) {
   });
 };
 
+/*
 const SELECT_ALL_IPS_OF_CLUSTER = `
   select
     ip, status
@@ -175,7 +181,7 @@ const SELECT_ALL_IPS_OF_CLUSTER = `
     hc_console_system_worker
   where cluster_code = ?`;
 exports.getAllIpsByClusterCode = function (clusterCode, cb) {
-  mysql.query(SELECT_ALL_IPS_OF_CLUSTER, [clusterCode], function (err, data) {
+  db.query(SELECT_ALL_IPS_OF_CLUSTER, [clusterCode], function (err, data) {
     if (err || !data) {
       let e = new Error('SELECT_ALL_IPS_OF_CLUSTER failed: ' + err.message);
       log.error(err.message);
@@ -186,6 +192,7 @@ exports.getAllIpsByClusterCode = function (clusterCode, cb) {
     cb(null, data);
   });
 };
+*/
 
 exports.gClusterConfig = {};
 

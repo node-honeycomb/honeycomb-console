@@ -1,39 +1,69 @@
 var async = require('async');
-var UserModel = require('../model/user');
+var User = require('../model/user');
 var UserACLModel = require('../model/user_acl');
 var log = require('../common/log');
 
+class UserClass {
+  constructor(user) {
+    this.id = user.id;
+    this.role = user.role;
+    this.name = user.name;
+    this.clusterAcl = user.clusterAcl;
+  }
+  isSystemAdmin() {
+    return this.role === 1;
+  }
+  isClusterAdmin(clusterCode) {
+    return this.isSystemAdmin() || this.clusterAcl[clusterCode] && this.clusterAcl[clusterCode].isAdmin;
+  }
+  containsCluster(clusterCode) {
+    return this.isClusterAdmin(clusterCode) || !!this.clusterAcl[clusterCode];
+  }
+  containsApp(clusterCode, appName) {
+    return this.isSystemAdmin() || this.isClusterAdmin(clusterCode) || ['server', 'common'].indexOf(appName) === -1 && this.clusterAcl[clusterCode] && (this.clusterAcl[clusterCode].apps.indexOf('*') > -1 || this.clusterAcl[clusterCode].apps.indexOf(appName) > -1);
+  }
+  getAdminClusterList() {
+    return Object.keys(this.clusterAcl).map((clusterCode) => {
+      return this.clusterAcl[clusterCode].isAdmin ? clusterCode: '';
+    }).filter((clusterCode) => {
+      return !!clusterCode;
+    });
+  }
+}
+
 module.exports = function (req, res, next) {
-  if (req.session && req.session.user) {
-    var user = req.session.user;
-    async.waterfall([
-      function (cb) {
-        UserModel.getUser(user.name, cb);
+  if (req.session && req.session.username) {
+    var username = req.session.username;
+    var user = {};
+    user.name = username;
+    async.waterfall([function (cb) {
+      User.getUser(username, cb);
+    },
+      function (data, cb) {
+        if (!data) {
+          cb(null);
+          return;
+        }
+        user.id = data.id;
+        user.role = data.role;
+        UserACLModel.getUserAcl(user, cb);
       },
       function (data, cb) {
         if (!data || data.length === 0) {
-          return cb(null);
+          user.clusterAcl = {};
+        } else {
+          let clusterAcl = {};
+          data.forEach((rowData) => {
+            clusterAcl[rowData.cluster_code] = {
+              id: rowData.id,
+              name: rowData.cluster_name,
+              isAdmin: rowData.cluster_admin,
+              apps: rowData.apps ? JSON.parse(rowData.apps) : []
+            };
+          });
+          user.clusterAcl = clusterAcl;
         }
-        user.role = data[0].role;
-        UserACLModel.getUserAcl(user, (err, data) => {
-          cb(err, data);
-        });
-      },
-      function (data, cb) {
-        if (!data || data.length === 0) {
-          req.session.user.clusterAcl = {};
-          return cb(null);
-        }
-        var clusterAcl = {};
-        data.forEach((rowData) => {
-          clusterAcl[rowData.cluster_code] = {
-            id: rowData.id,
-            name: rowData.cluster_name,
-            isAdmin: rowData.cluster_admin,
-            apps: rowData.apps ? JSON.parse(rowData.apps) : ''
-          };
-        });
-        req.session.user.clusterAcl = clusterAcl;
+        req.user = new UserClass(user);
         cb(null);
       }
     ], function (err) {

@@ -1,20 +1,13 @@
 'use strict';
-const config = require('../config');
-const log = require('../common/log');
-const utils = require('../common/utils');
-const cluster = require('../model/cluster');
-const user = require('../model/user');
 const userAcl = require('../model/user_acl');
 const async = require('async');
-
+const log = require('../common/log');
 /**
- * @api {post} /api/createAcl
- * @param req
- * @param res
+ * @api {post} /api/acl/create
  */
 exports.createAcl = function (req, callback) {
-  var user = req.session.user;
-  var nickname = req.body.nickname;
+  var user = req.user;
+  var name = req.body.name;
   var clusterId = req.body.cluster_id;
   var clusterCode = req.body.cluster_code;
   var clusterName = req.body.cluster_name;
@@ -23,7 +16,7 @@ exports.createAcl = function (req, callback) {
 
   async.waterfall([
     function (cb) {
-      userAcl.addUserAcl(nickname, clusterId, clusterCode, clusterName, clusterAdmin, apps, cb);
+      userAcl.addUserAcl(name, clusterId, clusterCode, clusterName, clusterAdmin, apps, cb);
     }
   ], function (err) {
     log.warn('createAcl', user, req.body);
@@ -37,21 +30,17 @@ exports.createAcl = function (req, callback) {
 };
 
 /**
- * @api {post} /api/getAcl
+ * @api {get} /api/acl/list
  * @param req
  * @param res
  */
 exports.getAcl = function (req, callback) {
-  if (!req.session.user) {
-    callback({code: 'ERROR', message: '获取权限列表异常'});
-    return;
-  }
-  var user = req.session.user;
+  var user = req.user;
   userAcl.getClusterAcl(user, callback);
 };
 
 /**
- * @api {post} /api/updateAcl
+ * @api {post} /api/acl/:id/update
  * @param req
  * @param res
  */
@@ -61,7 +50,7 @@ exports.updateAcl = function (req, callback) {
 };
 
 /**
- * @api {post} /api/deleteAcl
+ * @api {post} /api/acl/:id/delete
  * @param req
  * @param res
  */
