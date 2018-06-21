@@ -1,3 +1,3 @@
 'use strict';
-const log = require('hc-express/log');
+const log = require('hc-bee/log');
 module.exports = log();

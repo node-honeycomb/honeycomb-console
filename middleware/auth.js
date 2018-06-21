@@ -53,7 +53,7 @@ module.exports = function (req, res, next) {
           return res.redirect(config.prefix + '?error=' + err.message);
         }
         pwd = utils.sha256(pwd);
-        if (user.password === pwd) {
+        if (user.password === pwd && user.status === 1) {
           // req.session.user = {
           //   name: user.name,
           //   role: user.role

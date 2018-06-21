@@ -1,6 +1,6 @@
 {
   "name": "honeycomb-console",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "build": "2",
   "description": "Honeycomb admin console",
   "main": "app.js",
@@ -15,7 +15,7 @@
     "editor-json-parser": "1.1.1",
     "formidable": "1.1.1",
     "formstream": "1.1.0",
-    "hc-express": "0.0.3",
+    "hc-bee": "0.1.2",
     "honeypack": "0.1.10",
     "ip": "1.1.4",
     "lodash": "4.17.3",
