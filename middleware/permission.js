@@ -15,7 +15,11 @@ module.exports = function (req, res, next) {
   }
 
   //no need to check permission
-  if (pathToRegex('/api/user').test(pathname) || pathToRegex('/api/status').test(pathname)) {
+  if (
+    pathToRegex('/api/user').test(pathname) ||
+    pathToRegex('/api/user/**/**').test(pathname) ||
+    pathToRegex('/api/user/**').test(pathname) ||
+    pathToRegex('/api/status').test(pathname)) {
     return next();
   }
 
@@ -59,12 +63,12 @@ module.exports = function (req, res, next) {
 
   if (pathToRegex('/api/status').test(pathname)) {
     return next();
-  } 
+  }
 
   if (pathToRegex('/api/cluster/list').test(pathname)) {
     //过滤 cluster
     return next();
-  } 
+  }
 
   // list acl 需要集群管理权限
   if (pathToRegex('/api/acl/list').test(pathname)) {
@@ -74,7 +78,7 @@ module.exports = function (req, res, next) {
     // isPermitted ? next() : res.status(401).send('Unauthorized');
     // return;
     return next();
-  } 
+  }
 
   //用户可以 list 他有权限的集群,结果的过滤在 controller 里进行
   if (pathToRegex('/api/:entity/list').test(pathname)) {
@@ -167,5 +171,10 @@ module.exports = function (req, res, next) {
       });
       return;
     }
+
+    res.status(403).json({
+      code: 'Error',
+      message: 'Forbidden'
+    });
   }
 };

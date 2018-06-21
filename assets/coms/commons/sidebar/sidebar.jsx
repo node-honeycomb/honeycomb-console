@@ -79,6 +79,9 @@ class Sider extends React.Component {
           <Menu.Item key="acl">
             <Link to={window.prefix + '/pages/acl?' + this.state.clusterCode}><span><Icon type="usergroup-add" />{'集群授权'}</span></Link>
           </Menu.Item>
+          <Menu.Item key="userMgr">
+            <Link to={window.prefix + '/pages/userMgr?' + this.state.clusterCode}><span><Icon type="usergroup-add" />{'用户管理'}</span></Link>
+          </Menu.Item>
         </Menu>
       </div>
     );
