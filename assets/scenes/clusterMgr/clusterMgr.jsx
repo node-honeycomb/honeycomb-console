@@ -95,7 +95,7 @@ class Cluster extends React.Component {
         return(
           <div key={index}>
             {record.name}
-            {record.token === ORIGIN_TOKEN && 
+            {record.token === ORIGIN_TOKEN &&
               (<a onClick={this.clusterModal.bind(this,"updateToken",true,record)}>
                 <Icon type="exclamation-circle" style={{ marginLeft: 8,fontSize: 16, color: 'red' }} />
                </a>
@@ -179,7 +179,7 @@ class Cluster extends React.Component {
           visible={this.state.editClusterModalState.isShow}
           onHide={this.clusterModal.bind(this,"edit",false)}
         />
-        <UpdateSafeTokenModal 
+        <UpdateSafeTokenModal
           info={this.state.updateSafeTokenModalState.info}
           visible={this.state.updateSafeTokenModalState.isShow}
           onHide={this.clusterModal.bind(this,"updateToken",false)}

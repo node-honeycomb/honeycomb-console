@@ -10,7 +10,7 @@ module.exports = {
   },
   meta: {
     // DB config
-    driver: 'sqlite', // mysql, sqlite, default sqlite
+    driver: 'sql.js', // mysql, sql.js, default sqlite
     dbfile: '${serverRoot}/run/honeycomb-console.sqlite.db'
   },
   middleware: {

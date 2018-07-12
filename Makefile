@@ -1,11 +1,10 @@
-TESTS = $(shell ls -S `find test -type f -name "*.test.js" -print`)
 BIN_MOCHA = ./node_modules/.bin/_mocha
 BIN_ISTANBUL = ./node_modules/.bin/istanbul
 
 VERSION = $(shell cat package.json | awk -F '"' '/version" *: *"/{print $$4}')
 BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 
-TESTS_ENV = tests/env.js
+TESTS_ENV = test/env.js
 
 install:
 	@echo 'using npm registry, you need: make install registry=$$registry_addr'
@@ -37,7 +36,7 @@ test-cov:
 		-t 60000 \
 		-R tap \
 		-r $(TESTS_ENV) \
-		$(TESTS)
+		test
 
 package: release
 	@cd out/release/config && cat config_production.js > config.js
@@ -57,4 +56,5 @@ tag:
 release-linux:
 	docker run -it --rm -v $(shell pwd):/workspace centos/nodejs-8-centos7 /bin/bash -c \
 	"cd /workspace  && registry=https://registry.npm.taobao.org make package"
-.PHONY: install
+
+.PHONY: install test

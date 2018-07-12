@@ -173,27 +173,6 @@ exports.getClusterCfg = function (cb) {
   });
 };
 
-/*
-const SELECT_ALL_IPS_OF_CLUSTER = `
-  select
-    ip, status
-  from
-    hc_console_system_worker
-  where cluster_code = ?`;
-exports.getAllIpsByClusterCode = function (clusterCode, cb) {
-  db.query(SELECT_ALL_IPS_OF_CLUSTER, [clusterCode], function (err, data) {
-    if (err || !data) {
-      let e = new Error('SELECT_ALL_IPS_OF_CLUSTER failed: ' + err.message);
-      log.error(err.message);
-      return cb(e);
-    }
-    data = data || [];
-    log.debug('all ips of cluster: ', data);
-    cb(null, data);
-  });
-};
-*/
-
 exports.gClusterConfig = {};
 
 exports.getClusterCfgByCode = function (clusterCode) {

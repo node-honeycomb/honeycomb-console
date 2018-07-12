@@ -69,11 +69,6 @@ exports.getClusterAcl = function (user, callback) {
   var clusterCodeList = [];
   clusterCodeList = Object.keys(user.clusterAcl);
   var adminClusterList = user.getAdminClusterList();
-  // clusterCodeList.forEach((clusterCode) => {
-  //   if (user.clusterAcl[clusterCode].isAdmin === 1) {
-  //     adminClusterList.push(clusterCode);
-  //   }
-  // });
   if (adminClusterList.length === 0) {
     callback(null);
     return;
@@ -107,13 +102,9 @@ exports.getClusterAcl = function (user, callback) {
   );
 };
 
-const INSERT_USER_ACL_MYSQL = `INSERT INTO 
+const INSERT_USER_ACL = `INSERT INTO
   hc_console_system_user_acl(name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?, ?, ?, now(), now())`;
-
-const INSERT_USER_ACL_SQLITE = `INSERT INTO 
-hc_console_system_user_acl(name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
-VALUES(?, ?, ?, ?, ?, ?, datetime('now'), datetime('now'))`;
+  VALUES(?, ?, ?, ?, ?, ?, ?, ?)`;
 
 exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, clusterAdmin, apps, callback) {
   if (!apps) apps = '["*"]';
@@ -125,27 +116,19 @@ exports.addUserAcl = function (name, clusterId, clusterCode, clusterName, cluste
       message: 'apps 参数异常'
     });
   }
-  let querySql = '';
-  switch (config.meta.driver) {
-    case 'mysql': querySql = INSERT_USER_ACL_MYSQL; break;
-    case 'sqlite': querySql = INSERT_USER_ACL_SQLITE; break;
-    default: break;
-  }
-  if (!querySql) {
-    callback(new Error('Invalid driver type'));
-  }
+  let dd = new Date();
   db.query(
-    querySql,
-  [name, clusterId, clusterCode, clusterName, clusterAdmin, apps],
-  function (err) {
-    if (err) {
-      log.error('Insert new user acl failed:', err);
-      return callback(err);
-    } else {
-      log.info('Add user acl success');
-      callback();
+    INSERT_USER_ACL,
+    [name, clusterId, clusterCode, clusterName, clusterAdmin, apps, dd, dd],
+    function (err) {
+      if (err) {
+        log.error('Insert new user acl failed:', err);
+        return callback(err);
+      } else {
+        log.info('Add user acl success');
+        callback();
+      }
     }
-  }
   );
 };
 

@@ -9,7 +9,7 @@ module.exports = {
    *
    */
   meta: {
-    driver: 'sqlite', // mysql or sqlite, default sqlite
+    driver: 'sql.js', // mysql or sql.js, default sql.js
     dbfile: path.join(__dirname, '../run/meta.db')
   },
   // "meta": {
@@ -27,7 +27,6 @@ module.exports = {
   // },
   // port: 9000,
   prefix: '/honeycomb-console',
-  dumpConfig: true,
   middleware: {
     cookieSession: {
       config: {
