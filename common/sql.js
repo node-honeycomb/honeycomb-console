@@ -2,7 +2,7 @@ const SQL = require('sql.js');
 const config = require('../config');
 const path = require('path');
 const async = require('async');
-const fs = require('fs');
+const fs = require('xfs');
 const sqlString = require('sqlstring');
 const dbfile = config.meta.dbfile;
 const buf = fs.existsSync(dbfile) ? fs.readFileSync(dbfile) : undefined;
@@ -58,7 +58,7 @@ exports.query = function (sql, param, cb) {
     // console.log('>>> res:', JSON.stringify(res, null, 2));
     if (flag) {
         // console.log('save to file');
-        fs.writeFileSync(dbfile, new Buffer(db.export()));
+        fs.sync().save(dbfile, new Buffer(db.export()));
     }
     cb && cb(null, res);
 };
