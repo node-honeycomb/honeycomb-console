@@ -21,7 +21,7 @@ class OnlineListModal extends React.Component {
   handleOk = () => {
     let onlineList = _.get(this, 'props.onlineList') || [];
     let stopList = []
-    _.slice(onlineList, 0, 1).map(d => {
+    onlineList.map(d => {
       stopList = _.concat(stopList, _.slice(d, 0, d.length-2))
     })
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
