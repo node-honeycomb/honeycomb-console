@@ -57,7 +57,7 @@ class List extends React.Component {
     if(!_.isEmpty(clusterCode)){
       window.int = setInterval(function() {
         that.props.getAppList({ clusterCode: clusterCode })
-      }, 5000);
+      }, 3000);
     }
   }
 
@@ -266,6 +266,10 @@ class List extends React.Component {
       className:'name-wrap',
       render: (text, record, index) => {
         let needExpand = _.get(this.state.filterList,[record.name]).hide.length !== _.get(this.state.filterList,[record.name]).show.length;
+        //除去最新的3个版本的列表
+        let oldList = _.differenceBy(_.get(this.state.filterList,[record.name, 'show']), _.get(this.state.filterList,[record.name, 'lastThree']), 'appId');
+        //停用oldList列表中offline的版本
+        let deleteList = oldList.filter((v,k)=>{return v.cluster[0].status === 'offline'});
         const obj = {
           children: (
             <div>
@@ -275,7 +279,7 @@ class List extends React.Component {
                 ?<Icon title={'展开全部'} onClick={this.changeExpandStatus.bind(this, record.name, "show")} className="expand-btn app-btn" type="plus-square-o" />
                 :<Icon title={'收起offline'} onClick={this.changeExpandStatus.bind(this, record.name, "hide")} className="expand-btn app-btn" type="minus-square-o" />
               : null}
-              {needExpand
+              {deleteList.length > 0
               ?<i title={'清理'} onClick={this.openDeleteAllModal.bind(this, record.name)} className="iconfont app-btn">&#xe691;</i>
               : null}
             </div>

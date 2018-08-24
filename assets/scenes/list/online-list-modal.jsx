@@ -15,7 +15,8 @@ class OnlineListModal extends React.Component {
     super(props, context);
     this.state = {
       isOfflineSuccess:{},
-      isOfflineFailed:{}
+      isOfflineFailed:{},
+      isClearing:false
     }
   }
   handleOk = () => {
@@ -25,6 +26,7 @@ class OnlineListModal extends React.Component {
       stopList = _.concat(stopList, _.slice(d, 0, d.length-2))
     })
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    this.setState({isClearing : true});
     let that = this;
     (function stopApp(i, stopList) {
       return that.props.stopApps({ clusterCode: clusterCode }, { appId: stopList[i].appId})
@@ -44,7 +46,7 @@ class OnlineListModal extends React.Component {
         let isOfflineFailed = _.cloneDeep(that.state.isOfflineFailed);
         isOfflineFailed[stopList[i].appId] = true;
         that.setState({
-          isOfflineFailed: isOfflineFailed
+          isOfflineFailed: isOfflineFailed,
         });
         if(i < stopList.length-1){
           stopApp(i+1, stopList);

@@ -58,7 +58,7 @@ class Sider extends React.Component {
       <div className="admin-console-sidebar">
         <Menu theme="dark" mode="inline" onClick={this.handleClick} selectedKeys={[this.state.selectedKeys]}>
           <Menu.Item key="list" >
-            <Link to={window.prefix + '/pages/list?' + this.state.clusterCode}><span><Icon type="bars" />{'应用列表'}</span></Link>
+            <Link to={window.prefix + '/pages/list?' + this.state.clusterCode}><span><Icon type="bars" />{'应用管理'}</span></Link>
           </Menu.Item>
           <Menu.Item key="publish" >
             <Link to={window.prefix + '/pages/publish?' + this.state.clusterCode}><span><Icon type="rocket" />{'应用发布'}</span></Link>
