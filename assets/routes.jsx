@@ -51,7 +51,7 @@ module.exports = (store, dispatch) => {
         onEnter: function (nextState, replaceState) {
           let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
           if (clusterCode) {
-            dispatch(actions.app.getAppList({clusterCode: clusterCode}));
+            // dispatch(actions.app.getAppList({clusterCode: clusterCode}));
           }
         }
       }, {

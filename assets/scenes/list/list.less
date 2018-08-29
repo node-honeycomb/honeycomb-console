@@ -32,7 +32,7 @@
   .ant-table-tbody tr:last-child >td{
     border-bottom:none!important;
   }
-  
+
   .online {
     background: #51c332;
     border: #51c332;
@@ -71,7 +71,7 @@
   .btnHidden{
     visibility: hidden;
   }
-  
+
   .ant-table-thead .version-wrap{
     border-left: none;
   }
@@ -92,7 +92,6 @@
   .name-wrap{
     position: relative;
     .app-btn{
-      opacity: 0;
       margin-left:5px;
       font-size: 14px;
       color: gray;
@@ -104,12 +103,12 @@
       margin-left:10px;
     }
   }
-  .name-wrap:hover{
-    .app-btn{
-      opacity: 1;
-      display: inline-block;
-    }
-  }
+  // .name-wrap:hover{
+  //   .app-btn{
+  //     opacity: 1;
+  //     display: inline-block;
+  //   }
+  // }
 }
 
 .time-select{
@@ -132,6 +131,11 @@
 }
 .delete-all-list{
   color: #999;
+  height: 600px;
+  overflow: auto;
+  .ant-table-wrapper{
+    margin-bottom: 10px;
+  }
   .delete-icon{
     display: none;
   }
@@ -161,5 +165,8 @@
   }
   .delete-all-font{
     margin-top: 10px;
+  }
+  .protected-wrap{
+    color: #aaa;
   }
 }

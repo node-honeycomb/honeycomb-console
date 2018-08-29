@@ -11,6 +11,7 @@ require('./list.less');
 let AppDetailModal = require('./app-detail-modal.jsx');
 let ErrorMsgModal = require('./error-msg-modal.jsx');
 let DeleteAllModal = require('./delelte-all-modal.jsx');
+let OnlineListModal = require('./online-list-modal');
 const URL = require("url");
 class List extends React.Component {
   constructor(props, context) {
@@ -30,6 +31,8 @@ class List extends React.Component {
       dataSource: [],
       rowSpan:{},
       deleteAppName: null,
+      onlineList: [],
+      isShowOnlineListModal: false
     }
   }
   genRowspan = (appList, data) => {
@@ -54,13 +57,35 @@ class List extends React.Component {
     if(!_.isEmpty(clusterCode)){
       window.int = setInterval(function() {
         that.props.getAppList({ clusterCode: clusterCode })
-      }, 5000);
+      }, 3000);
     }
   }
 
   componentDidMount = () => {
     let that = this;
-    this.setListInterval(that);
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    this.props.getAppList({ clusterCode: clusterCode }).then(d => {
+      if(d.success && d.success.length > 0) {
+        let onlineList = {};
+        d.success.forEach(data => {
+          onlineList[data.name] = [];
+          data.versions.forEach((item, index) => {
+            if(_.get(item, 'cluster[0].status') === 'online'){
+              onlineList[data.name].push(item)
+            }
+          })
+        })
+        onlineList = _.filter(onlineList, (data, key) => data.length > 2);
+        if(onlineList.length > 0) {
+          this.setState({
+            onlineList,
+            isShowOnlineListModal: true
+          })
+        }else{
+          this.setListInterval(that);
+        }
+      }
+    })
   }
 
   componentWillReceiveProps = (nextProps) => {
@@ -87,7 +112,6 @@ class List extends React.Component {
     this.setState({
       filterList: newFilterList,
     })
-
   }
 
   componentWillUnmount = () => {
@@ -128,12 +152,15 @@ class List extends React.Component {
     this.setListInterval(that);
   }
   handleCancel = (e) => {
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     this.setState({
       admVisible: false,
       emmVisible:false,
-      deleteAllVisible:false
+      deleteAllVisible:false,
+      isShowOnlineListModal: false
     });
     let that = this;
+    this.props.getAppList({ clusterCode: clusterCode })
     this.setListInterval(that);
   }
   showConfirm = (operation, name) => {
@@ -239,6 +266,10 @@ class List extends React.Component {
       className:'name-wrap',
       render: (text, record, index) => {
         let needExpand = _.get(this.state.filterList,[record.name]).hide.length !== _.get(this.state.filterList,[record.name]).show.length;
+        //除去最新的3个版本的列表
+        let oldList = _.differenceBy(_.get(this.state.filterList,[record.name, 'show']), _.get(this.state.filterList,[record.name, 'lastThree']), 'appId');
+        //停用oldList列表中offline的版本
+        let deleteList = oldList.filter((v,k)=>{return v.cluster[0].status === 'offline'});
         const obj = {
           children: (
             <div>
@@ -248,7 +279,7 @@ class List extends React.Component {
                 ?<Icon title={'展开全部'} onClick={this.changeExpandStatus.bind(this, record.name, "show")} className="expand-btn app-btn" type="plus-square-o" />
                 :<Icon title={'收起offline'} onClick={this.changeExpandStatus.bind(this, record.name, "hide")} className="expand-btn app-btn" type="minus-square-o" />
               : null}
-              {needExpand
+              {deleteList.length > 0
               ?<i title={'清理'} onClick={this.openDeleteAllModal.bind(this, record.name)} className="iconfont app-btn">&#xe691;</i>
               : null}
             </div>
@@ -436,6 +467,12 @@ class List extends React.Component {
     let rowSpan = this.genRowspan(appList, data);
     return (
       <div className="list-wrap">
+        <OnlineListModal
+          visible = {this.state.isShowOnlineListModal}
+          onHide={this.handleCancel}
+          onlineList={this.state.onlineList}
+          stopApps={this.props.stopApps}
+        />
         <div className="list-table-wrap">
           <Table
           pagination = {false}
