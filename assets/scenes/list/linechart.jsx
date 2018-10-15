@@ -10,19 +10,19 @@ class Linechart extends React.Component {
     this.state = {
       cpu: null,
       mem: null
-    }
+    };
     this.setLineOption = this.setLineOption.bind(this);
     this.initLine = this.initLine.bind(this);
   }
 
-  initLine(data,myChart) {
+  initLine(data, myChart) {
     if (data && data.data.length > 0) {
       let options = this.setLineOption(data);
       myChart.setOption(options);
     }
   }
   componentWillReceiveProps(props) {
-    if(props.data && !_.isEqual(props.data.data, this.state[props.data.type])){
+    if (props.data && !_.isEqual(props.data.data, this.state[props.data.type])) {
       let newState = _.cloneDeep(this.state);
       newState[props.data.type] = _.cloneDeep(props.data.data);
     }
@@ -31,17 +31,17 @@ class Linechart extends React.Component {
     const data = this.props.data;
     let dom = $(ReactDom.findDOMNode(this)).find('#lineReact')[0];
     let myChart = echarts.init(dom);
-    if(data && !_.isEqual(data.data, this.state[data.type])){
-      this.initLine(data,myChart)
-    } 
+    if (data && !_.isEqual(data.data, this.state[data.type])) {
+      this.initLine(data, myChart);
+    }
   }
 
   componentDidUpdate() {
     const data = this.props.data;
     let dom = $(ReactDom.findDOMNode(this)).find('#lineReact')[0];
     let myChart = echarts.init(dom);
-    if(data && !_.isEqual(data.data, this.state[data.type])){
-      this.initLine(data,myChart)
+    if (data && !_.isEqual(data.data, this.state[data.type])) {
+      this.initLine(data, myChart);
     }
   }
   render() {

@@ -154,9 +154,11 @@ class Publish extends React.Component {
                     <Card title={"机器："+value.ip} >
                       {
                         _.map(value.data, (v, k)=>{
-                          return(
-                            <p key={k}>{k} : {v}</p>
-                          )
+                          if (!(_.isArray(v) || _.isObject(v))) {
+                            return(
+                              <p key={k}>{k} : {v}</p>
+                            )
+                          }
                         })
                       }
                     </Card>

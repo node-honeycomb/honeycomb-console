@@ -31,8 +31,8 @@ class List extends React.Component {
       dataSource: [],
       rowSpan:{},
       deleteAppName: null,
-      onlineList: [],
-      isShowOnlineListModal: false
+      clearList: {},
+      isShowClearListModal: false
     }
   }
   genRowspan = (appList, data) => {
@@ -55,31 +55,36 @@ class List extends React.Component {
   setListInterval = (that) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      window.int = setInterval(function() {
-        that.props.getAppList({ clusterCode: clusterCode })
-      }, 3000);
+      // window.int = setInterval(function() {
+      //   that.props.getAppList({ clusterCode: clusterCode })
+      // }, 3000);
     }
   }
-
+  genClearList = (value) => {
+    let clearList = {};
+    let keepOnlineNum = 1;
+    let keepOnserviceNum = 5;
+    value.forEach(data => {
+      let _onlineList = data.versions.filter((item, index) => {
+        if(_.get(item, 'cluster[0].status') === 'online') return item;
+      });
+      let _offlineList = data.versions.filter((item, index) => {
+        if(_.get(item, 'cluster[0].status') === 'offline') return item;
+      });
+      if(_onlineList.length > keepOnlineNum + 1 || _offlineList.length > keepOnserviceNum) clearList[data.name] = data.versions;
+    });
+    return clearList
+  }
   componentDidMount = () => {
     let that = this;
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     this.props.getAppList({ clusterCode: clusterCode }).then(d => {
       if(d.success && d.success.length > 0) {
-        let onlineList = {};
-        d.success.forEach(data => {
-          onlineList[data.name] = [];
-          data.versions.forEach((item, index) => {
-            if(_.get(item, 'cluster[0].status') === 'online'){
-              onlineList[data.name].push(item)
-            }
-          })
-        })
-        onlineList = _.filter(onlineList, (data, key) => data.length > 2);
-        if(onlineList.length > 0) {
+        let clearList = this.genClearList(d.success);
+        if(!_.isEmpty(clearList)) {
           this.setState({
-            onlineList,
-            isShowOnlineListModal: true
+            clearList,
+            isShowClearListModal: true
           })
         }else{
           this.setListInterval(that);
@@ -157,7 +162,7 @@ class List extends React.Component {
       admVisible: false,
       emmVisible:false,
       deleteAllVisible:false,
-      isShowOnlineListModal: false
+      isShowClearListModal: false
     });
     let that = this;
     this.props.getAppList({ clusterCode: clusterCode })
@@ -468,10 +473,15 @@ class List extends React.Component {
     return (
       <div className="list-wrap">
         <OnlineListModal
-          visible = {this.state.isShowOnlineListModal}
+          visible = {this.state.isShowClearListModal}
           onHide={this.handleCancel}
-          onlineList={this.state.onlineList}
+          clearList={this.state.clearList}
           stopApps={this.props.stopApps}
+          filterList={this.props.appMeta.filterList}
+          deleteApps={this.props.deleteApps}
+          genClearList={this.genClearList}
+          getAppList={this.props.getAppList}
+          deleteApps={this.props.deleteApps}
         />
         <div className="list-table-wrap">
           <Table
