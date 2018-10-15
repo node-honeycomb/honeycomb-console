@@ -34,6 +34,8 @@ class List extends React.Component {
       clearList: {},
       isShowClearListModal: false
     }
+    this.keepOnlineNum = 1; //保留的在线版本数量，可之后改为配置项
+    this.keepOnserviceNum = 5; //保留的离线版本数量，可之后改为配置项
   }
   genRowspan = (appList, data) => {
     let rowSpan ={};
@@ -55,15 +57,13 @@ class List extends React.Component {
   setListInterval = (that) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      // window.int = setInterval(function() {
-      //   that.props.getAppList({ clusterCode: clusterCode })
-      // }, 3000);
+      window.int = setInterval(function() {
+        that.props.getAppList({ clusterCode: clusterCode })
+      }, 3000);
     }
   }
   genClearList = (value) => {
     let clearList = {};
-    let keepOnlineNum = 1;
-    let keepOnserviceNum = 5;
     value.forEach(data => {
       let _onlineList = data.versions.filter((item, index) => {
         if(_.get(item, 'cluster[0].status') === 'online') return item;
@@ -71,7 +71,7 @@ class List extends React.Component {
       let _offlineList = data.versions.filter((item, index) => {
         if(_.get(item, 'cluster[0].status') === 'offline') return item;
       });
-      if(_onlineList.length > keepOnlineNum + 1 || _offlineList.length > keepOnserviceNum) clearList[data.name] = data.versions;
+      if(_onlineList.length > this.keepOnlineNum + 1 || _offlineList.length > this.keepOnserviceNum) clearList[data.name] = data.versions;
     });
     return clearList
   }
@@ -482,6 +482,8 @@ class List extends React.Component {
           genClearList={this.genClearList}
           getAppList={this.props.getAppList}
           deleteApps={this.props.deleteApps}
+          keepOnlineNum={this.keepOnlineNum}
+          keepOnserviceNum={this.keepOnserviceNum}
         />
         <div className="list-table-wrap">
           <Table

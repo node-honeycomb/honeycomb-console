@@ -35,8 +35,8 @@ class OnlineListModal extends React.Component {
         _.map(_clearList, (value, key) => {
           let offlineList = value.filter(d => d.cluster[0].status === 'offline');
           // 需要保留在机器上的版本数量
-          let keepOnserviceNum = 5;
-          deleteList = _.concat(deleteList, offlineList.slice(0, offlineList.length-keepOnserviceNum < 0 ? 0 : offlineList.length-keepOnserviceNum))
+          let keepOnserviceNum = this.props.keepOnserviceNum;
+          deleteList = _.concat(deleteList, offlineList.slice(0, offlineList.length - keepOnserviceNum < 0 ? 0 : offlineList.length - keepOnserviceNum))
         });
         // 循环删除应用
         (function deleteApp(i, deleteList) {
@@ -99,8 +99,8 @@ class OnlineListModal extends React.Component {
     _.map(clearList, (value, key) => {
       let onlineList = value.filter(d => d.cluster[0].status === 'online');
       // 需要保留在线的数量
-      let keepOnlineNum = 1;
-      stopList = _.concat(stopList, onlineList.slice(0, onlineList.length-keepOnlineNum < 0 ? 0 : onlineList.length-keepOnlineNum));
+      let keepOnlineNum = this.props.keepOnlineNum;
+      stopList = _.concat(stopList, onlineList.slice(0, onlineList.length - keepOnlineNum < 0 ? 0 : onlineList.length - keepOnlineNum));
     });
     // 循环下线应用
     (function stopApp(i, stopList) {
