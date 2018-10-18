@@ -8,7 +8,7 @@ module.exports = {
 
     },
     appList: [],
-    status: {},
+    status: [],
     filterList: {}
   },
   actions: {
