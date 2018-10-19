@@ -44,6 +44,7 @@
     line-height: 53px;
     color: #fff;
     .clusterName {
+      cursor: pointer;
       color: red;
       & > a {
         color: red !important;
@@ -117,4 +118,63 @@
 
 .ant-popover-inner-content {
   padding: 5px 2px;
+}
+.memory-warning-modal-wrap{
+  .ant-confirm-content{
+    height: 393px;
+    overflow: auto;
+    margin-left: 10px;
+    margin-top: 20px;
+  }
+}
+.memory-warn-wrap{
+  .warning-detail-wrap{
+    margin-bottom: 5px;
+    .ant-collapse-header{
+      padding-top: 0px;
+      padding-bottom: 0px;
+      .arrow{
+        top: -9px!important;
+        left: 9px!important;
+      }
+    }
+    .ant-collapse-content-box{
+      padding: 10px 0 5px 0;
+    }
+  }
+  .ant-card{
+    width: 48%;
+    display: inline-block;
+    margin-left: 10px;
+    margin-bottom: 10px;
+    overflow: auto;
+    height: 383px;
+    float: left;
+  }
+  .ant-card-head{
+    height: 350px;
+    overflow: auto;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 16px;
+  }
+  .ant-card-body{
+    padding: 8px 16px;
+    p{
+      border-bottom: 1px solid #eee;
+      margin-bottom: 3px;
+    }
+    p:last-child{
+      border: none;
+    }
+  }
+  .marginLf{
+    margin-left: 5px;
+  }
+}
+.fontColorYellow {
+  color: orange !important;
+}
+.fontColorRed {
+  color: red !important;
 }
