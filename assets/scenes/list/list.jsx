@@ -31,9 +31,11 @@ class List extends React.Component {
       dataSource: [],
       rowSpan:{},
       deleteAppName: null,
-      onlineList: [],
-      isShowOnlineListModal: false
+      clearList: {},
+      isShowClearListModal: false
     }
+    this.keepOnlineNum = 1; //保留的在线版本数量，可之后改为配置项
+    this.keepOnserviceNum = 5; //保留的离线版本数量，可之后改为配置项
   }
   genRowspan = (appList, data) => {
     let rowSpan ={};
@@ -60,26 +62,29 @@ class List extends React.Component {
       }, 3000);
     }
   }
-
+  genClearList = (value) => {
+    let clearList = {};
+    value.forEach(data => {
+      let _onlineList = data.versions.filter((item, index) => {
+        if(_.get(item, 'cluster[0].status') === 'online') return item;
+      });
+      let _offlineList = data.versions.filter((item, index) => {
+        if(_.get(item, 'cluster[0].status') === 'offline') return item;
+      });
+      if(_onlineList.length > this.keepOnlineNum + 1 || _offlineList.length > this.keepOnserviceNum) clearList[data.name] = data.versions;
+    });
+    return clearList
+  }
   componentDidMount = () => {
     let that = this;
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     this.props.getAppList({ clusterCode: clusterCode }).then(d => {
       if(d.success && d.success.length > 0) {
-        let onlineList = {};
-        d.success.forEach(data => {
-          onlineList[data.name] = [];
-          data.versions.forEach((item, index) => {
-            if(_.get(item, 'cluster[0].status') === 'online'){
-              onlineList[data.name].push(item)
-            }
-          })
-        })
-        onlineList = _.filter(onlineList, (data, key) => data.length > 2);
-        if(onlineList.length > 0) {
+        let clearList = this.genClearList(d.success);
+        if(!_.isEmpty(clearList)) {
           this.setState({
-            onlineList,
-            isShowOnlineListModal: true
+            clearList,
+            isShowClearListModal: true
           })
         }else{
           this.setListInterval(that);
@@ -157,7 +162,7 @@ class List extends React.Component {
       admVisible: false,
       emmVisible:false,
       deleteAllVisible:false,
-      isShowOnlineListModal: false
+      isShowClearListModal: false
     });
     let that = this;
     this.props.getAppList({ clusterCode: clusterCode })
@@ -468,10 +473,17 @@ class List extends React.Component {
     return (
       <div className="list-wrap">
         <OnlineListModal
-          visible = {this.state.isShowOnlineListModal}
+          visible = {this.state.isShowClearListModal}
           onHide={this.handleCancel}
-          onlineList={this.state.onlineList}
+          clearList={this.state.clearList}
           stopApps={this.props.stopApps}
+          filterList={this.props.appMeta.filterList}
+          deleteApps={this.props.deleteApps}
+          genClearList={this.genClearList}
+          getAppList={this.props.getAppList}
+          deleteApps={this.props.deleteApps}
+          keepOnlineNum={this.keepOnlineNum}
+          keepOnserviceNum={this.keepOnserviceNum}
         />
         <div className="list-table-wrap">
           <Table
