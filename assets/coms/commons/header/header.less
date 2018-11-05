@@ -45,10 +45,7 @@
     color: #fff;
     .clusterName {
       cursor: pointer;
-      color: red;
-      & > a {
-        color: red !important;
-      }
+
     }
   }
   .admin-console-serverSecureInfo {
@@ -120,6 +117,9 @@
   padding: 5px 2px;
 }
 .memory-warning-modal-wrap{
+  .ant-modal-body{
+    padding: 30px 20px;
+  }
   .ant-confirm-content{
     height: 393px;
     overflow: auto;
@@ -128,6 +128,7 @@
   }
 }
 .memory-warn-wrap{
+  overflow: auto;
   .warning-detail-wrap{
     margin-bottom: 5px;
     .ant-collapse-header{
@@ -143,12 +144,12 @@
     }
   }
   .ant-card{
-    width: 48%;
+    width: 400px;
     display: inline-block;
     margin-left: 10px;
     margin-bottom: 10px;
     overflow: auto;
-    height: 383px;
+    max-height: 383px;
     float: left;
   }
   .ant-card-head{
