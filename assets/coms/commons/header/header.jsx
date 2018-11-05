@@ -4,7 +4,7 @@ var React = require('react');
 var ReactRouter = require('react-router');
 var antd = require('antd');
 var Link = require('react-router').Link;
-let {Menu, Icon, Popover, Card, Modal, Collapse} = require('antd');
+let {Menu, Icon, Popover, Card, Modal, Collapse, Button} = require('antd');
 const SubMenu = Menu.SubMenu;
 const confirm = Modal.confirm;
 const Panel = Collapse.Panel;
@@ -30,15 +30,17 @@ class Header extends React.Component {
       serverSecure: true,
       currentCluster: clusterCode,
       currentUser: currentUser || this.clusterMeta.meta[URL.parse(window.location.href, true).query.clusterCode].name,
-      memeryWarning: false,
-      isRedWarning: false
+      memoryWarning: false,
+      isRedWarning: false,
+      isShowAllMachineData: {},
+      machineDataVisible:false
     };
     this.checkServerVersion(clusterCode);
     window.addEventListener('warning',()=>{
       this.state.warning = true;
     });
-    window.addEventListener('memeryWarning',()=>{
-      this.state.memeryWarning = true;
+    window.addEventListener('memoryWarning',()=>{
+      this.state.memoryWarning = true;
     });
     this.diskCapacityLimit = 0.8;
     this.memoryUsageLimit = 80;
@@ -59,32 +61,32 @@ class Header extends React.Component {
     this.props.getStatus({clusterCode: clusterCode}).then((result) => {
       let serverSecure = true;
       let serverList = result.success;
-      let memeryWarning = false;
+      let memoryWarning = false;
       let isRedWarning = false;
       serverList.forEach((server) => {
         if (server.data.serverVersion < window.secureServerVersion) {
           serverSecure = false;
         }
         this.diskCapacityFields.map(d => {
-          if(_.get(server, d) > this.diskCapacityLimit - 0.2) {
-            memeryWarning = true;
+          if(_.get(server, d) && _.get(server, d) > this.diskCapacityLimit - 0.2) {
+            memoryWarning = true;
           }
-          if(_.get(server, d) > this.diskCapacityLimit) {
+          if(_.get(server, d) && _.get(server, d) > this.diskCapacityLimit) {
             isRedWarning = true;
           }
         });
         this.memoryFields.map(d => {
-          if(_.get(server, d) > this.memoryUsageLimit - 20) {
-            memeryWarning = true;
+          if(_.get(server, d) && _.get(server, d) > this.memoryUsageLimit - 20) {
+            memoryWarning = true;
           }
-          if(_.get(server, d) > this.memoryUsageLimit) {
+          if(_.get(server, d) && _.get(server, d) > this.memoryUsageLimit) {
             isRedWarning = true;
           }
         });
       });
       this.setState({
         serverSecure,
-        memeryWarning,
+        memoryWarning,
         isRedWarning
       });
     }).catch(err => {
@@ -100,51 +102,22 @@ class Header extends React.Component {
     localStorage.setItem('clusterCode', e.key);
     this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
   }
-  onShowMemoryWarn = () => {
-    let status = _.get(this.props.appMeta, 'status') || [];
-    let content = (<div className='memory-warn-wrap'>
-      {
-        _.map(status, (item, index)=>{
-          return(
-            <Card key={index} title={"机器："+item.ip} >
-              <Collapse className='warning-detail-wrap' bordered={false}>
-                <Panel header="Details" key="1">
-                {_.map(item.data, (v, k)=>{
-                  if (!(_.isArray(v) || _.isObject(v)) && k !== 'memoryUsage') {
-                    return(
-                      <p key={k}>{k} : {v}</p>
-                    )
-                  }
-                })}
-                </Panel>
-              </Collapse>
-              <p className={classnames({'fontColorRed': _.get(item, 'data.memoryUsage') > this.memoryUsageLimit, 'fontColorYellow': _.get(item, 'data.memoryUsage') > this.diskCapacityLimit - 20})} key='memoryUsage'>{'memoryUsage : ' +  _.get(item, 'data.memoryUsage')}</p>
-              {_.map(item.data, (v, k)=>{
-                if (_.isObject(v) && !_.isArray(v)) {
-                  return(
-                    <p  key={k}>
-                      {k} : {_.map(v, (value, key) => {
-                        return <p className='marginLf' key={key}>{key} : {_.map(value, (_v, _k) => {
-                          return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_v}</p>
-                        })}
-                        </p>
-                      })}
-                    </p>
-                  )
-                }
-              })}
-            </Card>
-          )
-        })
-      }
-    </div>);
-    Modal.warning({
-      title: '报警机器',
-      content,
-      width: '60%',
-      className: 'memory-warning-modal-wrap',
-      maskClosable: true
+  onClickShowAllMachineData = (ip) => {
+    let isShowAllMachineData = _.cloneDeep(this.state.isShowAllMachineData);
+    isShowAllMachineData[ip] = !_.get(isShowAllMachineData, [ip]);
+    this.setState({
+      isShowAllMachineData
     });
+  }
+  onShowMemoryWarn = () => {
+    this.setState({
+      machineDataVisible: true
+    })
+  }
+  onCloseMemoryWarn = () => {
+    this.setState({
+      machineDataVisible: false
+    })
   }
   render() {
     let clusterMeta = _.cloneDeep(this.props.clusterMeta);
@@ -161,6 +134,55 @@ class Header extends React.Component {
     });
     let clusterName = _.get(clusterMeta.meta, [this.state.currentCluster, 'name']) || _.get(clusterMeta.meta, [this.props.chooseCluster, 'name']);
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode || '';
+
+    let status = _.get(this.props.appMeta, 'status') || [];
+    let width = status.length > 1 ? '890px' : '470px';
+    let whiteList = ['cpu', 'cpuNum', 'memory', 'memoryUsage', 'serverVersion', 'sysTime', 'sysLoad', 'diskInfo.logsRoot.capacity', 'diskInfo.serverRoot.capacity']
+    let content = (<div className='memory-warn-wrap'>
+      {
+        _.map(status, (item, index)=>{
+          return(
+            <Card key={index} title={"机器："+item.ip} >
+              {!_.get(this.state, ['isShowAllMachineData', item.ip]) ? <div>
+                {whiteList.map(d => {
+                  let fontColorRed = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit);
+                  let fontColorYellow = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit - 20) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit - 0.2);
+                  if(_.toString(_.get(item.data, d))) return (
+                    <p className={classnames({fontColorRed, fontColorYellow})} key={d}>{d} : {_.toString(_.get(item.data, d))}</p>
+                  )
+                })}
+                <a onClick={this.onClickShowAllMachineData.bind(this, item.ip)}>展示全部信息</a>
+              </div> : <div>
+                {_.map(item.data, (v, k)=>{
+                  let fontColorRed = k === 'memoryUsage' && v > this.memoryUsageLimit;
+                  let fontColorYellow = k === 'memoryUsage' && v > this.memoryUsageLimit - 20;
+                  if (!_.isObject(v)) {
+                    return(
+                      <p className={classnames({fontColorRed, fontColorYellow})} key={k}>{k} : {_.toString(v)}</p>
+                    )
+                  }
+                })}
+                {_.map(item.data, (v, k)=>{
+                  if (_.isObject(v) && !_.isArray(v)) {
+                    return(
+                      <p  key={k}>
+                        {k} : {_.map(v, (value, key) => {
+                          return <p className='marginLf' key={key}>{key} : {_.map(value, (_v, _k) => {
+                            return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_v}</p>
+                          })}
+                          </p>
+                        })}
+                      </p>
+                    )
+                  }
+                })}
+                <a onClick={this.onClickShowAllMachineData.bind(this, item.ip)}>收起</a>
+              </div>}
+            </Card>
+          )
+        })
+      }
+    </div>);
     return (
       <header className="admin-console-header">
        <a className="admin-console-logo">
@@ -179,14 +201,12 @@ class Header extends React.Component {
           当前所在集群：
           <span className="clusterName">{clusterName}</span>
         </div> */}
-        {this.state.memeryWarning && (
-          <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
-            <span className={classnames({'clusterName': true, 'fontColorRed': this.state.isRedWarning, 'fontColorYellow': !this.state.isRedWarning})}>
-              <Icon type="exclamation-circle-o" />
-              内存报警
-            </span>
-          </div>
-        )}
+        <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
+          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning, 'fontColorRed': this.state.isRedWarning})}>
+            <Icon type="exclamation-circle-o" />
+              {this.state.memoryWarning ? '内存报警' : '内存信息'}
+          </span>
+        </div>
         {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName">
             <Icon type="exclamation-circle-o" />
@@ -207,6 +227,18 @@ class Header extends React.Component {
           <SubMenu key="logout" title={<span><Icon type="logout" /><a href={window.prefix + '/logout'}>{'退出登录'}</a></span>}>
           </SubMenu>
         </Menu>
+        <Modal
+          title="报警机器"
+          visible={this.state.machineDataVisible}
+          width={width}
+          className='memory-warning-modal-wrap'
+          maskClosable={true}
+          footer={[
+            <Button onClick={this.onCloseMemoryWarn}>关闭</Button>,
+          ]}
+        >
+          {content}
+        </Modal>
       </header>
     );
   }
