@@ -141,35 +141,6 @@ class Publish extends React.Component {
         </button>
       </Upload>
     </div>
-    <div className="publish-list">
-      <div className="app-status-wrap">
-      {
-        ipStatus.map((item, index)=>{
-          return(
-            <row key={index}>
-              {
-                item.map((value, key)=>{
-                   return(
-                  <Col key={key} span={6}>
-                    <Card title={"机器："+value.ip} >
-                      {
-                        _.map(value.data, (v, k)=>{
-                          return(
-                            <p key={k}>{k} : {v}</p>
-                          )
-                        })
-                      }
-                    </Card>
-                  </Col>
-                  )
-                })
-              }
-            </row>
-          )
-        })
-      }
-      </div>
-    </div>
   </TabPane>);
     return(
       <div className="publish-wrap">
