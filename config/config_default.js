@@ -15,6 +15,7 @@ module.exports = {
   // 初始化默认用户名和密码，都为空是才初始化，否则不初始化，密码为明文sha256加密后的字串
   defaultUser: '',
   defaultPassword: '',
+  registerSecret: 'hc-console',
   /**
    * 初始化集群信息, 结构是一个对象，key是cluster的code和name, value是一个字符串用逗号隔开，对应集群中的ip
    * 例如 cluster: {dtboost: '127.0.0.1,127.0.0.2'}

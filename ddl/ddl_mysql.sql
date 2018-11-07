@@ -19,7 +19,16 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
   `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
   `status` tinyint(4) NOT NULL DEFAULT '1', -- COMMENT '0： 无效， 1：有效',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
-  `gmt_modified` datetime NOT NULL -- COMMENT '修改时间',
+  `gmt_modified` datetime NOT NULL, -- COMMENT '修改时间',
+  UNIQUE KEY `worker` (`cluster_code`,`ip`)
+);
+
+CREATE TABLE IF NOT EXISTS `hc_console_system_worker_tmp` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
+  `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
+  `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
+  UNIQUE KEY `worker` (`cluster_code`,`ip`)
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user` (

@@ -2,6 +2,7 @@
 module.exports = {
   env: 'production',
   debug: false,
+  registerSecret: '', // close register by default
   logs: {
     oplog: {
       level: 'INFO',
