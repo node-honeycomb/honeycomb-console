@@ -14,6 +14,7 @@ module.exports = function (req, res, next) {
     return next();
   }
 
+
   //no need to check permission
   if (
     pathToRegex('/api/user').test(pathname) ||
@@ -22,7 +23,9 @@ module.exports = function (req, res, next) {
     pathToRegex('/api/status').test(pathname) ||
     pathToRegex('/api/coredump').test(pathname) ||
     pathToRegex('/api/unknowProcess').test(pathname) ||
-    pathToRegex('/api/unknowProcess/**').test(pathname)) {
+    pathToRegex('/api/unknowProcess/**').test(pathname) ||
+    pathToRegex('/api/worker/register').test(pathname)
+  ) {
     return next();
   }
 

@@ -23,6 +23,14 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
   UNIQUE(`ip`,`cluster_code`)
 );
 
+CREATE TABLE IF NOT EXISTS `hc_console_system_worker_tmp` (
+  `id` INTEGER PRIMARY KEY,
+  `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
+  `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
+  `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
+  UNIQUE(`ip`,`cluster_code`)
+);
+
 CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
   `id` INTEGER PRIMARY KEY,
   `name` varchar(50), -- COMMENT '用户名',

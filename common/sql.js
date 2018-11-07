@@ -54,7 +54,13 @@ exports.query = function (sql, param, cb) {
     // console.log('>>> query:', sql, param);
     sql = prepareSql(sql, param);
     // console.log('>>> sql:', sql);
-    let res = transfer(db.exec(sql));
+    
+    let res;
+    try {
+        res = transfer(db.exec(sql));
+    } catch (e) {
+        return cb(e);
+    }
     // console.log('>>> res:', JSON.stringify(res, null, 2));
     if (flag) {
         // console.log('save to file');
