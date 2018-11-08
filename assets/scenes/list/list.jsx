@@ -78,6 +78,7 @@ class List extends React.Component {
   componentDidMount = () => {
     let that = this;
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
     this.props.getAppList({ clusterCode: clusterCode }).then(d => {
       if(d.success && d.success.length > 0) {
         let clearList = this.genClearList(d.success);
@@ -103,6 +104,7 @@ class List extends React.Component {
       if(window.int){
         clearInterval(window.int);
       }
+      if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
       this.props.getAppList({ clusterCode: clusterCode })
       this.setListInterval(that);
     }
@@ -524,9 +526,11 @@ class List extends React.Component {
 let mapStateToProps = (store) => {
   let appMeta = store.app;
   let monitorMeta = store.monitor;
+  let clusterMeta = store.cluster;
   return {
     appMeta,
-    monitorMeta
+    monitorMeta,
+    clusterMeta
   }
 }
 

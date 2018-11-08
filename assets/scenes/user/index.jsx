@@ -56,8 +56,6 @@ class User extends React.Component {
         },
       }
     ];
-
-    // debugger;
     this.props.listUser();
   }
   componentWillReceiveProps(nextProps) {
