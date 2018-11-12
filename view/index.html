@@ -13,6 +13,7 @@
     window.csrfToken = '<%=csrfToken%>';
     window.publishPages = JSON.parse('<%- JSON.stringify(publishPages) %>');
     window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');
+    window.appManageConfig = JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>');
     <% if(env === 'dev'){ %>
     document.write('<scrip' + 't src="<%=prefix%>/assets/.build/build.js"></s' + 'cript>');
     <% } %>

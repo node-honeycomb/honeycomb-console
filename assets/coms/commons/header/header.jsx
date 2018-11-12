@@ -14,6 +14,23 @@ import { ReactContext } from 'react-router';
 const connect = require('react-redux').connect;
 const classnames = require('classnames');
 
+function versionCompare(v1, v2) {
+  v1 = v1.replace(/_/g, '.');
+  v2 = v2.replace(/_/g, '.');
+  const aVer = v1.split('.');
+  const bVer = v2.split('.');
+
+  for (let i = 0; i < 3; i++) {
+    if (+aVer[i] > +bVer[i]) {
+      return 1;
+    } else if (+aVer[i] < +bVer[i]) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
 require('./header.less');
 class Header extends React.Component {
   constructor(props, context){
@@ -64,7 +81,7 @@ class Header extends React.Component {
       let memoryWarning = false;
       let isRedWarning = false;
       serverList.forEach((server) => {
-        if (server.data.serverVersion < window.secureServerVersion) {
+        if (versionCompare(server.data.serverVersion, window.secureServerVersion) < 0) {
           serverSecure = false;
         }
         this.diskCapacityFields.map(d => {
