@@ -13,7 +13,8 @@ const confirm = Modal.confirm;
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
 require('./clusterMgr.less');
 
-let UserService = require('../../services/user');
+const UserService = require('../../services/user');
+const URL = require("url");
 class Cluster extends React.Component {
   state = {
     addClusterModalState: {
@@ -32,6 +33,7 @@ class Cluster extends React.Component {
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
     switch(operation){
       case 'add':
+        this.checkClusterCode();
         this.setState({
           addClusterModalState:{
             isShow:state
@@ -74,14 +76,21 @@ class Cluster extends React.Component {
       console.error(err);
     });
   }
+  checkClusterCode = () => {
+    UserService.getClusterList().then(d => {
+      let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+      if(_.isEmpty(clusterCode) || _.isEmpty(_.get(d, [clusterCode]))) {
+        this.props.showModal();
+      }
+    })
+  }
   showConfirm = (record) => {
-    let that = this;
     confirm({
       title: '确定要删除该集群吗？',
       content: '无法复原，请谨慎操作',
-      onOk() {
-        that.props.deleteCluster({},{code:record.code}).then(()=>{
-          that.props.getCluster();
+      onOk:() => {
+        this.props.deleteCluster({},{code:record.code}).then(()=>{
+          this.checkClusterCode();
         })
       },
       onCancel() {},
@@ -147,7 +156,7 @@ class Cluster extends React.Component {
   }
    render() {
     this.generateColumns();
-    let dataSource = _.map(this.props.clusterMeta.meta,function(value,key){
+    let dataSource = _.map(window.clusterList, function(value,key){
       if(value.token === ORIGIN_TOKEN){
         window.dispatchEvent(new Event('warning'));
       }

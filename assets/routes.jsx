@@ -40,7 +40,7 @@ module.exports = (store, dispatch) => {
       path: window.prefix + '/pages',
       component: App,
       onEnter: function (nextState, replaceState) {
-        dispatch(actions.cluster.getCluster());
+        //dispatch(actions.cluster.getCluster());
         User.getUser().then((data) => {
           localStorage.setItem('name', data.nickname || data.name);
         });
@@ -70,7 +70,7 @@ module.exports = (store, dispatch) => {
         path: 'clusterMgr',
         component: ClusterMgrPage,
         onEnter: function (nextState, replaceState) {
-          dispatch(actions.cluster.getCluster());
+          // dispatch(actions.cluster.getCluster());
         }
       }, {
         path: 'appsConfig',

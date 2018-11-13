@@ -37,8 +37,8 @@ import * as monaco from 'monaco-editor';
  *
  * @param {*} clusterMeta 存放在store中的clusterMeta
  */
-const getClusters = (clusterMeta = {}) => {
-  const meta = _.get(clusterMeta, 'meta');
+const getClusters = () => {
+  const meta = window.clusterList;
   if (!meta) {
     return [];
   }
@@ -206,7 +206,7 @@ class ConfigDiff extends React.Component {
   }
 
   render() {
-    const clusters = getClusters(this.props.clusterMeta);
+    const clusters = getClusters();
     const {origin, compare} = this.state;
     return (
       <div className="config-diff-container">
@@ -241,7 +241,7 @@ class ConfigDiff extends React.Component {
               >
                 {
                   origin.merge ?
-                    '解除合并'                    
+                    '解除合并'
                     :
                     '合并common配置'
                 }
@@ -254,7 +254,7 @@ class ConfigDiff extends React.Component {
               >
                 {
                   compare.merge ?
-                    '解除合并'                    
+                    '解除合并'
                     :
                     '合并common配置'
                 }

@@ -185,7 +185,7 @@ class Log extends React.Component {
   render() {
     let fileData = [];
     let dir = [];
-    let clusterIpList = _.get(this.props.clusterMeta.meta, [_.get(URL.parse(window.location.href, true), ['query' ,'clusterCode']), 'ips']);
+    let clusterIpList = _.get(window.clusterList, [_.get(URL.parse(window.location.href, true), ['query' ,'clusterCode']), 'ips']);
     clusterIpList  = clusterIpList ? clusterIpList.toString() : '';
     let ips = _.isEmpty(clusterIpList)? [] : clusterIpList.split(',');
 

@@ -14,8 +14,6 @@ module.exports = {
       async: true,
       reducer: {
         success: (store, action) => {
-          //let oldIps = localStorage.getItem('clusterIpList');
-          //localStorage.setItem('clusterIpList',clusterMeta.meta[e.key].ips.toString());
         }
       }
     },
@@ -23,7 +21,6 @@ module.exports = {
       async: true,
       reducer: {
         success: (store, action) => {
-          //let oldIps = localStorage.getItem('clusterIpList');
           store.logContent = _.get(action, 'data.success');
         }
       }

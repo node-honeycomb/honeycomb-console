@@ -29,13 +29,15 @@ class Header extends React.Component {
       warning: false,
       serverSecure: true,
       currentCluster: clusterCode,
-      currentUser: currentUser || this.clusterMeta.meta[URL.parse(window.location.href, true).query.clusterCode].name,
+      currentUser: currentUser,
       memoryWarning: false,
       isRedWarning: false,
       isShowAllMachineData: {},
       machineDataVisible:false
     };
-    this.checkServerVersion(clusterCode);
+    if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))) {
+      this.checkServerVersion(clusterCode);
+    }
     window.addEventListener('warning',()=>{
       this.state.warning = true;
     });
@@ -53,10 +55,14 @@ class Header extends React.Component {
       'data.memoryUsage'
     ];
   }
+
   componentDidMount = () => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
-    this.checkServerVersion(clusterCode);
+    if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))){
+      this.checkServerVersion(clusterCode);
+    }
   }
+
   checkServerVersion = (clusterCode) => {
     this.props.getStatus({clusterCode: clusterCode}).then((result) => {
       let serverSecure = true;
@@ -94,7 +100,6 @@ class Header extends React.Component {
     });
   }
   changeCluster = (e)=>{
-    let clusterMeta = this.props.clusterMeta;
     this.setState({
       currentCluster: e.key,
     });
@@ -120,11 +125,11 @@ class Header extends React.Component {
     })
   }
   render() {
-    let clusterMeta = _.cloneDeep(this.props.clusterMeta);
-    _.map(clusterMeta.meta, (value, key)=>{
+    let clusterMeta = window.clusterList;
+    _.map(clusterMeta, (value, key)=>{
       return  value.code = key
     })
-    let clusterList = _.sortBy(clusterMeta.meta, [function(o) { return o.name; }]);
+    let clusterList = _.sortBy(clusterMeta, [function(o) { return o.name; }]);
     let workspacesList = _.map(clusterList, (menu, index) => {
       return (
         <Menu.Item key={menu.code}>
@@ -132,7 +137,7 @@ class Header extends React.Component {
           </Menu.Item>
       );
     });
-    let clusterName = _.get(clusterMeta.meta, [this.state.currentCluster, 'name']) || _.get(clusterMeta.meta, [this.props.chooseCluster, 'name']);
+    let clusterName =  _.get(clusterMeta, [this.props.chooseCluster, 'name']) || _.get(clusterMeta, [this.state.currentCluster, 'name']);
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode || '';
 
     let status = _.get(this.props.appMeta, 'status') || [];
@@ -233,6 +238,7 @@ class Header extends React.Component {
           width={width}
           className='memory-warning-modal-wrap'
           maskClosable={true}
+          onCancel={this.onCloseMemoryWarn}
           footer={[
             <Button onClick={this.onCloseMemoryWarn}>关闭</Button>,
           ]}
