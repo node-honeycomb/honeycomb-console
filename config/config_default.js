@@ -72,5 +72,9 @@ module.exports = {
   ignoreLogFiles: [/_app_usage_cache_\/app-usage\./, /app-usage\.{year}-{month}-{day}-{hour}\.log/, /nodejs_stdout\.log\.2\d+/],
   logSqlQuery: true,
   secureServerVersion: '1.0.3_3',
-  oldConsole: ''
+  oldConsole: '',
+  appManageConfig: {
+    keepOnlineNum: 3,
+    keepOfflineNum: 5
+  }
 };
