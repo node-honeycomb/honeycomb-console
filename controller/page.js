@@ -45,6 +45,7 @@ exports.pages = function (req, callback) {
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
         user: req.user,
+        appManageConfig: config.appManageConfig,
         env: config.env,
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : []
       }

@@ -22,7 +22,7 @@ class App extends React.Component {
     this.clusterCode = URL.parse(window.location.href, true).query.clusterCode || null;
   }
   componentDidMount = () => {
-    if(_.isEmpty(this.clusterCode)&&_.isEmpty(this.localClusterCode)){
+    if(_.isEmpty(this.clusterCode) || _.isEmpty(this.localClusterCode) || _.isEmpty(_.get(window.clusterList, [this.clusterCode]))){
       this.showModal();
     }
   }
@@ -33,7 +33,7 @@ class App extends React.Component {
     });
   }
   handleOk = (e) => {
-    let clusterMeta = this.props.clusterMeta.meta;
+    let clusterMeta = window.clusterList;
     let {chooseCluster} = this.state;
     this.setState({
       visible: false,
@@ -52,7 +52,7 @@ class App extends React.Component {
     return selectedKeys
   }
   render() {
-    let meta = this.props.clusterMeta.meta;
+    let meta = window.clusterList;
     return (
       <div className="app-main-div">
         <Modal title="请选择集群" visible={this.state.visible} width={600}
@@ -65,10 +65,10 @@ class App extends React.Component {
           <div className="choose-cluster-modal">
             <p>已选集群:  <i>{_.get(meta, [this.state.chooseCluster, 'name'])}</i></p>
             {
-              this.props.clusterMeta.result.map((value,key)=>{
+              _.map(window.clusterList, (value,key)=>{
                 return(
-                  <Button key={key} onClick={this.chooseCluster.bind(this,value)}>
-                    <span className={this.state.chooseCluster === value ? 'active-cluster' : null} >{meta[value].name+"("+value+")"}</span>
+                  <Button key={key} onClick={this.chooseCluster.bind(this,key)}>
+                    <span className={this.state.chooseCluster === key ? 'active-cluster' : null} >{value.name + '(' + key + ')'}</span>
                   </Button>
                 )
               })
@@ -77,7 +77,6 @@ class App extends React.Component {
         </Modal>
         <Header
           chooseCluster={this.state.chooseCluster}
-          clusterMeta={this.props.clusterMeta}
         />
         <div className="main-wrap">
           <div className="main-wrap-aside">
@@ -86,7 +85,7 @@ class App extends React.Component {
             />
           </div>
           <div className="main-wrap-main">
-            { this.props.children }
+            {React.cloneElement(this.props.children, { showModal: this.showModal })}
           </div>
         </div>
       </div>

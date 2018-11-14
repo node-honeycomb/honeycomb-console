@@ -34,8 +34,8 @@ class List extends React.Component {
       clearList: {},
       isShowClearListModal: false
     }
-    this.keepOnlineNum = 1; //保留的在线版本数量，可之后改为配置项
-    this.keepOnserviceNum = 5; //保留的离线版本数量，可之后改为配置项
+    this.keepOnlineNum = _.get(window, ['appManageConfig', 'keepOnlineNum']); //保留的在线版本数量
+    this.keepOfflineNum = _.get(window, ['appManageConfig', 'keepOfflineNum']); //保留的离线版本数量
   }
   genRowspan = (appList, data) => {
     let rowSpan ={};
@@ -71,13 +71,14 @@ class List extends React.Component {
       let _offlineList = data.versions.filter((item, index) => {
         if(_.get(item, 'cluster[0].status') === 'offline') return item;
       });
-      if(_onlineList.length > this.keepOnlineNum + 1 || _offlineList.length > this.keepOnserviceNum) clearList[data.name] = data.versions;
+      if(_onlineList.length > this.keepOnlineNum || _offlineList.length > this.keepOfflineNum) clearList[data.name] = data.versions;
     });
     return clearList
   }
   componentDidMount = () => {
     let that = this;
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
     this.props.getAppList({ clusterCode: clusterCode }).then(d => {
       if(d.success && d.success.length > 0) {
         let clearList = this.genClearList(d.success);
@@ -103,6 +104,7 @@ class List extends React.Component {
       if(window.int){
         clearInterval(window.int);
       }
+      if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
       this.props.getAppList({ clusterCode: clusterCode })
       this.setListInterval(that);
     }
@@ -483,7 +485,7 @@ class List extends React.Component {
           getAppList={this.props.getAppList}
           deleteApps={this.props.deleteApps}
           keepOnlineNum={this.keepOnlineNum}
-          keepOnserviceNum={this.keepOnserviceNum}
+          keepOfflineNum={this.keepOfflineNum}
         />
         <div className="list-table-wrap">
           <Table
@@ -524,9 +526,11 @@ class List extends React.Component {
 let mapStateToProps = (store) => {
   let appMeta = store.app;
   let monitorMeta = store.monitor;
+  let clusterMeta = store.cluster;
   return {
     appMeta,
-    monitorMeta
+    monitorMeta,
+    clusterMeta
   }
 }
 

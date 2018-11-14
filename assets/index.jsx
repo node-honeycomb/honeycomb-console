@@ -15,14 +15,14 @@ const syncHistoryWithStore = require('react-router-redux').syncHistoryWithStore;
 const browserHistory = ReactRouter.browserHistory;
 const history = syncHistoryWithStore(browserHistory, store);
 let routes = require('./routes.jsx');
-let User = require("./services/user");
+let User = require('./services/user');
 let rootElement = document.getElementById('server-admin');
 
 
-User.getUser().then((user) => {
+Promise.all([User.getUser(), User.getClusterList()]).then(() => {
   ReactDOM.render(
     <Provider store={store}>
-      <Router history={history} routes={routes(store,store.dispatch)}>
+      <Router history={history} routes={routes(store, store.dispatch)}>
       </Router>
     </Provider>,
     rootElement

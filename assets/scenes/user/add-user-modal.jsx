@@ -44,7 +44,6 @@ class CreateUserModal extends React.Component {
     });
   }
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps.edit);
     if (nextProps.edit) {
       this.setState({
         info: {

@@ -35,8 +35,8 @@ class OnlineListModal extends React.Component {
         _.map(_clearList, (value, key) => {
           let offlineList = value.filter(d => d.cluster[0].status === 'offline');
           // 需要保留在机器上的版本数量
-          let keepOnserviceNum = this.props.keepOnserviceNum;
-          deleteList = _.concat(deleteList, offlineList.slice(0, offlineList.length - keepOnserviceNum < 0 ? 0 : offlineList.length - keepOnserviceNum))
+          let keepOfflineNum = this.props.keepOfflineNum;
+          deleteList = _.concat(deleteList, offlineList.slice(0, offlineList.length - keepOfflineNum < 0 ? 0 : offlineList.length - keepOfflineNum))
         });
         // 循环删除应用
         (function deleteApp(i, deleteList) {
@@ -158,15 +158,25 @@ class OnlineListModal extends React.Component {
       let offlineList = value.filter((item, index) => {
         if(_.get(item, 'cluster[0].status') === 'offline') return item;
       });
-      onlineList.slice(onlineList.length - keepOnlineNum).map(d => {d.isKeepOnline = true; return d});
-      offlineList.slice(offlineList.length - keepOfflineNum).map(d => {d.isKeepOffline = true; return d});
+
+      let keepOnlineIdx = onlineList.length - keepOnlineNum;
+      let keepOfflineIdx = offlineList.length - keepOfflineNum;
+      // 在线版本数未达到上限则全部保留
+      if (keepOnlineIdx < 0) {
+        keepOnlineIdx = 0;
+      }
+      onlineList.slice(keepOnlineIdx).map(d => {d.isKeepOnline = true; return d});
+      if (keepOfflineIdx < 0) {
+        keepOfflineIdx = 0;
+      }
+      offlineList.slice(keepOfflineIdx).map(d => {d.isKeepOffline = true; return d});
     });
     return data;
   }
   render() {
     let clearList = _.get(this, 'props.clearList') || [];
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
-    clearList = this.setClearPolicy(clearList, 1, 5);
+    clearList = this.setClearPolicy(clearList, this.props.keepOnlineNum, this.props.keepOfflineNum);
     function colorChoose(value) {
       if (value === 'online' || value === 'success') return 'green';
       if (value === 'offline' || value === 'pending') return 'lightgray';
