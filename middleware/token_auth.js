@@ -1,7 +1,6 @@
 const crypto = require('crypto');
 const log = require('../common/log');
 const TokenModel = require('../model/token');
-const UserModel = require('../model/user')
 
 function userVerify(req, userSign, accessKeySecret) {
     debugger;
