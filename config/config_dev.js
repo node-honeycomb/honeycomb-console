@@ -2,6 +2,7 @@
 module.exports = {
   env: 'dev',
   debug: true,
+  dumpConfig: true,
   logs: {
     sys: {
       level: 'DEBUG'

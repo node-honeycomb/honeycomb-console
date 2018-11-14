@@ -44,3 +44,13 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `gmt_modified` datetime NOT NULL COMMENT '修改时间',
   UNIQUE KEY `user_cluster` (`name`,`cluster_code`)
 );
+
+CREATE TABLE IF NOT EXISTS `hc_console_system_user_token` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `username` varchar(50) NOT NULL,
+  `accessKeyId` varchar(100) not null,
+  `accessKeySecret` varchar(100) not null,
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  `gmt_modified` datetime NOT NULL COMMENT '修改时间',
+  UNIQUE KEY `accessKeyId` (`accessKeyId`)
+);

@@ -77,7 +77,7 @@ module.exports = function (req, res, next) {
           prefix: config.prefix !== '/' ? config.prefix : '',
           userCount: count,
           errMsg: errmsg,
-          csrfToken: req.csrfToken()
+          csrfToken: req.csrfToken && req.csrfToken()
         });
       });
   }

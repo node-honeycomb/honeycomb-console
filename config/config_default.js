@@ -28,10 +28,18 @@ module.exports = {
   // port: 9000,
   prefix: '/honeycomb-console',
   middleware: {
+    csrf: {
+      enable: false
+    },
     cookieSession: {
       config: {
         secret: '** change this config when publish **'
       }
+    },
+    tokenAuth: {
+      enable: true,
+      module: '../middleware/token_auth.js',
+      config: {}
     },
     appAuth: {
       enable: true,

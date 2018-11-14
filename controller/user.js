@@ -57,4 +57,15 @@ exports.deleteUser = function (req, callback) {
   });
 };
 
+/**
+ * @api {get} /api/xxxx
+ */
+exports.xxxx = function (req, callback) {
+  let user = req.user;
+  callback(null, {
+    name: user.name,
+    role: user.role
+  }, {ignoreCamel: true});
+};
+
 

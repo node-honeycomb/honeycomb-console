@@ -338,3 +338,11 @@ exports.mergeAppInfo = function (ips, apps) {
 
   return data;
 };
+
+exports.getRandomStr = function (len) {
+    let text = '';
+    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < len; i++)
+      text += possible.charAt(_.random(61));
+    return text;
+}
