@@ -4,7 +4,7 @@ var React = require('react');
 var ReactRouter = require('react-router');
 var antd = require('antd');
 var Link = require('react-router').Link;
-let {Menu, Icon, Popover, Card, Modal, Collapse, Button} = require('antd');
+let {Menu, Icon, Popover, Card, Modal, Collapse, Button, Tag, Row, Col, message, Tooltip} = require('antd');
 const SubMenu = Menu.SubMenu;
 const confirm = Modal.confirm;
 const Panel = Collapse.Panel;
@@ -33,7 +33,9 @@ class Header extends React.Component {
       memoryWarning: false,
       isRedWarning: false,
       isShowAllMachineData: {},
-      machineDataVisible:false
+      machineDataVisible:false,
+      coredumpInfo: [],
+      unknowProcess:[],
     };
     if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))) {
       this.checkServerVersion(clusterCode);
@@ -55,12 +57,28 @@ class Header extends React.Component {
       'data.memoryUsage'
     ];
   }
-
-  componentDidMount = () => {
+  initApp = () => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))){
       this.checkServerVersion(clusterCode);
+      this.props.getCoredump({clusterCode}).then(d => {
+        if(d.success) {
+          this.setState({
+            coredumpInfo: d.success
+          });
+        }
+      });
+      this.props.getUnknowProcess({clusterCode}).then(d => {
+        if(d.success) {
+          this.setState({
+            unknowProcess: d.success
+          });
+        }
+      })
     }
+  }
+  componentDidMount = () => {
+    this.initApp();
   }
 
   checkServerVersion = (clusterCode) => {
@@ -106,6 +124,7 @@ class Header extends React.Component {
     this.checkServerVersion(e.key);
     localStorage.setItem('clusterCode', e.key);
     this.context.router.push({pathname: window.prefix + '/pages/list', query:{clusterCode: e.key}});
+    this.initApp();
   }
   onClickShowAllMachineData = (ip) => {
     let isShowAllMachineData = _.cloneDeep(this.state.isShowAllMachineData);
@@ -122,6 +141,36 @@ class Header extends React.Component {
   onCloseMemoryWarn = () => {
     this.setState({
       machineDataVisible: false
+    })
+  }
+  onDeleteCoredump = (data) => {
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    this.props.deleteCoredump({clusterCode, files: [data]}).then(d => {
+      if(d.success) {
+        message.success('清除成功');
+        this.props.getCoredump({clusterCode}).then(d => {
+          if(d.success) {
+            this.setState({
+              coredumpInfo: d.success
+            });
+          }
+        });
+      }
+    })
+  }
+  onDeleteUnknowProcess = (data) => {
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    this.props.deleteUnknowProcess({clusterCode}, {pid: data}).then(d => {
+      if(d.success) {
+        message.success('清除成功');
+        this.props.getUnknowProcess({clusterCode}).then(d => {
+          if(d.success) {
+            this.setState({
+              unknowProcess: d.success
+            });
+          }
+        })
+      }
     })
   }
   render() {
@@ -146,8 +195,49 @@ class Header extends React.Component {
     let content = (<div className='memory-warn-wrap'>
       {
         _.map(status, (item, index)=>{
+          let coredumpFileList = _.get(this.state.coredumpInfo.find(d => d.ip === item.ip), 'data') || [];
+          let unknowProcessList = _.get(this.state.unknowProcess.find(d => d.ip === item.ip), 'data') || [];
           return(
             <Card key={index} title={"机器："+item.ip} >
+              {coredumpFileList && coredumpFileList.length>0 && <div>
+                <Row>
+                  <Col style={{color: 'red'}} span={9}>coredump文件：</Col>
+                  <Col span={15}>
+                    {coredumpFileList.map((d, index)=> {
+                      let coredumpFile = _.isObject(d)? d.file : d;
+                      const isLongTag = coredumpFile.length > 25;
+                      const tagElem = (
+                        <Tag className='file-name-wrap' key={index}>
+                          {isLongTag ? `${coredumpFile.slice(0, 25)}...` : coredumpFile}
+                          <Icon onClick={this.onDeleteCoredump.bind(this, coredumpFile)} type="close" />
+                        </Tag>
+                      );
+                      return isLongTag ? <Tooltip title={coredumpFile} key={index}>{tagElem}</Tooltip> : tagElem;
+                    })}
+                  </Col>
+                </Row>
+              </div>}
+              {unknowProcessList && unknowProcessList.length>0 &&<div>
+              <Row>
+                <Col style={{color: 'red'}} span={9}>unknowProcess文件：</Col>
+                <Col span={15}>
+                  {unknowProcessList.map(d => {
+                    let unknowProcess = d.info;
+                    const isLongTag = unknowProcess.length > 25;
+                    const tagElem = (
+                      <Tag className='file-name-wrap' key={d.pid}>
+                        {isLongTag ? `${unknowProcess.slice(0, 25)}...` : unknowProcess}
+                        <Icon onClick={this.onDeleteUnknowProcess.bind(this, d.pid)} type="close" />
+                      </Tag>
+                    );
+                    return isLongTag ? <Tooltip title={unknowProcess} key={d.pid}>{tagElem}</Tooltip> : tagElem;
+                    {/* return (
+                      <Tag visible={true} key={d.pid} title={d.info} className='file-name-wrap' closable>{d.info}</Tag>
+                    ) */}
+                  })}
+                </Col>
+              </Row>
+              </div>}
               {!_.get(this.state, ['isShowAllMachineData', item.ip]) ? <div>
                 {whiteList.map(d => {
                   let fontColorRed = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit);
@@ -208,8 +298,7 @@ class Header extends React.Component {
         </div> */}
         <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
           <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning, 'fontColorRed': this.state.isRedWarning})}>
-            <Icon type="exclamation-circle-o" />
-              {this.state.memoryWarning ? '内存报警' : '内存信息'}
+            {this.state.memoryWarning ? <span><Icon type="exclamation-circle-o" /> 内存报警</span> : <span><Icon type="info-circle-o" /> 内存信息</span>}
           </span>
         </div>
         {this.state.warning && (<div className="admin-console-clusterInfo" >
@@ -240,7 +329,7 @@ class Header extends React.Component {
           maskClosable={true}
           onCancel={this.onCloseMemoryWarn}
           footer={[
-            <Button onClick={this.onCloseMemoryWarn}>关闭</Button>,
+            <Button key='close' onClick={this.onCloseMemoryWarn}>关闭</Button>,
           ]}
         >
           {content}
@@ -265,5 +354,9 @@ Header.contextTypes = {
 let actions = require("../../../actions");
 
 module.exports = connect(mapStateToProps,{
-  getStatus : actions.app.getStatus
+  getCoredump : actions.app.getCoredump,
+  getUnknowProcess: actions.app.getUnknowProcess,
+  getStatus : actions.app.getStatus,
+  deleteCoredump: actions.app.deleteCoredump,
+  deleteUnknowProcess: actions.app.deleteUnknowProcess
 })(Header);
