@@ -231,9 +231,6 @@ class Header extends React.Component {
                       </Tag>
                     );
                     return isLongTag ? <Tooltip title={unknowProcess} key={d.pid}>{tagElem}</Tooltip> : tagElem;
-                    {/* return (
-                      <Tag visible={true} key={d.pid} title={d.info} className='file-name-wrap' closable>{d.info}</Tag>
-                    ) */}
                   })}
                 </Col>
               </Row>

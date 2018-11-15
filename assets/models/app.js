@@ -43,7 +43,7 @@ module.exports = {
     }
   },
   deleteUnknowProcess: {
-    url: '/api/unknowProcess/:pid',
+    url: '/api/unknowProcess/:pid/delete',
     method: 'POST',
     headers: {
       'x-csrf-token': window.csrfToken

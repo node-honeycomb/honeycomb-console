@@ -165,7 +165,7 @@ exports.unknowProcess = function (req, callback) {
 };
 
 /**
- * @api {post} /api/unknowProcess/:pid
+ * @api {post} /api/unknowProcess/:pid/delete
  * @param req
  * @param callback
  */
