@@ -219,7 +219,7 @@ class Header extends React.Component {
               </div>}
               {unknowProcessList && unknowProcessList.length>0 &&<div>
               <Row>
-                <Col style={{color: 'red'}} span={9}>unknowProcess文件：</Col>
+                <Col style={{color: 'red'}} span={9}>未知进程：</Col>
                 <Col span={15}>
                   {unknowProcessList.map(d => {
                     let unknowProcess = d.info;
