@@ -3,7 +3,6 @@ const log = require('../common/log');
 const TokenModel = require('../model/token');
 
 function userVerify(req, userSign, accessKeySecret) {
-    debugger;
     let headers   = req.headers;
     let date      = headers.date;
     let method = req.method;
@@ -29,7 +28,7 @@ function userVerify(req, userSign, accessKeySecret) {
       err.status = 401;
       err.code = 'check_sign_error';
       err.message = msg;
-      throw err;
+      return err;
     }
   }
 
@@ -51,9 +50,12 @@ module.exports = function(req, res, next){
           return next();
       }
       TokenModel.getTokenByAKID(id,(err, token) => {
-          if(err) throw err;
-          if(!token) throw new Error('token not exist');
-          userVerify(req, signStr, token.accessKeySecret);
+          if(err) return next(err);
+          if(!token) return next(new Error('token not exist'));
+          err = userVerify(req, signStr, token.accessKeySecret)
+          if (err) {
+            return next(err)
+          }
           req.session.username = token.username;
           next();
       });
