@@ -87,6 +87,18 @@ module.exports = {
           store.status = _.get(action, 'data.success');
         }
       }
+    },
+    getCoredump: {
+      async: true
+    },
+    getUnknowProcess: {
+      async: true
+    },
+    deleteCoredump: {
+      async: true
+    },
+    deleteUnknowProcess: {
+      async: true
     }
   }
 };

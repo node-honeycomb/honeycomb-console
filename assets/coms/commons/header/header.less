@@ -129,6 +129,24 @@
 }
 .memory-warn-wrap{
   overflow: auto;
+  .file-name-wrap{
+    margin-bottom: 3px;
+    .ant-tag-text{
+      max-width: 180px;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      height: 20px;
+      line-height: 20px;
+      float: left;
+    }
+    .anticon{
+      display: inline-block;
+      height: 20px;
+      line-height: 20px;
+    }
+  }
   .warning-detail-wrap{
     margin-bottom: 5px;
     .ant-collapse-header{
@@ -161,6 +179,7 @@
   }
   .ant-card-body{
     padding: 8px 16px;
+
     p{
       border-bottom: 1px solid #eee;
       margin-bottom: 3px;

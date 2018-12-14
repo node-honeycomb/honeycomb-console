@@ -19,7 +19,10 @@ module.exports = function (req, res, next) {
     pathToRegex('/api/user').test(pathname) ||
     pathToRegex('/api/user/**/**').test(pathname) ||
     pathToRegex('/api/user/**').test(pathname) ||
-    pathToRegex('/api/status').test(pathname)) {
+    pathToRegex('/api/status').test(pathname) ||
+    pathToRegex('/api/coredump').test(pathname) ||
+    pathToRegex('/api/unknowProcess').test(pathname) ||
+    pathToRegex('/api/unknowProcess/**').test(pathname)) {
     return next();
   }
 
@@ -58,6 +61,10 @@ module.exports = function (req, res, next) {
 
   if (pathToRegex('/api/appUsages').test(pathname)) {
     // filter app
+    return next();
+  }
+
+  if (pathToRegex('/api/status').test(pathname)) {
     return next();
   }
 
@@ -177,4 +184,8 @@ module.exports = function (req, res, next) {
       message: 'Forbidden'
     });
   }
+  res.status(403).json({
+    code: 'Error',
+    message: 'Forbidden'
+  });
 };
