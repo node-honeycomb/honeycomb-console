@@ -55,7 +55,6 @@ class App extends React.Component {
     return selectedKeys
   }
   render() {
-    console.log("!!", this.state.visible)
     let meta = window.clusterList;
     return (
       <div className="app-main-div">
