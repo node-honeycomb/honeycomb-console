@@ -28,7 +28,7 @@ class AddClusterModal extends React.Component {
     editInfo.isUpdate = false;
     if(typeof editInfo.ips === 'string'){
       editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/g);
-      editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));  
+      editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));
     }
     if(editInfo.ips.length === 0){
       this.setState({
@@ -59,6 +59,7 @@ class AddClusterModal extends React.Component {
       isIpsError: false
     })
     this.props.addCluster(editInfo).then(()=>{
+      this.props.getCluster();
       this.props.onHide && this.props.onHide.call({});
       this.setState({info:{}});
     });

@@ -28,7 +28,8 @@ class Cluster extends React.Component {
     updateSafeTokenModalState: {
       isShow: false,
       info: {}
-    }
+    },
+    clusterList: window.clusterList
   }
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
     switch(operation){
@@ -61,6 +62,13 @@ class Cluster extends React.Component {
     }
 
   }
+  getClusterList = () => {
+    this.props.getCluster().then(d => {
+      this.setState({
+        clusterList: d
+      })
+    })
+  }
   changeUnSafeToken = (data) => {
     let newToken = randomstring.generate(64);
     // call api change server config.admin.token
@@ -79,7 +87,7 @@ class Cluster extends React.Component {
   checkClusterCode = () => {
     UserService.getClusterList().then(d => {
       let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
-      if(_.isEmpty(clusterCode) || _.isEmpty(_.get(d, [clusterCode]))) {
+      if(!_.isEmpty(d) && (_.isEmpty(clusterCode) || _.isEmpty(_.get(d, [clusterCode])))) {
         this.props.showModal();
       }
     })
@@ -90,6 +98,7 @@ class Cluster extends React.Component {
       content: '无法复原，请谨慎操作',
       onOk:() => {
         this.props.deleteCluster({},{code:record.code}).then(()=>{
+          this.getClusterList();
           this.checkClusterCode();
         })
       },
@@ -156,7 +165,7 @@ class Cluster extends React.Component {
   }
    render() {
     this.generateColumns();
-    let dataSource = _.map(window.clusterList, function(value,key){
+    let dataSource = _.map(this.state.clusterList, function(value,key){
       if(value.token === ORIGIN_TOKEN){
         window.dispatchEvent(new Event('warning'));
       }
@@ -176,19 +185,20 @@ class Cluster extends React.Component {
           />
         </div>
         <AddClusterModal
-          getCluster={this.props.getCluster}
+          getCluster={this.getClusterList}
           addCluster={this.props.addCluster}
           visible={this.state.addClusterModalState.isShow}
           onHide={this.clusterModal.bind(this,"add",false)}
         />
         <EditClusterModal
           info={this.state.editClusterModalState.info}
-          getCluster={this.props.getCluster}
+          getCluster={this.getClusterList}
           addCluster={this.props.addCluster}
           visible={this.state.editClusterModalState.isShow}
           onHide={this.clusterModal.bind(this,"edit",false)}
         />
         <UpdateSafeTokenModal
+          getCluster={this.getClusterList}
           info={this.state.updateSafeTokenModalState.info}
           visible={this.state.updateSafeTokenModalState.isShow}
           onHide={this.clusterModal.bind(this,"updateToken",false)}

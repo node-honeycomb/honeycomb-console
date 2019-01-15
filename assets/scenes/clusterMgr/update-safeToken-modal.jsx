@@ -36,6 +36,7 @@ class UpdateSafeTokenModal extends React.Component {
         isIpsError: false
       })
       this.props.addCluster(editInfo).then(()=>{
+        this.props.getCluster();
         this.props.onHide && this.props.onHide.call({});
       })
     }else{

@@ -311,8 +311,8 @@ class Header extends React.Component {
           <span className="clusterName">{clusterName}</span>
         </div> */}
         <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
-          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning, 'fontColorRed': this.state.isRedWarning})}>
-            {this.state.memoryWarning ? <span><Icon type="exclamation-circle-o" /> 内存报警</span> : <span><Icon type="info-circle-o" /> 内存信息</span>}
+          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0, 'fontColorRed': this.state.isRedWarning})}>
+            {this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0 ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
           </span>
         </div>
         {this.state.warning && (<div className="admin-console-clusterInfo" >
@@ -336,7 +336,7 @@ class Header extends React.Component {
           </SubMenu>
         </Menu>
         <Modal
-          title="报警机器"
+          title={this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0 ? '异常集群' : '集群信息'}
           visible={this.state.machineDataVisible}
           width={width}
           className='memory-warning-modal-wrap'

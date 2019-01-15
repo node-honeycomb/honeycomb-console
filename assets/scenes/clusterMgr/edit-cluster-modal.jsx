@@ -37,7 +37,14 @@ class EditClusterModal extends React.Component {
       this.setState({
         isIpsError: false
       })
+      if (!editInfo.token) {
+        editInfo.token = '***honeycomb-default-token***';
+      }
+      if (!editInfo.endpoint) {
+        editInfo.endpoint = 'http://' + editInfo.ips[0] + ':9999';
+      }
       this.props.addCluster(editInfo).then(()=>{
+        this.props.getCluster();
         this.props.onHide && this.props.onHide.call({});
       })
     }else{
