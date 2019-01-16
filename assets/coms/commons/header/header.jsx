@@ -109,7 +109,6 @@ class Header extends React.Component {
         }
         this.diskCapacityFields.map(d => {
           if(_.get(server, d) && _.get(server, d) > this.diskCapacityLimit - 0.2) {
-            debugger;
             memoryWarning = true;
           }
           if(_.get(server, d) && _.get(server, d) > this.diskCapacityLimit) {
@@ -118,7 +117,6 @@ class Header extends React.Component {
         });
         this.memoryFields.map(d => {
           if(_.get(server, d) && _.get(server, d) > this.memoryUsageLimit - 20) {
-            debugger;
             memoryWarning = true;
           }
           if(_.get(server, d) && _.get(server, d) > this.memoryUsageLimit) {
