@@ -21,6 +21,7 @@ class OnlineListModal extends React.Component {
       isDeleteSuccess: {},
       isDeleteFailed: {},
       deleteSpinning: {},
+      countDownNum: false
     }
   }
   delelteApps = (that) => {
@@ -46,6 +47,7 @@ class OnlineListModal extends React.Component {
           that.setState({
             deleteSpinning
           });
+          if (deleteList.length < 1) return that.countDownCancel();
           return that.props.deleteApps({ clusterCode: clusterCode }, { appId: deleteList[i].appId})
           .then((d)=>{
             // 改变删除成功的提示
@@ -61,9 +63,7 @@ class OnlineListModal extends React.Component {
             if(i < deleteList.length-1){
               deleteApp(i+1, deleteList);
             } else {
-              that.setState({
-                isClearing : false
-              })
+              that.countDownCancel();
             }
           })
           .catch((err)=>{
@@ -87,6 +87,19 @@ class OnlineListModal extends React.Component {
         })(0, deleteList)
       }
     });
+  }
+  countDownCancel() {
+    let n = 3;
+    let inter = setInterval(()=>{
+      if(n === 0) {
+        clearInterval(inter);
+        this.handleCancel();
+      }else{
+        this.setState({
+          countDownNum: n--
+        });
+      }
+    },1000)
   }
   handleOk = () => {
     this.setState({isClearing : true});
@@ -221,10 +234,10 @@ class OnlineListModal extends React.Component {
       key: 'isDelete',
       render: (text, record, index) => {
         let genDom = () => {
-          if(record.isKeepOnline) return <span></span>;
-          if(record.isKeepOffline) return <span><Icon style={{fontSize: '16px'}} title='保留服务' type="lock" /></span>;
           if(this.state.isDeleteSuccess[record.appId]) return <span style={{color:colorChoose('success')}}>删除成功</span>;
           if(this.state.isDeleteFailed[record.appId]) return <span style={{color: colorChoose('fail')}}>删除失败</span>;
+          if(record.isKeepOnline) return <span></span>;
+          if(record.isKeepOffline) return <span><Icon style={{fontSize: '16px'}} title='保留服务' type="lock" /></span>;
           if(record.cluster[0].status === 'online') return <span></span>
           return <span style={{color: colorChoose('pending')}}>待删除</span>;
         }
@@ -242,7 +255,7 @@ class OnlineListModal extends React.Component {
         footer={
           <div>
             <Button disabled={this.state.isClearing} type="primary" onClick={this.handleOk.bind(this)}>清理</Button>
-            <Button onClick={this.handleCancel}>关闭窗口</Button>
+            <Button onClick={this.handleCancel}>关闭窗口{this.state.countDownNum && `(${this.state.countDownNum})`}</Button>
           </div>
         }
         onCancel={this.handleCancel}

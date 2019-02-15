@@ -34,8 +34,8 @@ class List extends React.Component {
       clearList: {},
       isShowClearListModal: false
     }
-    this.keepOnlineNum = _.get(window, ['appManageConfig', 'keepOnlineNum']); //保留的在线版本数量
-    this.keepOfflineNum = _.get(window, ['appManageConfig', 'keepOfflineNum']); //保留的离线版本数量
+    this.keepOnlineNum = _.get(window, ['appManageConfig', 'keepOnlineNum']) || 3; //保留的在线版本数量
+    this.keepOfflineNum = _.get(window, ['appManageConfig', 'keepOfflineNum']) || 5; //保留的离线版本数量
   }
   genRowspan = (appList, data) => {
     let rowSpan ={};
