@@ -68,8 +68,7 @@ class Header extends React.Component {
     this.memoryUsageLimit = 80;
     this.diskCapacityFields = [
       'data.diskInfo.serverRoot.capacity',
-      'data.diskInfo.logsRoot.capacity',
-      'data.memoryUsage'
+      'data.diskInfo.logsRoot.capacity'
     ];
     this.memoryFields = [
       'data.memoryUsage'
@@ -277,7 +276,7 @@ class Header extends React.Component {
                   let fontColorRed = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit);
                   let fontColorYellow = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit - 20) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit - 0.2);
                   if(_.toString(_.get(item.data, d))) return (
-                    <p className={classnames({fontColorRed, fontColorYellow})} key={d}>{d} : {_.toString(_.get(item.data, d))}</p>
+                    <p className={classnames({fontColorRed, fontColorYellow})} key={d}>{d} : {d.indexOf('capacity') > -1 ? `${_.get(item.data, d) * 100}` : _.toString(_.get(item.data, d))}</p>
                   )
                 })}
                 <a onClick={this.onClickShowAllMachineData.bind(this, item.ip)}>展示全部信息</a>
@@ -297,7 +296,9 @@ class Header extends React.Component {
                       <p  key={k}>
                         {k} : {_.map(v, (value, key) => {
                           return <p className='marginLf' key={key}>{key} : {_.map(value, (_v, _k) => {
-                            return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_v}</p>
+                            if(_k === 'capacity' || _k === 'filesystem') {
+                              return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_k === 'capacity' ? `${_v * 100}` : _v}</p>
+                            }
                           })}
                           </p>
                         })}
@@ -333,8 +334,8 @@ class Header extends React.Component {
           <span className="clusterName">{clusterName}</span>
         </div> */}
         <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
-          <span className={classnames({'clusterName': true, 'fontColorYellow': clusterInfoStatus === 'wraning', 'fontColorRed': clusterInfoStatus === 'error'})}>
-            {clusterInfoStatus === 'wraning' || clusterInfoStatus === 'error' ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
+          <span className={classnames({'clusterName': true, 'fontColorRed': clusterInfoStatus === 'error'})}>
+            {clusterInfoStatus === 'error' ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
           </span>
         </div>
         {/* {this.state.warning && (<div className="admin-console-clusterInfo" >
