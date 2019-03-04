@@ -31,6 +31,16 @@ class Cluster extends React.Component {
     },
     clusterList: window.clusterList
   }
+  componentDidMount() {
+    if (_.get(this.props.location, 'state.isShowClusterModal')) {
+      _.forEach(this.state.clusterList, (value,key) => {
+        if(value.token === ORIGIN_TOKEN){
+          this.clusterModal("updateToken", true, value);
+          return;
+        }
+      });
+    }
+  }
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
     switch(operation){
       case 'add':
@@ -53,16 +63,16 @@ class Cluster extends React.Component {
         let self = this;
         confirm({
           title: '安全修复',
-          content: '检测到该集群正在使用默认的token，这可能会造成安全隐患，是否自动修复?',
+          content: `检测到${data.name}集群正在使用默认的token，这可能会造成安全隐患，是否自动修复?`,
           onOk() {
             self.changeUnSafeToken(data);
           },
           onCancel() {},
         });
     }
-
   }
   getClusterList = () => {
+    this.state.clusterList.f
     this.props.getCluster().then(d => {
       this.setState({
         clusterList: d

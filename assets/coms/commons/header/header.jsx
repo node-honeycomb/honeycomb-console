@@ -13,6 +13,7 @@ const URL = require("url");
 import { ReactContext } from 'react-router';
 const connect = require('react-redux').connect;
 const classnames = require('classnames');
+const ORIGIN_TOKEN = '***honeycomb-default-token***';
 
 function versionCompare(v1, v2) {
   v1 = v1.replace(/_/g, '.');
@@ -77,6 +78,7 @@ class Header extends React.Component {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))){
       this.checkServerVersion(clusterCode);
+      this.checkWarning();
       this.props.getCoredump({clusterCode}).then(d => {
         if(d.success) {
           this.setState({
@@ -96,7 +98,13 @@ class Header extends React.Component {
   componentDidMount = () => {
     this.initApp();
   }
-
+  checkWarning = () => {
+    _.forEach(window.clusterList, function(value,key){
+      if(value.token === ORIGIN_TOKEN){
+        window.dispatchEvent(new Event('warning'));
+      }
+    });
+  }
   checkServerVersion = (clusterCode) => {
     this.props.getStatus({clusterCode: clusterCode}).then((result) => {
       let serverSecure = true;
@@ -189,6 +197,13 @@ class Header extends React.Component {
       }
     })
   }
+  getClusterInfoStatus = () => {
+    let clusterStatus = 'normal'; //three status: 'normal', 'warning', 'error'
+    if (this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0) clusterStatus = 'warning';
+    if (this.state.isRedWarning) clusterStatus = 'error';
+    return clusterStatus;
+  }
+
   render() {
     let clusterMeta = window.clusterList;
     _.map(clusterMeta, (value, key)=>{
@@ -209,6 +224,11 @@ class Header extends React.Component {
     let width = status.length > 1 ? '890px' : '470px';
     let whiteList = ['cpu', 'cpuNum', 'memory', 'memoryUsage', 'serverVersion', 'sysTime', 'sysLoad', 'diskInfo.logsRoot.capacity', 'diskInfo.serverRoot.capacity']
     let content = (<div className='memory-warn-wrap'>
+      {(!this.state.serverSecure || this.state.warning) && <div className='warning-wrap'>
+        {!this.state.serverSecure && <span>Server版本过低，请升级至{window.secureServerVersion}以上</span>}
+        {this.state.warning &&<span>集群存在安全隐患</span>}
+        请前往<Link onClick={this.onCloseMemoryWarn} to={{pathname: window.prefix + '/pages/clusterMgr', query: clusterCode && {clusterCode: clusterCode}, state:{isShowClusterModal: true}}}>集群管理</Link>处理
+      </div>}
       {
         _.map(status, (item, index)=>{
           let coredumpFileList = _.get(this.state.coredumpInfo.find(d => d.ip === item.ip), 'data') || [];
@@ -256,7 +276,7 @@ class Header extends React.Component {
                   let fontColorRed = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit);
                   let fontColorYellow = (d === 'memoryUsage' && _.get(item.data, d) > this.memoryUsageLimit - 20) || ((d === 'diskInfo.logsRoot.capacity' || d === 'diskInfo.serverRoot.capacity') && _.get(item.data, d) > this.diskCapacityLimit - 0.2);
                   if(_.toString(_.get(item.data, d))) return (
-                    <p className={classnames({fontColorRed, fontColorYellow})} key={d}>{d} : {_.toString(_.get(item.data, d))}</p>
+                    <p className={classnames({fontColorRed, fontColorYellow})} key={d}>{d} : {d.indexOf('capacity') > -1 ? `${_.get(item.data, d) * 100}` : _.toString(_.get(item.data, d))}</p>
                   )
                 })}
                 <a onClick={this.onClickShowAllMachineData.bind(this, item.ip)}>展示全部信息</a>
@@ -276,7 +296,9 @@ class Header extends React.Component {
                       <p  key={k}>
                         {k} : {_.map(v, (value, key) => {
                           return <p className='marginLf' key={key}>{key} : {_.map(value, (_v, _k) => {
-                            return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_v}</p>
+                            if(_k === 'capacity' || _k === 'filesystem') {
+                              return <p className={classnames({'marginLf': true, 'fontColorRed': _k === 'capacity' && _v > this.diskCapacityLimit, 'fontColorYellow': _k === 'capacity' && _v > this.diskCapacityLimit - 0.2})} key={_k}>{_k} : {_k === 'capacity' ? `${_v * 100}` : _v}</p>
+                            }
                           })}
                           </p>
                         })}
@@ -291,6 +313,8 @@ class Header extends React.Component {
         })
       }
     </div>);
+
+    let clusterInfoStatus = this.getClusterInfoStatus();
     return (
       <header className="admin-console-header">
        <a className="admin-console-logo">
@@ -310,11 +334,11 @@ class Header extends React.Component {
           <span className="clusterName">{clusterName}</span>
         </div> */}
         <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
-          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0)|| this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0), 'fontColorRed': this.state.isRedWarning})}>
-            {this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0) || this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0) ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
+          <span className={classnames({'clusterName': true, 'fontColorRed': clusterInfoStatus === 'error'})}>
+            {clusterInfoStatus === 'error' ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
           </span>
         </div>
-        {this.state.warning && (<div className="admin-console-clusterInfo" >
+        {/* {this.state.warning && (<div className="admin-console-clusterInfo" >
           <span className="clusterName">
             <Icon type="exclamation-circle-o" />
             <Link to={window.prefix + '/pages/clusterMgr' + (clusterCode ? '?clusterCode=' + clusterCode : '')}>安全隐患</Link>
@@ -325,7 +349,7 @@ class Header extends React.Component {
             <Icon type="info-circle-o" />
             <Link to={window.prefix + '/pages/clusterMgr' + (clusterCode ? '?clusterCode=' + clusterCode : '')}> Server版本过低</Link>
           </span>
-        </div>)}
+        </div>)} */}
         <Menu mode="horizontal">
           {window.oldConsole && <SubMenu key="retweet" title={<span><Icon type="retweet" /><a href={window.oldConsole}>{'返回旧版'}</a></span>}>
           </SubMenu>}
@@ -335,7 +359,7 @@ class Header extends React.Component {
           </SubMenu>
         </Menu>
         <Modal
-          title={this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0) || this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0) ? '异常集群' : '集群信息'}
+          title={this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0 ? '异常集群' : '集群信息'}
           visible={this.state.machineDataVisible}
           width={width}
           className='memory-warning-modal-wrap'
