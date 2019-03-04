@@ -67,8 +67,7 @@ class Header extends React.Component {
     this.memoryUsageLimit = 80;
     this.diskCapacityFields = [
       'data.diskInfo.serverRoot.capacity',
-      'data.diskInfo.logsRoot.capacity',
-      'data.memoryUsage'
+      'data.diskInfo.logsRoot.capacity'
     ];
     this.memoryFields = [
       'data.memoryUsage'
@@ -311,8 +310,8 @@ class Header extends React.Component {
           <span className="clusterName">{clusterName}</span>
         </div> */}
         <div onClick={this.onShowMemoryWarn} className="admin-console-clusterInfo" >
-          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0, 'fontColorRed': this.state.isRedWarning})}>
-            {this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0 ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
+          <span className={classnames({'clusterName': true, 'fontColorYellow': this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0)|| this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0), 'fontColorRed': this.state.isRedWarning})}>
+            {this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0) || this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0) ? <span><Icon type="exclamation-circle-o" /> 集群异常</span> : <span><Icon type="info-circle-o" /> 集群信息</span>}
           </span>
         </div>
         {this.state.warning && (<div className="admin-console-clusterInfo" >
@@ -336,7 +335,7 @@ class Header extends React.Component {
           </SubMenu>
         </Menu>
         <Modal
-          title={this.state.memoryWarning || this.state.coredumpInfo.length > 0 || this.state.unknowProcess.length > 0 ? '异常集群' : '集群信息'}
+          title={this.state.memoryWarning || this.state.coredumpInfo.find(d => (_.get(d, 'data') || []).length > 0) || this.state.unknowProcess.find(d => (_.get(d, 'data') || []).length > 0) ? '异常集群' : '集群信息'}
           visible={this.state.machineDataVisible}
           width={width}
           className='memory-warning-modal-wrap'
