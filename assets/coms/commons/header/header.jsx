@@ -75,6 +75,7 @@ class Header extends React.Component {
     ];
   }
   initApp = () => {
+    clearInterval(window.int);
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(clusterCode && !_.isEmpty(_.get(window.clusterList, [clusterCode]))){
       this.checkServerVersion(clusterCode);
