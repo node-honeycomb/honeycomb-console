@@ -74,7 +74,7 @@ module.exports = {
   secureServerVersion: '1.0.3_3',
   oldConsole: '',
   appManageConfig: {
-    keepOnlineNum: 3,
+    keepOnlineNum: 2,
     keepOfflineNum: 5
   }
 };
