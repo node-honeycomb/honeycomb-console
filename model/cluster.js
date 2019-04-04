@@ -2,6 +2,11 @@
 
 const log = require('../common/log');
 const db = require('../common/db');
+const userAcl = require('./user_acl');
+const async = require('async');
+const config = require('../config');
+const _ = require('lodash');
+
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
@@ -192,3 +197,55 @@ exports.getClusterCfgByCode = function (clusterCode) {
     };
   }
 };
+
+// TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
+function clusterInit (callback) {
+  // TODO count before addCluster
+  // TODO verify clusterCfg format
+  callback = callback || function () {};
+  const clusterToken = config.clusterToken || '***honeycomb-default-token***';
+  const clusterCfg = config.cluster;
+  if (!clusterCfg) {
+    return callback();
+  }
+  // 如果没有初始化账户，则不初始化cluster
+  if(!config.defaultUser || !config.defaultPassword) {
+    return callback();
+  }
+  _.forEach(clusterCfg, (ips, clusterCode) => {
+    ips = ips.split(',').map(ip => ip.trim());
+    const endpoint = ips[0];
+    exports.addCluster(clusterCode, clusterCode, clusterToken, `http://${endpoint}:9999`, (err) => {
+      // TODO need transcation, cause by error and recovery.
+      if(err) return callback(err);
+      async.eachSeries(ips, (ip, cb) => {
+        exports.addWorker(ip, clusterCode, cb);
+      }, (err) => {
+        if (err) {
+          return callback(err);
+        }
+        exports.getClusterCfg(function (err) {
+          if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
+          let newCluster = exports.gClusterConfig[clusterCode];
+          if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
+          userAcl.addUserAcl(config.defaultUser, newCluster.id, clusterCode, clusterCode, 1, '["*"]', function (err) {
+            return callback(err);
+          });
+        });
+      });
+    });
+  });
+}
+
+clusterInit((err) => {
+  if (err){
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      // TODO: sql顺序需要可控
+      return setTimeout(clusterInit, 1000)
+    }
+    if (err.code === 'ER_DUP_ENTRY') {
+      return;
+    }
+    log.error(err);
+  }
+})

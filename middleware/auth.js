@@ -32,7 +32,7 @@ module.exports = function (req, res, next) {
         if (err) {
           return next(err);
         }
-        if (data.length) {
+        if (data > 0) {
           return next(new Error('root user all ready inited'));
         }
         User.addUser(user, pwd, 1, 1, (err) => {

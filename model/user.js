@@ -2,6 +2,7 @@
 
 const log = require('../common/log');
 const db = require('../common/db');
+const config = require('../config');
 
 const RoleType = {
   RoleUser: 0,
@@ -162,5 +163,36 @@ User.updateUserRole = function (name, role, callback) {
 };
 
 User.RoleType = RoleType;
+
+// TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
+function userInit (callback) {
+  callback = callback || function () {};
+  if (config.defaultUser && config.defaultPassword) {
+      User.countUser((err, data) => {
+        if (err) {
+          return callback(err);
+        }
+        if (data > 0) {
+          return callback();
+        }
+        User.addUser(config.defaultUser, config.defaultPassword, 1, 1, (err) => {
+          callback(err);
+        });
+    });
+  }
+};
+
+userInit((err) => {
+  if (err) {
+    if (err.code === 'ER_NO_SUCH_TABLE') {
+      // TODO: sql顺序需要可控
+      return setTimeout(userInit, 1000)
+    }
+    if (err.code === 'ER_DUP_ENTRY') {
+      return;
+    }
+    log.error('init user error', err);
+  }
+});
 
 module.exports = User;
