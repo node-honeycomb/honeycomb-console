@@ -6,7 +6,7 @@ const userAcl = require('./user_acl');
 const async = require('async');
 const config = require('../config');
 const _ = require('lodash');
-
+const net = require('net');
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
@@ -202,6 +202,7 @@ exports.getClusterCfgByCode = function (clusterCode) {
 function clusterInit (callback) {
   // TODO count before addCluster
   // TODO verify clusterCfg format
+  // TODO callback once
   callback = callback || function () {};
   const clusterToken = config.clusterToken || '***honeycomb-default-token***';
   const clusterCfg = config.cluster;
@@ -213,7 +214,13 @@ function clusterInit (callback) {
     return callback();
   }
   _.forEach(clusterCfg, (ips, clusterCode) => {
-    ips = ips.split(',').map(ip => ip.trim());
+    if(!ips) return;
+    ips = ips.split(',').map(ip => ip.trim()).filter( eachIp => {
+      return net.isIP(eachIp);
+    });
+    if(!ips.length) {
+      return; //do nothing
+    }
     const endpoint = ips[0];
     exports.addCluster(clusterCode, clusterCode, clusterToken, `http://${endpoint}:9999`, (err) => {
       // TODO need transcation, cause by error and recovery.
