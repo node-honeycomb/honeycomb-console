@@ -2,7 +2,9 @@
 const async = require('async');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
+const userModel = require('../model/user');
 const userAcl = require('../model/user_acl');
+const userAclModel = userAcl;
 const lodash = require('lodash');
 
 function getFilterCluster(gClusterConfig, req) {
@@ -47,7 +49,18 @@ exports.listCluster = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
-    callback(null, getFilterCluster(cluster.gClusterConfig, req));
+    let clusterMap = getFilterCluster(cluster.gClusterConfig, req);
+    async.parallel([
+      cb => userModel.getSystemAdmin(cb),
+      cb => userAclModel.getClusterUserByRole(Object.keys(clusterMap), '1', cb)
+    ], (err, results) => {
+      let systemAdmin = results[0];
+      let clusterAdminMap = results[1];
+      for (let clusterCode in clusterMap) {
+        clusterMap[clusterCode].admin = lodash.uniq(systemAdmin.concat(clusterAdminMap[clusterCode]));
+      }
+      callback(null, clusterMap);
+    });
   });
 };
 

@@ -164,6 +164,18 @@ User.updateUserRole = function (name, role, callback) {
 
 User.RoleType = RoleType;
 
+const GET_SYSTEM_ADMIN = `
+  SELECT 
+    ID, NAME
+  FROM
+    hc_console_system_user
+  WHERE role = ${RoleType.RoleAdmin} AND status = '1'
+  `;
+// 获取 console 系统管理员
+User.getSystemAdmin = function (callback) {
+  db.query(GET_SYSTEM_ADMIN, callback);
+};
+
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
 function userInit (callback) {
   callback = callback || function () {};

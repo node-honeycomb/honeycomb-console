@@ -189,3 +189,24 @@ exports.deleteClusterAllAcl = function (clusterCode, callback) {
       }
     });
 };
+
+const GET_CLUSTER_USER_BY_ROLE = `
+  SELECT
+    name, cluster_code
+  FROM
+    hc_console_system_user_acl
+  WHERE cluster_code in (?) and cluster_admin = ?
+
+`;
+exports.getClusterUserByRole = function (clusterCodeList, role, callback) {
+  db.query(GET_CLUSTER_USER_BY_ROLE, [clusterCodeList, role], (err, data) => {
+    callback(err, !err && data.reduce((clusterAdminMap, clusterAdminInfo) => {
+      let clusterCode = clusterAdminInfo.cluster_code;
+      if (!clusterAdminMap[clusterCode]) {
+        clusterAdminMap[clusterCode] = [];
+      }
+      clusterAdminMap[clusterCode].push(clusterAdminInfo.name);
+      return clusterAdminMap;
+    }, {}));
+  });
+}
