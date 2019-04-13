@@ -54,10 +54,12 @@ exports.listCluster = function (req, callback) {
       cb => userModel.getSystemAdmin(cb),
       cb => userAclModel.getClusterUserByRole(Object.keys(clusterMap), '1', cb)
     ], (err, results) => {
-      let systemAdmin = results[0];
-      let clusterAdminMap = results[1];
-      for (let clusterCode in clusterMap) {
-        clusterMap[clusterCode].admin = lodash.uniq(systemAdmin.concat(clusterAdminMap[clusterCode]));
+      if (!err) {
+        let systemAdmin = results[0];
+        let clusterAdminMap = results[1];
+        for (let clusterCode in clusterMap) {
+          clusterMap[clusterCode].admin = lodash.uniq(systemAdmin.concat(clusterAdminMap[clusterCode]));
+        }
       }
       callback(null, clusterMap);
     });
