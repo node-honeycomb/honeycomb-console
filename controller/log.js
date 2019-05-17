@@ -213,6 +213,9 @@ exports.queryAppUsages = function (req, callback) {
       if (err) {
         return cb(err);
       }
+      if (usages.code !== 'SUCCESS') {
+        return cb(usages);
+      }
       let data = usages.data.success;
       let result = {};
       data.forEach(function (item) {
