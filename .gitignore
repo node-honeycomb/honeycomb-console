@@ -17,3 +17,4 @@ runtime_config.json
 auto_router.js
 .package
 .*.swp
+assets/package-lock.json
