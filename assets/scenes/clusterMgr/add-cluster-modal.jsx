@@ -37,7 +37,7 @@ class AddClusterModal extends React.Component {
       });
       return;
     }
-    let errorIps = editInfo.ips.find((item, key)=>{
+    let errorIps = editInfo.ips.find((item, key) => {
       if(!(item.match(ipRegex1) || item.match(ipRegex2))){
         item.replace(/\/$/g, '')
         return item;
@@ -60,7 +60,7 @@ class AddClusterModal extends React.Component {
     this.setState({
       isIpsError: false
     })
-    this.props.addCluster(editInfo).then(()=>{
+    this.props.addCluster(editInfo).then(() => {
       this.props.getCluster();
       this.props.onHide && this.props.onHide.call({});
       this.setState({info:{}});
