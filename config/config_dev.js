@@ -10,6 +10,7 @@ module.exports = {
       level: 'INFO'
     }
   },
+  pport: 9000,
   middleware: {
     appAuth: {
       enable: true
