@@ -8,6 +8,9 @@ import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Toolti
 const FormItem = Form.Item;
 const Option = Select.Option;
 const URL = require("url");
+const ipRegex1 = /^(http[s]?)?:\/\/([\S])+/;
+const ipRegex2 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+
 class EditClusterModal extends React.Component {
   constructor(props) {
     super(props);
@@ -28,11 +31,13 @@ class EditClusterModal extends React.Component {
     editInfo = _.assign({},editInfo,{isUpdate:true});
     editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/);
     editInfo.ips =  _.compact(editInfo.ips.map((item, index)=> item.trim()));
+    editInfo.ips = editInfo.ips.map(item => item.replace(/\/$/g, ''));
+   
     let errorIps = editInfo.ips.find((item, key)=>{
-      if(!item.match('^[0-9a-zA-Z\.\\?]+$')){
+      if(!item.match(ipRegex1) && !item.match(ipRegex2)){
         return item;
       }
-    })
+    });
     if(_.isEmpty(errorIps)){
       this.setState({
         isIpsError: false

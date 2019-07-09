@@ -30,6 +30,7 @@ class AddClusterModal extends React.Component {
     if(typeof editInfo.ips === 'string'){
       editInfo.ips = editInfo.ips.replace(/,/g, '\n').split(/\r?\n/g);
       editInfo.ips =  _.compact(editInfo.ips.map((item, index) => item.trim()));
+      editInfo.ips = editInfo.ips.map(item => item.replace(/\/$/g, ''));
     }
     if(editInfo.ips.length === 0){
       this.setState({
@@ -37,9 +38,8 @@ class AddClusterModal extends React.Component {
       });
       return;
     }
-    let errorIps = editInfo.ips.find((item, key)=>{
-      if(!(item.match(ipRegex1) || item.match(ipRegex2))){
-        item.replace(/\/$/g, '')
+    let errorIps = editInfo.ips.find((item, key) => {
+      if(!item.match(ipRegex1) && !item.match(ipRegex2)){
         return item;
       }
     });
@@ -49,7 +49,6 @@ class AddClusterModal extends React.Component {
       });
       return;
     }
-
     if (!editInfo.token) {
       editInfo.token = '***honeycomb-default-token***';
     }
@@ -60,7 +59,7 @@ class AddClusterModal extends React.Component {
     this.setState({
       isIpsError: false
     })
-    this.props.addCluster(editInfo).then(()=>{
+    this.props.addCluster(editInfo).then(() => {
       this.props.getCluster();
       this.props.onHide && this.props.onHide.call({});
       this.setState({info:{}});
