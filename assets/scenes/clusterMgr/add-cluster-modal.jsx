@@ -7,7 +7,8 @@ let classnames = require('classnames');
 import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Tooltip, Spin, Icon} from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
-const ipRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+const ipRegex1 = /^(https|http)?:\/\/([0-9]{1,3}\.){3}[0-9]{1,3}(:[0-9]{1,4})$/;
+const ipRegex2 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 class AddClusterModal extends React.Component {
   state = {
     info: {
@@ -37,7 +38,7 @@ class AddClusterModal extends React.Component {
       return;
     }
     let errorIps = editInfo.ips.find((item, key)=>{
-      if(!item.match(ipRegex)){
+      if(!(item.match(ipRegex1) || item.match(ipRegex2))){
         return item;
       }
     });
