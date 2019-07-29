@@ -96,7 +96,6 @@ class List extends React.Component {
 
   componentWillReceiveProps = (nextProps) => {
     if(this.props.location.query.clusterCode !== nextProps.location.query.clusterCode){
-      debugger;
       let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
       let that = this;
       this.setState({
