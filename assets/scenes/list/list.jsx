@@ -105,8 +105,19 @@ class List extends React.Component {
         clearInterval(window.int);
       }
       if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
-      this.props.getAppList({ clusterCode: clusterCode })
-      this.setListInterval(that);
+      this.props.getAppList({ clusterCode: clusterCode }).then(d => {
+        if(d.success && d.success.length > 0) {
+          let clearList = this.genClearList(d.success);
+          if(!_.isEmpty(clearList)) {
+            this.setState({
+              clearList,
+              isShowClearListModal: true
+            })
+          }else{
+            this.setListInterval(that);
+          }
+        }
+      })
     }
     let newState = _.cloneDeep(this.state);
     let newFilterList = _.cloneDeep(nextProps.appMeta.filterList);
