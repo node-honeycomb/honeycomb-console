@@ -1,6 +1,7 @@
 # honeycomb-console
 
-本console只发挥了50%的管理能力，还在快速迭代中
+honeycomb-server管控台模块，基于honeycomb app机制开发。
+本console目前发挥了70%的功力，还在继续迭代中。
 
 ## build
 
@@ -13,7 +14,8 @@
 
 ## data persistence
 
-默认honeycomb-console的存储为本地sqlite.db, 系统默认支持多种存储驱动
+honeycomb-console的存储默认支持两种驱动：mysql 和 sqlite。
+默认为本地sqlite.db文件, 适用于单机场景。
 
 如果需要更可靠的存储，请切换config.meta配置:
 
@@ -44,4 +46,4 @@ mysql:（honeycomb-console高可用集群部署推荐）
 
 ## install into honeycomb-server
 
-visit honeycomb-server `http://ip:9999/`, publish it
+访问 honeycomb-server 的控制端口， 通常为 `http://ip:9999/`, 发布上去即可。
