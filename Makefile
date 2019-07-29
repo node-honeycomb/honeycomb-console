@@ -1,15 +1,16 @@
 BIN_MOCHA = ./node_modules/.bin/_mocha
 BIN_ISTANBUL = ./node_modules/.bin/istanbul
 
+REGISTRY = https://registry.npm.taobao.org
+
 VERSION = $(shell cat package.json | awk -F '"' '/version" *: *"/{print $$4}')
 BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 
 TESTS_ENV = test/env.js
 
 install:
-	@echo 'using npm registry, you need: make install registry=$$registry_addr'
-	@npm install --registry=${registry}
-	@cd assets && npm install --registry=${registry}
+	@npm install --registry=${REGISTRY}
+	@cd assets && npm install --registry=${REGISTRY}
 
 test:
 	NODE_ENV=test $(BIN_MOCHA) \
@@ -22,8 +23,8 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release/assets && NODE_ENV=production npm install
-	@cd out/release && NODE_ENV=production npm install
+	@cd out/release/assets && NODE_ENV=production npm install --registry=${REGISTRY}
+	@cd out/release && NODE_ENV=production npm install --registry=${REGISTRY}
 	@cd out/release/assets && ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
