@@ -29,9 +29,11 @@ class Cluster extends React.Component {
       isShow: false,
       info: {}
     },
-    clusterList: window.clusterList
+    clusterList: window.clusterList,
+    ipStatus: {}
   }
   componentDidMount() {
+    this.genIpStatus();
     if (_.get(this.props.location, 'state.isShowClusterModal')) {
       _.forEach(this.state.clusterList, (value,key) => {
         if(value.token === ORIGIN_TOKEN){
@@ -40,6 +42,24 @@ class Cluster extends React.Component {
         }
       });
     }
+  }
+  genIpStatus = () => {
+    _.forEach(this.state.clusterList, (value,key) => {
+      this.props.getStatus({clusterCode: value.code || key}).then(data => {
+        let object = {};
+        value.ips.forEach(d => {
+          if ((data.success || []).find(v => v.ip === d)) {
+            object[d] = 'SUCCESS'
+          }
+          if ((data.error || []).find(v => v.ip === d)) {
+            object[d] = 'ERROR'
+          }
+        })
+        this.setState({
+          [value.code]: object
+        })
+      })
+    })
   }
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
     switch(operation){
@@ -72,10 +92,12 @@ class Cluster extends React.Component {
     }
   }
   getClusterList = () => {
-    this.state.clusterList.f
+    // this.state.clusterList.f
     this.props.getCluster().then(d => {
       this.setState({
         clusterList: d
+      }, () => {
+        this.genIpStatus();
       })
     })
   }
@@ -154,7 +176,11 @@ class Cluster extends React.Component {
           <div key={index}>
             {record.ips.map((value,key)=>{
               return(
-                <p key={key}>{value}</p>
+                <p key={key}>
+                  {value}
+                  {_.get(this.state, [record.code, value]) === 'SUCCESS' && <Icon style={{color: 'green', marginLeft: '5px'}} type="check-circle" />}
+                  {_.get(this.state, [record.code, value]) === 'ERROR' && <Icon style={{color: 'red', marginLeft: '5px'}} type="close-circle" />}
+                </p>
               )
             })}
           </div>
@@ -234,4 +260,5 @@ module.exports = connect(mapStateToProps,{
   addCluster:actions.cluster.addCluster,
   getAppsConfig:actions.appsConfig.getAppsConfig,
   setAppConfig:actions.appsConfig.setAppConfig,
+  getStatus:actions.app.getStatus
 })(Cluster);
