@@ -17,6 +17,7 @@ const history = syncHistoryWithStore(browserHistory, store);
 let routes = require('./routes.jsx');
 let User = require('./services/user');
 let rootElement = document.getElementById('server-admin');
+import 'babel-polyfill';
 
 
 Promise.all([User.getUser(), User.getClusterList()]).then(() => {

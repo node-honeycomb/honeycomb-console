@@ -8,7 +8,7 @@ let EditClusterModal = require('./edit-cluster-modal.jsx');
 let UpdateSafeTokenModal = require('./update-safeToken-modal');
 const _ = require('lodash');
 const randomstring = require("randomstring");
-import { Modal, Button, Table, Icon, Tag } from 'antd';
+import { Modal, Button, Table, Icon, Tag, Spin } from 'antd';
 const confirm = Modal.confirm;
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
 require('./clusterMgr.less');
@@ -30,7 +30,7 @@ class Cluster extends React.Component {
       info: {}
     },
     clusterList: window.clusterList,
-    ipStatus: {}
+    spinning: {}
   }
   componentDidMount() {
     this.genIpStatus();
@@ -43,9 +43,18 @@ class Cluster extends React.Component {
       });
     }
   }
-  genIpStatus = () => {
-    _.forEach(this.state.clusterList, (value,key) => {
-      this.props.getStatus({clusterCode: value.code || key}).then(data => {
+  genIpStatus = async() => {
+    for (const key in this.state.clusterList) {
+      let spinning = _.cloneDeep(this.state.spinning);
+      spinning[key] = true;
+      await this.setState({
+        spinning
+      })
+      let value = this.state.clusterList[key];
+      try {
+        await this.props.getStatus({clusterCode: value.code || key}).then(data => {
+        let spinning = _.cloneDeep(this.state.spinning);
+        spinning[key] = false;
         let object = {};
         value.ips.forEach(d => {
           if ((data.success || []).find(v => v.ip === d)) {
@@ -56,10 +65,20 @@ class Cluster extends React.Component {
           }
         })
         this.setState({
-          [value.code]: object
+          [value.code]: object,
+          spinning
         })
       })
-    })
+      } catch (e) {
+        let spinning = _.cloneDeep(this.state.spinning);
+        spinning[key] = false;
+        this.setState({
+          spinning
+        })
+        continue;
+      }
+      
+    }
   }
   clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
     switch(operation){
@@ -177,9 +196,10 @@ class Cluster extends React.Component {
             {record.ips.map((value,key)=>{
               return(
                 <p key={key}>
-                  {value}
-                  {_.get(this.state, [record.code, value]) === 'SUCCESS' && <Icon style={{color: 'green', marginLeft: '5px'}} type="check-circle" />}
-                  {_.get(this.state, [record.code, value]) === 'ERROR' && <Icon style={{color: 'red', marginLeft: '5px'}} type="close-circle" />}
+                  <span style={{marginRight: '5px'}}>{value}</span>
+                  <Spin size="small" spinning={_.get(this.state, ['spinning', record.code]) || false}/>
+                  {_.get(this.state, [record.code, value]) === 'SUCCESS' && <Icon style={{color: 'green'}} type="check-circle" />}
+                  {_.get(this.state, [record.code, value]) === 'ERROR' && <Icon style={{color: 'red'}} type="close-circle" />}
                 </p>
               )
             })}
