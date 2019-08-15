@@ -94,12 +94,17 @@ exports.registerWorker = function (req, callback) {
     if (err && !/unique|duplicate/i.test(err.message)) {
       return callback(err);
     }
-    cluster.addWorker(ip, code, (err) => {
-      if (err && !/unique|duplicate/i.test(err.message)) {
-        log.error(`register worker: ${ip} failed:`, err.message);
-        return callback({code: err.code || 'ERROR', message: err.message});
+    cluster.updateCluster(name, code, token, endpoint, (err) => {
+      if (err) {
+        return callback(err);
       }
-      callback(null, 'register worker success');
+      cluster.addWorker(ip, code, (err) => {
+        if (err && !/unique|duplicate/i.test(err.message)) {
+          log.error(`register worker: ${ip} failed:`, err.message);
+          return callback({code: err.code || 'ERROR', message: err.message});
+        }
+        callback(null, 'register worker success');
+      });
     });
   });
   /*
@@ -135,4 +140,3 @@ exports.unregisterWorker = function (req, callback) {
     callback(null, 'del tmp worker success');
   });
 };
-
