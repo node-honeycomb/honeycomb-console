@@ -1,38 +1,99 @@
 <style>
   .login {
+    -webkit-box-sizing: border-box;
+    color: rgba(0,0,0,0.65);
+    font-size: 14px;
+    font-variant: tabular-nums;
+    line-height: 1.5;
+    list-style: none;
+    -webkit-font-feature-settings: 'tnum';
+    font-feature-settings: 'tnum';
+    position: relative;
+    background: #fff;
+    border-radius: 2px;
+    -webkit-transition: all .3s;
+    transition: all .3s;
+    border: 1px solid #e8e8e8;
     font-family:"Helvetica Neue",Helvetica,"Hiragino Sans GB","STHeitiSC-Light","Microsoft YaHei","微软雅黑",Arial,sans-serif;
-    background: #eee;
     width: 400px;
-    border-radius: 8px;
     margin: 50px auto;
     padding: 20px;
     line-height: 24px;
   }
   p {
     color: #666;
-    margin: 10px;
+    margin: 20px;
+    text-align: center;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Helvetica Neue', Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
   }
   input {
-    width: 200px;
-    line-height: 24px;
+    width: 250px;
+    line-height: 32px;
+    margin-left: 5px;
+  }
+  .submit{
+    margin-left: 0px;
+    line-height: 1.499;
+    display: inline-block;
+    white-space: nowrap;
+    text-align: center;
+    background-image: none;
+    border: 1px solid transparent;
+    box-shadow: 0 2px 0 rgba(0, 0, 0, 0.015);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.645, 0.045, 0.355, 1);
+    user-select: none;
+    touch-action: manipulation;
+    height: 32px;
+    padding: 0 15px;
+    background-color: #fff;
+    border-color: #d9d9d9;
+    width: 250px;
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.12);
+    -webkit-box-shadow: 0 2px 0 rgba(0,0,0,0.045);
+    box-shadow: 0 2px 0 rgba(0,0,0,0.045);
+  }
+  .input{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-variant: tabular-nums;
+    line-height: 1.5;
+    list-style: none;
+    font-feature-settings: 'tnum';
+    position: relative;
+    display: inline-block;
+    height: 32px;
+    padding: 4px 11px;
+    color: rgba(0, 0, 0, 0.65);
+    font-size: 14px;
+    line-height: 32px;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #d9d9d9;
   }
 </style>
 <script>
   window.prefix = '<%=prefix%>';
 </script>
 <form action="<%= userCount > 0 ? prefix + '/loginAuth' : prefix + '/initUser'%>" class="login" method="POST">
-  <h3>Honeycomb-Console <%= userCount > 0 ? 'Login' : 'Init'%></h3>
+  <h3 style="text-align: center;">Honeycomb管理后台<%= userCount > 0 ? '登录' : '初始化'%></h4>
   <% if (errMsg) {%>
-    <p style="color:red; font-size: 12px"><%=errMsg%></p>
+    <p style="color:red; font-size: 12px; text-align: center;"><%=errMsg%></p>
   <% } %>
   <p>
-    username: <input type="text" name="username"/>
+    <input class="input" type="text" name="username" placeholder="请输入用户名"/>
   </p>
   <p>
-    password: <input type="password" name="password"/>
+    <input class="input" type="password" name="password" placeholder="请输入密码"/>
   </p>
-  <p style="margin-left: 108px">
+  <p>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
-    <input type="submit" value="<%= userCount > 0 ? 'Login' : 'create root user'%>" />
+    <input class='submit' type="submit" value="<%= userCount > 0 ? '登录' : '创建用户'%>" />
   </p>
 </form>
