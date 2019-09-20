@@ -59,6 +59,7 @@ exports.publishApp = function (req, callback) {
   async.waterfall([
     function (cb) {
       let form = new formidable.IncomingForm();
+      form.maxFileSize = 1000 * 1024 * 1024;
       form.parse(req, function (err, fields, files) {
         req.oplog({
           clientId: req.ips.join('') || '-',
@@ -92,7 +93,7 @@ exports.publishApp = function (req, callback) {
       opt.method = 'POST';
       opt.headers = form.headers();
       opt.stream = form;
-      opt.timeout = 120000;
+      opt.timeout = 1000000;
       callremote(path, opt, cb);
     }
   ], function (err, results) {
