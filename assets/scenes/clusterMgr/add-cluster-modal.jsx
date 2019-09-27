@@ -8,7 +8,7 @@ import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Toolti
 const FormItem = Form.Item;
 const Option = Select.Option;
 const ipRegex1 = /^(http[s]?)?:\/\/([\S])+/;
-const ipRegex2 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/;
+const ipRegex2 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
 class AddClusterModal extends React.Component {
   state = {
     info: {
