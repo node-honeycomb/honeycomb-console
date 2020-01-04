@@ -1,4 +1,4 @@
-const SQL = require('sql.js');
+const SQLJS = require('sql.js');
 const config = require('../config');
 const path = require('path');
 const async = require('async');
@@ -6,18 +6,27 @@ const fs = require('xfs');
 const sqlString = require('sqlstring');
 const dbfile = config.meta.dbfile;
 const buf = fs.existsSync(dbfile) ? fs.readFileSync(dbfile) : undefined;
-const db = new SQL.Database(buf);
+let db;
+let readyFn = null;
+let flagReady = false;
 
-let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
-statments = statments.split(/\n\n/);
-
-async.eachSeries(statments, (st, done) => {
-  let res = db.exec(st);
-  done();
-}, (err) => {
-  if (err) {
-    return log.error(err);
-  }
+SQLJS().then((SQL) => {
+  db = new SQL.Database(buf);
+  let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
+  statments = statments.split(/\n\n/);
+  async.eachSeries(statments, (st, done) => {
+    let res = db.exec(st);
+    done();
+  }, (err) => {
+    if (err) {
+      return log.error(err);
+    }
+    flagReady = true;
+    if (readyFn) {
+      console.log('sql.js db ready');
+      readyFn();
+    }
+  });
 });
 
 function transfer(data) {
@@ -68,3 +77,12 @@ exports.query = function (sql, param, cb) {
     }
     cb && cb(null, res);
 };
+
+exports.ready = function (cb) {
+    if (flagReady) {
+        return cb();
+    }
+    readyFn = cb;
+};
+
+exports.type = 'sqlite';

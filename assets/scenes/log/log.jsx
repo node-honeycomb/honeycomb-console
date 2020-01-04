@@ -57,7 +57,7 @@ class Log extends React.Component {
         ips: data.ip
       }
       this.setState(newState);
-      this.props.queryLog(newState).then((d)=>{
+      this.props.queryLog(newState).then((d) => {
         this.setState({
           loading: false,
         });
@@ -66,7 +66,7 @@ class Log extends React.Component {
       this.props.queryLog({
         fileName: fileName,
         clusterCode: clusterCode
-      }).then(()=>{
+      }).then(() => {
         this.setState({
           loading: false,
         });
@@ -83,7 +83,7 @@ class Log extends React.Component {
     }
   }
 
-  replaceFilename = (_date, _time, fileName)=> {
+  replaceFilename = (_date, _time, fileName) => {
     let date = _.isEmpty(_date) ? moment().format("YYYY-MM-DD").split('-') : _date.split('-');
     let time = _.isEmpty(_time) ? moment().format("HH:mm:ss").split(':') : _time.split(':');
     fileName = _.replace(fileName, '{year}', date[0]);
@@ -116,7 +116,7 @@ class Log extends React.Component {
     this.props.queryLog({
       fileName:fileName,
       clusterCode:this.state.clusterCode
-    }).then((d)=>{
+    }).then((d) => {
       this.setState({
         loading: false,
       });
@@ -145,7 +145,7 @@ class Log extends React.Component {
       loading: true
     });
     let newState = _.cloneDeep(this.state) || {};
-    this.props.queryLog(newState).then(()=>{
+    this.props.queryLog(newState).then(() => {
       this.setState({
         isQuery: false,
         loading: false
@@ -206,10 +206,10 @@ class Log extends React.Component {
             <div className="log-menu">
               <Menu theme="light" mode="inline" onClick={this.handleClick}>
                 {
-                  _.uniq(dir).map((value,key)=>{
+                  _.uniq(dir).map((value,key) => {
                     return(
                       <SubMenu key={"dir"+key} title={<span>{value}</span>}>
-                        {_.map(this.props.logMeta.logFile, (item,index)=>{
+                        {_.map(this.props.logMeta.logFile, (item,index) => {
                           if(item.split("/")[0]===value){
                             return(
                               <Menu.Item key={item}>
@@ -225,7 +225,7 @@ class Log extends React.Component {
                   })
                 }
                 {
-                fileData.map((item,index)=>{
+                fileData.map((item,index) => {
                   return(
                     <Menu.Item key={item} className="log-menu-item">
                       <Tooltip  title={item} placement="right" trigger="hover">
@@ -262,7 +262,7 @@ class Log extends React.Component {
                 <Select value={this.state.ips} disabled={this.state.isRefresh} onChange={this.getLogContent.bind(this,"ips")} placeholder="全部机器"  >
                   <Option key="" value="">全部机器</Option>
                   {
-                    ips.map((item,index)=>{
+                    ips.map((item,index) => {
                       return(
                         <Option key={item} value={item}>{item}</Option>
                       )
@@ -319,8 +319,8 @@ let mapStateToProps = (store) => {
   return {
     logMeta,
     clusterMeta
-  }
-}
+  };
+};
 
 let actions = require("../../actions");
 

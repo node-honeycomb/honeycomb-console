@@ -25,7 +25,7 @@ module.exports = {
         success: (store, action) => {
           let logContent = _.get(action, 'data').success;
           if (_.isEmpty(logContent)) {
-            logContent = ['log empty！'];
+            logContent = [''];
           }
           store.logContent = logContent;
         }

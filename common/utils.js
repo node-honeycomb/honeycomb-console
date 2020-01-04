@@ -141,7 +141,10 @@ exports.parseAppId = function (appId) {
   return {
     name: appName,
     version: version,
-    buildNum: buildNum
+    buildNum: buildNum,
+    id: appId,
+    weight: genWeight(version || '0.0.0.0', buildNum),
+    md5: ''
   };
 };
 
@@ -196,7 +199,7 @@ exports.callremote = function (queryPath, options, callback) {
 
   options = _.merge(defaultOptions, options);
 
-  if (queryPath.indexOf('?')) {
+  if (queryPath.indexOf('?') === -1) {
     queryPath += '?ips=' + ips;
   } else {
     queryPath += '&ips=' + ips;
@@ -337,4 +340,36 @@ exports.mergeAppInfo = function (ips, apps) {
   });
 
   return data;
+};
+
+
+exports.getClusterApps = function (clusterIinfo, cb) {
+  let path = '/api/apps';
+  clusterIinfo.timeout = 5000;
+  exports.callremote(path, clusterIinfo, function (err, result) {
+    if (err || result.code !== 'SUCCESS') {
+      return cb(err);
+    } else {
+      let ips = [];
+      let apps = [];
+      result.data.success.forEach((item) => {
+        ips.push(item.ip);
+        apps = apps.concat(item.apps);
+      });
+
+      apps = exports.mergeAppInfo(ips, apps);
+      let res = []
+      apps.forEach((app) => {
+        if (/^__\w+__$/.test(app.name)) {
+          return;
+        }
+        app.versions.sort((a, b) => {
+          return a.weight > b.weight ? -1 : 1;
+        });
+        app.versions = app.versions.slice(0, 2);
+        res.push(app);
+      });
+      cb(null, res);
+    }
+  });
 };

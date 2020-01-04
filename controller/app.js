@@ -5,8 +5,32 @@ const formidable = require('formidable');
 const log = require('../common/log');
 const utils = require('../common/utils');
 const cluster = require('../model/cluster');
+const appPackage = require('../model/app_package');
 
 const callremote = utils.callremote;
+
+function saveSnapShort(clusterCode) {
+  let opt = cluster.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    log.warn();
+    return;
+  }
+  utils.getClusterApps(opt, (err, data) => {
+    if (err) {
+      log.error('snapshort faild, get cluster info failed', err);
+    } else {
+      let obj = {
+        clusterCode,
+        info: data
+      };
+      cluster.saveSnapshort(obj, (err) => {
+        if (err) {
+          log.error('save snapshort failed', err);
+        }
+      });
+    }
+  });
+}
 
 /**
  * @api {get} /api/app/list
@@ -56,6 +80,7 @@ exports.listApp = function (req, callback) {
  */
 exports.publishApp = function (req, callback) {
   let clusterCode = req.query.clusterCode;
+  let recover = req.query.recover === 'true';
   async.waterfall([
     function (cb) {
       let form = new formidable.IncomingForm();
@@ -82,6 +107,25 @@ exports.publishApp = function (req, callback) {
       });
     },
     function (file, cb) {
+      let appId = file.name.replace(/.tgz$/, '');
+      let appInfo = utils.parseAppId(appId);
+      let obj = {
+        clusterCode,
+        appId: appInfo.id,
+        appName: appInfo.name,
+        weight: appInfo.weight,
+        pkg: file.path,
+        user: req.session.username
+      };
+      if (!recover) {
+        appPackage.savePackage(obj, (err) => {
+          cb(err, file);
+        });
+      } else {
+        cb(null, file);
+      }
+    },
+    function (file, cb) {
       let opt = cluster.getClusterCfgByCode(clusterCode);
       if (opt.code === 'ERROR') {
         return cb(opt);
@@ -106,6 +150,9 @@ exports.publishApp = function (req, callback) {
         message: errMsg
       });
     } else {
+      if (!recover) {
+        saveSnapShort(clusterCode);
+      }
       return callback(null, results.data);
     }
   });
@@ -185,6 +232,11 @@ exports.deleteApp = function (req, callback) {
       });
     } else {
       log.debug(`delete app ${appId} results:`, results);
+      appPackage.deletePackage(clusterCode, appId, (err) => {
+        if (err) {
+          log.error('delete apppackage failed', err.message);
+        }
+      });
       return callback(null, results.data);
     }
   });
@@ -299,6 +351,7 @@ exports.startApp = function (req, callback) {
       });
     } else {
       log.debug(`start app ${appId} results:`, results);
+      saveSnapShort(clusterCode);
       return callback(null, results.data);
     }
   });
@@ -338,6 +391,7 @@ exports.stopApp = function (req, callback) {
       });
     } else {
       log.debug(`stop app ${appId} results:`, results);
+      saveSnapShort(clusterCode);
       return callback(null, results.data);
     }
   });

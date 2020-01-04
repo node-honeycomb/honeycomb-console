@@ -11,6 +11,13 @@ module.exports = {
   meta: {
     driver: 'sql.js', // mysql or sql.js, default sql.js
     dbfile: path.join(__dirname, '../run/meta.db')
+    /**
+    driver   : mysql
+    host     : 'localhost',
+    user     : 'me',
+    password : 'secret',
+    database : 'my_db'
+    */
   },
   // 初始化默认用户名和密码，都为空是才初始化，否则不初始化，密码为明文sha256加密后的字串
   defaultUser: '',

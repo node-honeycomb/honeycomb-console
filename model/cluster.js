@@ -7,6 +7,8 @@ const async = require('async');
 const config = require('../config');
 const _ = require('lodash');
 const net = require('net');
+const utils = require('../common/utils');
+const callremote = utils.callremote;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
@@ -268,6 +270,13 @@ exports.getClusterCfg = function (cb) {
 
 exports.gClusterConfig = {};
 
+exports.fixClusterConfigCache = (clusterCode, ips) => {
+  let cluster = exports.gClusterConfig[clusterCode];
+  if (cluster) {
+    cluster.ips = ips;
+  }
+};
+
 exports.getClusterCfgByCode = function (clusterCode) {
   let opt = exports.gClusterConfig[clusterCode] || {};
   if (!opt.endpoint || !opt.token || !opt.ips) {
@@ -304,16 +313,126 @@ const DELETE_SYSTEM_WORKER_BY_IP = `
   DELETE FROM
     hc_console_system_worker
   WHERE
-    ip = ?;
+    ip in (?);
 `;
 
 exports.deleteWorkerByIp = function (ip, callback) {
+  if (!Array.isArray(ip)) {
+    ip = [ip];
+  }
   db.query(
     DELETE_SYSTEM_WORKER_BY_IP,
     [ip],
     callback
   );
 };
+
+const SQL_QUERY_CLUSTER_SNAPSHORT = `
+  select 
+    cluster_code as clusterCode, info, md5, max(gmt_create) as gmtCreate
+  from 
+    hc_console_system_cluster_snapshort 
+  where 
+    cluster_code = ?
+  group by
+    cluster_code
+`;
+exports.getSnapshort = (clusterCode, cb) => {
+  db.query(SQL_QUERY_CLUSTER_SNAPSHORT, [clusterCode], (err, data) => {
+    if (err) {
+      return cb(err);
+    }
+    if (!data) {
+      return cb(new Error('not found'));
+    }
+    data[0].info = JSON.parse(data[0].info);
+    cb(null, data[0]);
+  });
+};
+
+const SQL_QUERY_CLUSTER_SNAPSHORTS = `
+  select 
+    cluster_code as clusterCode, info, md5, max(gmt_create)
+  from 
+    hc_console_system_cluster_snapshort
+  where
+    cluster_code in (?)
+  group by
+    cluster_code, info, md5
+`;
+exports.getSnapshorts = (cb) => {
+  let codes = Object.keys(exports.gClusterConfig);
+  if (!codes.length) {
+    return cb(null, []);
+  }
+  db.query(SQL_QUERY_CLUSTER_SNAPSHORTS, [codes], (err, data) => {
+    if (err) {
+      return cb(err);
+    }
+    if (!data) {
+      return cb(null, []);
+    }
+    data.forEach((d) => {
+      d.info = d.info ? JSON.parse(d.info) : {};
+    });
+    cb(null, data);
+  });
+};
+
+const SQL_INSERT_CLUSTER_SNAPSHORT = `insert into hc_console_system_cluster_snapshort 
+(cluster_code, info, md5, user, gmt_create) 
+values 
+(?, ?, ?, ?, ?)`;
+exports.saveSnapshort = (obj, cb) => {
+  let info = JSON.stringify(obj.info);
+  let md5 = utils.md5(info);
+  let param = [
+    obj.clusterCode,
+    info,
+    md5,
+    obj.user || '',
+    new Date()
+  ];
+  db.query(SQL_INSERT_CLUSTER_SNAPSHORT, param, cb);
+};
+
+
+exports.fixCluster = function (clusterCode, callback) {
+  let opt = exports.getClusterCfgByCode(clusterCode);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = '/api/status';
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error('get status info failed: ', errMsg);
+      let code = err && err.code || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      log.debug('get status results:', results);
+      let errList = results.data.error;
+      let oklist = results.data.success;
+      let okips = [];
+      oklist.forEach((node) => {
+        okips.push(node.ip);
+      });
+      exports.fixClusterConfigCache(clusterCode, okips);
+      if (errList.length) {
+        let errips = [];
+        errList.forEach((node) => {
+          errips.push(node.ip);
+        });
+        exports.deleteWorkerByIp(errips, callback);
+      } else {
+        callback(null);
+      }
+    }
+  });
+}
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
 function clusterInit (callback) {

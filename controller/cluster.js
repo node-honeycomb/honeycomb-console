@@ -4,6 +4,8 @@ const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
 const lodash = require('lodash');
+const utils = require('../common/utils');
+const callremote = utils.callremote;
 
 function getFilterCluster(gClusterConfig, req) {
   let clusterConfig = {};
@@ -164,5 +166,13 @@ exports.removeCluster = function (req, callback) {
       });
     });
   });
+};
+
+/**
+ * @api {GET} /api/cluster/fix
+ */
+exports.fixCluster = function (req, callback) {
+  let clusterCode = req.query.clusterCode;
+  cluster.fixCluster(clusterCode, callback);
 };
 
