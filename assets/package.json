@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@ali/error-center": "^2.0.5",
     "alpha-order": "^1.0.1",
     "antd": "^2.6.0",
     "async": "~1.5.2",

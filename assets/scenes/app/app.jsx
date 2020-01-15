@@ -8,7 +8,7 @@ var SideBar = require('../../coms/commons/sidebar/sidebar.jsx');
 let User = require("../../services/user");
 import { Modal, Button} from 'antd';
 import { ReactContext } from 'react-router';
-
+import ErrorCenter from '@ali/error-center';
 require('./app.less');
 class App extends React.Component {
   constructor(props, context) {
@@ -58,6 +58,7 @@ class App extends React.Component {
     let meta = window.clusterList;
     return (
       <div className="app-main-div">
+        <ErrorCenter />
         <Modal title="请选择集群" visible={this.state.visible} width={600}
         footer={
           <div>
