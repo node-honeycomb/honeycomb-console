@@ -32,7 +32,8 @@ class List extends React.Component {
       rowSpan:{},
       deleteAppName: null,
       clearList: {},
-      isShowClearListModal: false
+      isShowClearListModal: false,
+      stopTimer: false
     }
     this.keepOnlineNum = _.get(window, ['appManageConfig', 'keepOnlineNum']) || 3; //保留的在线版本数量
     this.keepOfflineNum = _.get(window, ['appManageConfig', 'keepOfflineNum']) || 5; //保留的离线版本数量
@@ -54,13 +55,31 @@ class List extends React.Component {
     })
     return rowSpan
   }
-  setListInterval = (that) => {
+  // setListInterval = (that) => {
+  //   let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+  //   if(!_.isEmpty(clusterCode)){
+  //     window.int = setInterval(function() {
+  //       that.props.getAppList({ clusterCode: clusterCode })
+  //     }, 3000);
+  //   }
+  // }
+  timerFun = () => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     if(!_.isEmpty(clusterCode)){
-      window.int = setInterval(function() {
-        that.props.getAppList({ clusterCode: clusterCode })
-      }, 3000);
+      let {stopTimer} = this.state;
+      this.props.getAppList({ clusterCode: clusterCode })
+      let timer=setTimeout(() => {
+        !stopTimer && this.timerFun();
+        clearTimeout(timer)
+      },3000);
     }
+  }
+  setListInterval = () => {
+    this.setState({
+      stopTimer: false
+    }, () => {
+      this.timerFun();
+    })
   }
   genClearList = (value) => {
     let clearList = {};
@@ -88,7 +107,7 @@ class List extends React.Component {
             isShowClearListModal: true
           })
         }else{
-          this.setListInterval(that);
+          this.setListInterval();
         }
       }
     })
@@ -101,8 +120,10 @@ class List extends React.Component {
       this.setState({
         filterList: {},
       })
-      if(window.int){
-        clearInterval(window.int);
+      if(!this.state.stopTimer){
+        this.setState({
+          stopTimer: true
+        })
       }
       if(_.isEmpty(clusterCode) || _.isEmpty(_.get(window.clusterList, [clusterCode]))) return;
       this.props.getAppList({ clusterCode: clusterCode }).then(d => {
@@ -114,7 +135,7 @@ class List extends React.Component {
               isShowClearListModal: true
             })
           }else{
-            this.setListInterval(that);
+            this.setListInterval();
           }
         }
       })
@@ -133,7 +154,10 @@ class List extends React.Component {
   }
 
   componentWillUnmount = () => {
-    clearInterval(window.int);
+    this.setState({
+      stopTimer: true
+    })
+    // clearInterval(window.int);
   }
   changeMonitorData = (gap = null) => {
     let fromTime = moment().format("YYYY-MM-DD-HH");
@@ -149,7 +173,10 @@ class List extends React.Component {
     return this.props.queryAppUsages(param);
   }
   showModal = (record) => {
-    clearInterval(window.int);
+    this.setState({
+      stopTimer: true
+    })
+    // clearInterval(window.int);
     let index = record.appId;
     this.setState({
       index: index
@@ -167,7 +194,7 @@ class List extends React.Component {
 
     });
     let that = this;
-    this.setListInterval(that);
+    this.setListInterval();
   }
   handleCancel = (e) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
@@ -179,7 +206,7 @@ class List extends React.Component {
     });
     let that = this;
     this.props.getAppList({ clusterCode: clusterCode })
-    this.setListInterval(that);
+    this.setListInterval();
   }
   showConfirm = (operation, name) => {
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
@@ -259,7 +286,10 @@ class List extends React.Component {
     });
   }
   showErrorMsg = (message,record) => {
-    clearInterval(window.int);
+    this.setState({
+      stopTimer: true
+    })
+    // clearInterval(window.int);
     this.setState({
       message: message,
       name: record.name,
@@ -270,7 +300,10 @@ class List extends React.Component {
   }
 
   openDeleteAllModal = (appName) =>{
-    clearInterval(window.int);
+    this.setState({
+      stopTimer: true
+    })
+    // clearInterval(window.int);
     this.setState({
       deleteAllVisible: true,
       deleteAppName: appName
