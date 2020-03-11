@@ -8,7 +8,7 @@ var SideBar = require('../../coms/commons/sidebar/sidebar.jsx');
 let User = require("../../services/user");
 import { Modal, Button} from 'antd';
 import { ReactContext } from 'react-router';
-import ErrorCenter from '@ali/error-center';
+import ErrorCenter from '../errorCenter/error-center';
 require('./app.less');
 class App extends React.Component {
   constructor(props, context) {
@@ -25,7 +25,6 @@ class App extends React.Component {
     if(_.isEmpty(_.get(window.clusterList, [this.clusterCode]))) {
       this.context.router.push('/honeycomb-console/pages/clusterMgr');
     } else if(_.isEmpty(this.clusterCode) || _.isEmpty(this.localClusterCode)){
-      debugger;
       this.showModal();
     }
   }

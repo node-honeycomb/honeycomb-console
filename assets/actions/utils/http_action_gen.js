@@ -5,7 +5,7 @@ const ajax = require('./ajax');
 const antd = require('antd');
 const actionNameGen = require('./action_name_gen');
 const React = require('react');
-const ErrorCenter = require('@ali/error-center');
+const ErrorCenter = require('../../scenes/errorCenter/error-center');
 module.exports = (urlCfg) => {
   return (param, urlParam, options) => {
     return (dispatch) => {
