@@ -22,12 +22,13 @@ class App extends React.Component {
     this.clusterCode = URL.parse(window.location.href, true).query.clusterCode || null;
   }
   componentDidMount = () => {
-    if(_.isEmpty(_.get(window.clusterList, [this.clusterCode]))) {
+    if(_.isEmpty(window.clusterList)) {
       this.context.router.push('/honeycomb-console/pages/clusterMgr');
     } else if(_.isEmpty(this.clusterCode) || _.isEmpty(this.localClusterCode)){
-      debugger;
       this.showModal();
-    }
+    } else if(_.isEmpty(_.get(window.clusterList, [(this.clusterCode || _.isEmpty(this.localClusterCode))]))){
+      this.showModal();
+    } 
   }
 
   showModal = () => {
