@@ -4,6 +4,7 @@ let async = require('async');
 let log = require('../common/log');
 let pathToRegex = require('path-to-regexp');
 let userAclModel = require('../model/user_acl');
+const config = require('../config');
 
 module.exports = function (req, res, next) {
   let user = req.user || req.session.user;
@@ -23,9 +24,27 @@ module.exports = function (req, res, next) {
     pathToRegex('/api/status').test(pathname) ||
     pathToRegex('/api/coredump').test(pathname) ||
     pathToRegex('/api/unknowProcess').test(pathname) ||
-    pathToRegex('/api/unknowProcess/**').test(pathname) ||
-    pathToRegex('/api/worker/register').test(pathname)
+    pathToRegex('/api/unknowProcess/**').test(pathname)
   ) {
+    return next();
+  }
+
+  // 注册、注销、获取列表接口根据header授权
+  if (
+    [
+      '/api/worker/register',
+      '/api/worker/unregister',
+      '/api/worker/listAll'
+    ].some(i => pathToRegex(i).test(pathname))
+  ) {
+    const secret = req.headers.authorization;
+    if (config.registerSecret !== secret) {
+      res.status(401).json({
+        code: 'Error',
+        message: 'Unauthorized'
+      });
+      return;
+    }
     return next();
   }
 

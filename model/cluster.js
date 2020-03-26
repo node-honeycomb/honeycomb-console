@@ -188,7 +188,7 @@ const DELETE_SYSTEM_WORKER_TMP = `
   DELETE FROM
     hc_console_system_worker
   WHERE
-    id = ?;
+    ip = ?;
 `;
 
 exports.deleteTmpWorker = function (id, callback) {
@@ -284,6 +284,20 @@ exports.getClusterCfgByCode = function (clusterCode) {
       token: opt.token
     };
   }
+};
+
+const QUERY_ALL_SYSTEM_WORKER = `
+  SELECT *
+  FROM hc_console_system_worker
+  WHERE
+    status = 1;`;
+
+exports.queryAllWorker = function (callback) {
+  db.query(
+    QUERY_ALL_SYSTEM_WORKER,
+    [],
+    callback
+  );
 };
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行

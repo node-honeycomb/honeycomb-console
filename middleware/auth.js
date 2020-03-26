@@ -67,6 +67,7 @@ module.exports = function (req, res, next) {
       break;
     case '/api/worker/register':
     case '/api/worker/unregister':
+    case '/api/worker/listAll':
       next();
       break;
     default:

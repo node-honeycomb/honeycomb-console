@@ -119,10 +119,10 @@ exports.registerWorker = function (req, callback) {
 };
 
 /**
- * @api {post} /api/worker/unregister/:id
+ * @api {post} /api/worker/unregister
  */
 exports.unregisterWorker = function (req, callback) {
-  let ip = req.params.id;
+  let ip = req.body.ip;
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DEL_TMP_WORKER',
@@ -131,12 +131,31 @@ exports.unregisterWorker = function (req, callback) {
     opItem: 'WORKER',
     opItemId: ip
   });
-  log.info('delete tmp worker: ', ip, clusterCode);
-  cluster.deleteTmpWorker(id, function (err) {
+  log.info('delete tmp worker: ', ip);
+  cluster.deleteTmpWorker(ip, function (err) {
     if (err) {
       log.error(`delete tmp worker: ${ip} failed:`, err);
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, 'del tmp worker success');
+  });
+};
+
+/**
+ * @api {get} /api/worker/listAll
+ */
+exports.listAllWorker = function (req, callback) {
+  req.oplog({
+    opName: 'LIST_WORKER',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'NORMAL',
+    opItem: 'WORKER',
+  });
+  cluster.queryAllWorker((err, workers) => {
+    if (err) {
+      log.error(`query all workers failed:`, err);
+      return callback({code: err.code || 'ERROR', message: err.message});
+    }
+    callback(null, workers);
   });
 };
