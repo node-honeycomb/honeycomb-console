@@ -188,7 +188,7 @@ const DELETE_SYSTEM_WORKER_TMP = `
   DELETE FROM
     hc_console_system_worker
   WHERE
-    ip = ?;
+    id = ?;
 `;
 
 exports.deleteTmpWorker = function (id, callback) {
@@ -296,6 +296,21 @@ exports.queryAllWorker = function (callback) {
   db.query(
     QUERY_ALL_SYSTEM_WORKER,
     [],
+    callback
+  );
+};
+
+const DELETE_SYSTEM_WORKER_BY_IP = `
+  DELETE FROM
+    hc_console_system_worker
+  WHERE
+    ip = ?;
+`;
+
+exports.deleteWorkerByIp = function (ip, callback) {
+  db.query(
+    DELETE_SYSTEM_WORKER_BY_IP,
+    [ip],
     callback
   );
 };

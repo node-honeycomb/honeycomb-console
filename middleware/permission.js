@@ -33,7 +33,7 @@ module.exports = function (req, res, next) {
   if (
     [
       '/api/worker/register',
-      '/api/worker/unregister',
+      '/api/worker/deleteByIp',
       '/api/worker/listAll'
     ].some(i => pathToRegex(i).test(pathname))
   ) {

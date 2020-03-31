@@ -68,6 +68,7 @@ module.exports = function (req, res, next) {
     case '/api/worker/register':
     case '/api/worker/unregister':
     case '/api/worker/listAll':
+    case '/api/worker/deleteByIp':
       next();
       break;
     default:
