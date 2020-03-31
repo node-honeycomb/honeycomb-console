@@ -5,7 +5,7 @@ const ajax = require('./ajax');
 const antd = require('antd');
 const actionNameGen = require('./action_name_gen');
 const React = require('react');
-const ErrorCenter = require('../../scenes/errorCenter/error-center');
+// const ErrorCenter = require('../../scenes/errorCenter/error-center');
 module.exports = (urlCfg) => {
   return (param, urlParam, options) => {
     return (dispatch) => {
@@ -46,18 +46,23 @@ module.exports = (urlCfg) => {
             dispatch({type: actionName.fail, data: error, urlParam: urlParam, options: options, message: error.message});
             let message = _.get(error, 'message', '接口错误, 无错误消息');
             if (message && typeof message === 'object') message = JSON.stringify(message);
-            ErrorCenter.add({
-              request: {
-                url,
-                method,
-                headers,
-                param
-              },
-              response: {
-                code: _.get(error, 'code', 'NO_ERROR_CODE'),
-                message: message
-              }
+            antd.notification.error({
+              message: _.get(error, 'code', 'NO_ERROR_CODE'),
+              description: message,
+              duration: 6
             });
+            // ErrorCenter.add({
+            //   request: {
+            //     url,
+            //     method,
+            //     headers,
+            //     param
+            //   },
+            //   response: {
+            //     code: _.get(error, 'code', 'NO_ERROR_CODE'),
+            //     message: message
+            //   }
+            // });
             return reject(error);
           }
           dispatch({type: actionName.success, data: data.data, urlParam: urlParam, options: options, param: param, message: data.message});
@@ -74,18 +79,23 @@ module.exports = (urlCfg) => {
                 <span style={css}>message: {d.message}</span>
               </div>)}
             </div>;
-            ErrorCenter.add({
-              request: {
-                url,
-                method,
-                headers,
-                param
-              },
-              response: {
-                code: 'ERROR',
-                message: _description
-              }
+            antd.notification.error({
+              message: 'ERROR',
+              description: _description,
+              duration: null
             });
+            // ErrorCenter.add({
+            //   request: {
+            //     url,
+            //     method,
+            //     headers,
+            //     param
+            //   },
+            //   response: {
+            //     code: 'ERROR',
+            //     message: _description
+            //   }
+            // });
           }
           return resolve(data.data);
         });
