@@ -46,6 +46,11 @@ module.exports = (urlCfg) => {
             dispatch({type: actionName.fail, data: error, urlParam: urlParam, options: options, message: error.message});
             let message = _.get(error, 'message', '接口错误, 无错误消息');
             if (message && typeof message === 'object') message = JSON.stringify(message);
+            // antd.notification.error({
+            //   message: _.get(error, 'code', 'NO_ERROR_CODE'),
+            //   description: message,
+            //   duration: 6
+            // });
             ErrorCenter.add({
               request: {
                 url,
