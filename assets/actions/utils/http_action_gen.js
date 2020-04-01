@@ -67,13 +67,11 @@ module.exports = (urlCfg) => {
               display: 'block',
               'word-break': 'break-all'
             };
-            let _description = <div>
-              {_error.map(d => <div style={{borderBottom: '1px dotted #eee', borderTop: '1px dotted #eee', padding: '5px 0px'}}>
-                <span style={css}>ip: {d.ip}</span>
-                <span style={css}>code: {d.code}</span>
-                <span style={css}>message: {d.message}</span>
-              </div>)}
-            </div>;
+            // let _description = _error.map(d => <div style={{borderBottom: '1px dotted #eee', borderTop: '1px dotted #eee', padding: '5px 0px'}}>
+            //   <span style={css}>ip: {d.ip}</span>
+            //   <span style={css}>code: {d.code}</span>
+            //   <span style={css}>message: {d.message}</span>
+            // </div>);
             ErrorCenter.add({
               request: {
                 url,
@@ -83,7 +81,7 @@ module.exports = (urlCfg) => {
               },
               response: {
                 code: 'ERROR',
-                message: _description
+                message: _error.map(d => `${d.ip}: ${d.message}`).join(';')
               }
             });
           }

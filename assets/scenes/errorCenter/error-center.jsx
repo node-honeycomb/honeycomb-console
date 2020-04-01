@@ -40,7 +40,7 @@ class Errorcenter extends Component {
       searchValue: '',
       redIconTip: false,
       errorNotificationId: null,
-      mesage: '',
+      message: '',
       isShowBodyDetail: false
     };
     viewState.watch((e) => {
@@ -121,7 +121,6 @@ class Errorcenter extends Component {
 
   errTips(data) {
     this.errNotificationShow();
-
     data = {
       message: data.response.message,
       id: data.id
@@ -519,7 +518,8 @@ class Errorcenter extends Component {
               <div className="show-message"
                 onClick={() => {
                   this.showWarningBox(true);
-                }}>
+                }} 
+              >
                 {this.state.message}
               </div>
               <div className="error-detail"
