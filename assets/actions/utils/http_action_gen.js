@@ -67,16 +67,21 @@ module.exports = (urlCfg) => {
           }
           dispatch({type: actionName.success, data: data.data, urlParam: urlParam, options: options, param: param, message: data.message});
           let _error = _.get(data.data, 'error');
-          if (_error && _error.length > 0) {
-            let css = {
-              display: 'block',
-              'word-break': 'break-all'
-            };
+          if (_error && (_error || []).length > 0) {
+            // let css = {
+            //   display: 'block',
+            //   'word-break': 'break-all'
+            // };
             // let _description = _error.map(d => <div style={{borderBottom: '1px dotted #eee', borderTop: '1px dotted #eee', padding: '5px 0px'}}>
             //   <span style={css}>ip: {d.ip}</span>
             //   <span style={css}>code: {d.code}</span>
             //   <span style={css}>message: {d.message}</span>
             // </div>);
+            // antd.notification.error({
+            //   message: 'ERROR',
+            //   description: _description,
+            //   duration: null
+            // });
             ErrorCenter.add({
               request: {
                 url,
