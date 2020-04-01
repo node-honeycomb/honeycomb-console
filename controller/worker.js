@@ -168,7 +168,7 @@ exports.deleteWorkerByIp = function (req, callback) {
   const {ip} = req.body;
   req.oplog({
     clientId: req.ips.join('') || '-',
-    opName: 'DEL_TMP_WORKER',
+    opName: 'DEL_WORKER',
     opType: 'PAGE_MODEL',
     opLogLevel: 'NORMAL',
     opItem: 'WORKER',
