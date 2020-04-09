@@ -87,5 +87,6 @@ module.exports = {
   appManageConfig: {
     keepOnlineNum: 2,
     keepOfflineNum: 5
-  }
+  },
+  hideUpload: false
 };
