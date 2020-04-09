@@ -132,47 +132,49 @@ class Publish extends React.Component {
       });
       publishTabs = publishTabs.concat(tabs);
     }
-    publishTabs.push(
-    <TabPane tab="手动发布" key={publishTabs.length + 1}>
-    <div className="publish-update">
-      <Upload {...props}>
-        <button type="button" className="ant-btn ant-btn-ghost">
-          <i className="anticon anticon-upload"></i> 发布应用
-        </button>
-      </Upload>
-    </div>
-    <div className="publish-list">
-      <div className="app-status-wrap">
-      {
-        ipStatus.map((item, index)=>{
-          return(
-            <row key={index}>
-              {
-                item.map((value, key)=>{
-                   return(
-                  <Col key={key} span={6}>
-                    <Card title={"机器："+value.ip} >
-                      {
-                        _.map(value.data, (v, k)=>{
-                          if (!(_.isArray(v) || _.isObject(v))) {
-                            return(
-                              <p key={k}>{k} : {v}</p>
-                            )
+    if (_.toString(window.hideUpload) !== 'true') {
+      publishTabs.push(
+        <TabPane tab="手动发布" key={publishTabs.length + 1}>
+        <div className="publish-update">
+          <Upload {...props}>
+            <button type="button" className="ant-btn ant-btn-ghost">
+              <i className="anticon anticon-upload"></i> 发布应用
+            </button>
+          </Upload>
+        </div>
+        <div className="publish-list">
+          <div className="app-status-wrap">
+          {
+            ipStatus.map((item, index)=>{
+              return(
+                <row key={index}>
+                  {
+                    item.map((value, key)=>{
+                       return(
+                      <Col key={key} span={6}>
+                        <Card title={"机器："+value.ip} >
+                          {
+                            _.map(value.data, (v, k)=>{
+                              if (!(_.isArray(v) || _.isObject(v))) {
+                                return(
+                                  <p key={k}>{k} : {v}</p>
+                                )
+                              }
+                            })
                           }
-                        })
-                      }
-                    </Card>
-                  </Col>
-                  )
-                })
-              }
-            </row>
-          )
-        })
-      }
-      </div>
-    </div>
-  </TabPane>);
+                        </Card>
+                      </Col>
+                      )
+                    })
+                  }
+                </row>
+              )
+            })
+          }
+          </div>
+        </div>
+      </TabPane>);
+    }
     return(
       <div className="publish-wrap">
         <Tabs className="tab-wrap" defaultActiveKey={'1'}>

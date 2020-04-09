@@ -47,7 +47,8 @@ exports.pages = function (req, callback) {
         user: req.user,
         appManageConfig: config.appManageConfig,
         env: config.env,
-        publishPages: Array.isArray(config.publishPages) ? config.publishPages : []
+        publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
+        hideUpload: config.hideUpload
       }
     }, 'html');
   });
