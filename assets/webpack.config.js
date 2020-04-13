@@ -8,6 +8,10 @@ module.exports = {
     'html.worker': 'monaco-editor/esm/vs/language/html/html.worker',
     'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
   },
+  devServer: {
+    stats: 'errors-only',
+    progress: true
+  },
   plugins: [
     // Ignore require() calls in vs/language/typescript/lib/typescriptServices.js
     new webpack.IgnorePlugin(
