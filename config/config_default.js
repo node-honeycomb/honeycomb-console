@@ -47,7 +47,9 @@ module.exports = {
     appAuth: {
       enable: true,
       module: '../middleware/auth.js',
-      config: {}
+      config: {
+        ignore: ['/signatureAuth/**']
+      }
     },
     store: {
       enable: false,
@@ -63,6 +65,20 @@ module.exports = {
       enable: true,
       module: '../middleware/permission.js',
       config: {}
+    },
+    systemCall: {
+      enable: true,
+      module: 'hc-signature-auth',
+      router: ['/signatureAuth/systemCall/*'],
+      config: {
+        authType: 'systemCall',
+        signatures: [
+          {
+            accessKeyId: 'honeycomb-console-keyid',
+            accessKeySecret: 'honeycomb-console-keysecret'
+          }
+        ]
+      }
     }
   },
   extension: {
@@ -80,7 +96,11 @@ module.exports = {
     }
   },
   whiteList: ['admin'],
-  ignoreLogFiles: [/_app_usage_cache_\/app-usage\./, /app-usage\.{year}-{month}-{day}-{hour}\.log/, /nodejs_stdout\.log\.2\d+/],
+  ignoreLogFiles: [
+    /_app_usage_cache_\/app-usage\./,
+    /app-usage\.{year}-{month}-{day}-{hour}\.log/,
+    /nodejs_stdout\.log\.2\d+/
+  ],
   logSqlQuery: true,
   secureServerVersion: '1.0.3_3',
   oldConsole: '',
