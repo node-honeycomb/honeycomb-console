@@ -25,7 +25,7 @@ release: clean
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
 	@cd out/release/assets && NODE_ENV=production npm install --registry=${REGISTRY}
 	@cd out/release && NODE_ENV=production npm install --registry=${REGISTRY}
-	@cd out/release/assets && ../node_modules/.bin/honeypack build && mv .package ../
+	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
 	@cd out/release && cp -r .package/* ./assets/

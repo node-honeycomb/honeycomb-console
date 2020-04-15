@@ -1,24 +1,15 @@
 const path = require('path');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const TerserWebpackPlugin = require('terser-webpack-plugin');
-const webpack = require('webpack');
 
 const config = {
   context: __dirname,
   mode: process.env.NODE_ENV === 'production' ? 'production' : 'development',
 
   entry: {
-    app: './index.jsx',
-    'editor.worker': 'monaco-editor/esm/vs/editor/editor.worker.js',
-    'json.worker': 'monaco-editor/esm/vs/language/json/json.worker',
-    'css.worker': 'monaco-editor/esm/vs/language/css/css.worker',
-    'html.worker': 'monaco-editor/esm/vs/language/html/html.worker',
-    'ts.worker': 'monaco-editor/esm/vs/language/typescript/ts.worker',
+    app: './index.jsx'
   },
-  devServer: {
-    stats: 'errors-only',
-    progress: true
-  },
+
   output: {
     filename: '[name].js',
     chunkFilename: '[name].js',
@@ -79,19 +70,7 @@ const config = {
         }
       },
       {
-        test: /\.css$/,
-
-        use: [
-          {
-            loader: MiniCssExtractPlugin.loader
-          },
-          {
-            loader: 'css-loader'
-          }
-        ]
-      },
-      {
-        test: /\.less$/,
+        test: /\.(less|css)$/,
 
         use: [
           {
@@ -108,19 +87,14 @@ const config = {
             }
           }
         ]
-      },
+      }
     ]
   },
 
   plugins: [
     new MiniCssExtractPlugin({
       filename: '[name].css'
-    }),
-    // Ignore require() calls in vs/language/typescript/lib/typescriptServices.js
-    new webpack.IgnorePlugin(
-      /^((fs)|(path)|(os)|(crypto)|(source-map-support))$/,
-      /vs(\/|\\)language(\/|\\)typescript(\/|\\)lib/
-    )
+    })
   ],
 
   optimization: {
