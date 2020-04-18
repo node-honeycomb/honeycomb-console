@@ -11,7 +11,9 @@ function getFilterCluster(gClusterConfig, req) {
   let clusterConfig = {};
   Object.keys(gClusterConfig).forEach((clusterCode) => {
     if (req.user.containsCluster(clusterCode)) {
-      clusterConfig[clusterCode] = lodash.cloneDeep(cluster.gClusterConfig[clusterCode]);
+      clusterConfig[clusterCode] = lodash.cloneDeep(
+        cluster.gClusterConfig[clusterCode]
+      );
     }
   });
   Object.keys(clusterConfig).forEach((clusterCode) => {
@@ -53,7 +55,6 @@ exports.listCluster = function (req, callback) {
   });
 };
 
-
 /**
  * @api {post} /api/cluster/create
  */
@@ -66,9 +67,11 @@ exports.addCluster = function (req, callback) {
     opType: 'PAGE_MODEL',
     opLogLevel: 'NORMAL',
     opItem: 'CLUSTER',
-    opItemId: clusterCode
+    opItemId: clusterCode,
+    opEnv: req.body.env,
   });
   let clusterName = req.body.name;
+  let clusterEnv = req.body.env;
   let token = req.body.token;
   if (token === '***********') {
     let opt = cluster.getClusterCfgByCode(clusterCode);
@@ -79,59 +82,100 @@ exports.addCluster = function (req, callback) {
   }
   let endpoint = req.body.endpoint;
   let ips = req.body.ips;
-  log.debug('cluster info:', clusterName, clusterCode, token, endpoint, ips);
+  log.debug(
+    'cluster info:',
+    clusterName,
+    clusterCode,
+    token,
+    endpoint,
+    ips,
+    clusterEnv
+  );
   if (!clusterName || !clusterCode || !token || !endpoint || !ips) {
     return callback('form data missing.');
   }
   if (isUpdate) {
-    cluster.updateCluster(clusterName, clusterCode, token, endpoint, function (err) {
-      if (err) {
-        log.error(err);
-        return callback(err);
-      }
-      cluster.deleteWorkers(clusterCode, (err) => {
-        if (err) {
-          return callback(err);
-        }
-        async.eachSeries(ips, (ip, cb) => {
-          cluster.addWorker(ip, clusterCode, cb);
-        }, (err) => {
-          if (err) {
-            log.error(err);
-            return callback(err);
-          }
-          //callback(null, cluster.gClusterConfig);
-          callback(null, getFilterCluster(cluster.gClusterConfig, req));
-        });
-      });
-    });
-  } else {
-    cluster.addCluster(clusterName, clusterCode, token, endpoint, function (err) {
-      if (err) {
-        log.error(err);
-        return callback(err);
-      }
-      async.eachSeries(ips, (ip, cb) => {
-        cluster.addWorker(ip, clusterCode, cb);
-      }, (err) => {
+    cluster.updateCluster(
+      clusterName,
+      clusterCode,
+      token,
+      endpoint,
+      clusterEnv,
+      function (err) {
         if (err) {
           log.error(err);
           return callback(err);
         }
-        cluster.getClusterCfg(function (err) {
-          if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
-          let newCluster = cluster.gClusterConfig[clusterCode];
-          if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-          userAcl.addUserAcl(req.user.name, newCluster.id, clusterCode, clusterName, 1, '["*"]', function (err) {
-            //callback(err, cluster.gClusterConfig);
-            callback(err, getFilterCluster(cluster.gClusterConfig, req));
-          });
+        cluster.deleteWorkers(clusterCode, (err) => {
+          if (err) {
+            return callback(err);
+          }
+          async.eachSeries(
+            ips,
+            (ip, cb) => {
+              cluster.addWorker(ip, clusterCode, cb);
+            },
+            (err) => {
+              if (err) {
+                log.error(err);
+                return callback(err);
+              }
+              //callback(null, cluster.gClusterConfig);
+              callback(null, getFilterCluster(cluster.gClusterConfig, req));
+            }
+          );
         });
-      });
-    });
+      }
+    );
+  } else {
+    cluster.addCluster(
+      clusterName,
+      clusterCode,
+      token,
+      endpoint,
+      clusterEnv,
+      function (err) {
+        if (err) {
+          log.error(err);
+          return callback(err);
+        }
+        async.eachSeries(
+          ips,
+          (ip, cb) => {
+            cluster.addWorker(ip, clusterCode, cb);
+          },
+          (err) => {
+            if (err) {
+              log.error(err);
+              return callback(err);
+            }
+            cluster.getClusterCfg(function (err) {
+              if (err)
+                callback(
+                  new Error('getClusterCfg fail before add cluster acl')
+                );
+              let newCluster = cluster.gClusterConfig[clusterCode];
+              if (!newCluster)
+                callback(new Error('get new cluster fail after getClusterCfg'));
+              userAcl.addUserAcl(
+                req.user.name,
+                newCluster.id,
+                clusterCode,
+                clusterName,
+                1,
+                '["*"]',
+                function (err) {
+                  //callback(err, cluster.gClusterConfig);
+                  callback(err, getFilterCluster(cluster.gClusterConfig, req));
+                }
+              );
+            });
+          }
+        );
+      }
+    );
   }
 };
-
 
 /**
  * @api {post} /api/cluster/:code/delete
@@ -144,23 +188,23 @@ exports.removeCluster = function (req, callback) {
     opType: 'PAGE_MODEL',
     opLogLevel: 'NORMAL',
     opItem: 'CLUSTER',
-    opItemId: clusterCode
+    opItemId: clusterCode,
   });
   log.info('delete cluster: ', clusterCode);
   cluster.deleteCluster(clusterCode, function (err) {
     if (err) {
       log.error('delete cluster failed:', err);
-      return callback({code: err.code || 'ERROR', message: err.message});
+      return callback({ code: err.code || 'ERROR', message: err.message });
     }
     cluster.deleteWorkers(clusterCode, function (err) {
       if (err) {
         log.error('delete cluster worker failed:', err);
-        return callback({code: err.code || 'ERROR', message: err.message});
+        return callback({ code: err.code || 'ERROR', message: err.message });
       }
-      userAcl.deleteClusterAllAcl(clusterCode,function (err) {
+      userAcl.deleteClusterAllAcl(clusterCode, function (err) {
         if (err) {
           log.error('delete cluster acl failed:', err);
-          return callback({code: err.code || 'ERROR', message: err.message});
+          return callback({ code: err.code || 'ERROR', message: err.message });
         }
         callback(null, 'delete cluster success');
       });

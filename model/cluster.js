@@ -12,15 +12,15 @@ const callremote = utils.callremote;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
-    (name, code, token, endpoint, gmt_create, gmt_modified)
+    (name, code, token, endpoint, env, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?, ?, ?) ;`;
+    (?, ?, ?, ?, ?, ?, ?) ;`;
 
-exports.addCluster = function (name, code, token, endpoint, callback) {
+exports.addCluster = function (name, code, token, endpoint, env, callback) {
   let d = new Date();
   db.query(
     INSERT_SYSTEM_CLUSTER,
-    [name, code, token, endpoint, d, d],
+    [name, code, token, endpoint, env, d, d],
     function (err) {
       if (err) {
         log.error('Insert new cluster failed:', err);
@@ -35,14 +35,14 @@ exports.addCluster = function (name, code, token, endpoint, callback) {
 
 const UPDATE_SYSTEM_CLUSTER = `
   UPDATE hc_console_system_cluster
-  SET status = 1, name = ?, token = ?, endpoint = ?, gmt_modified = ?
+  SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, gmt_modified = ?
   WHERE code = ?;
 `;
-exports.updateCluster = function (name, code, token, endpoint, callback) {
+exports.updateCluster = function (name, code, token, endpoint, env, callback) {
   let d = new Date();
   db.query(
     UPDATE_SYSTEM_CLUSTER,
-    [name, token, endpoint, d, code],
+    [name, token, endpoint, env, d, code],
     function (err) {
       if (err) {
         log.error('Update cluster failed:', err);
@@ -64,19 +64,15 @@ const UPDATE_SYSTEM_CLUSTER_ENDPOINT = `
 exports.updateClusterEndpoint = function (code, endpoint, callback) {
   callback = callback || function () {};
   let d = new Date();
-  db.query(
-    UPDATE_SYSTEM_CLUSTER_ENDPOINT,
-    [endpoint, d, code],
-    function (err) {
-      if (err) {
-        log.error('Update cluster failed:', err);
-        return callback(err);
-      } else {
-        log.info('update cluster success');
-        callback();
-      }
+  db.query(UPDATE_SYSTEM_CLUSTER_ENDPOINT, [endpoint, d, code], function (err) {
+    if (err) {
+      log.error('Update cluster failed:', err);
+      return callback(err);
+    } else {
+      log.info('update cluster success');
+      callback();
     }
-  );
+  });
 };
 
 const DELETE_SYSTEM_CLUSTER = `
@@ -84,19 +80,15 @@ const DELETE_SYSTEM_CLUSTER = `
     hc_console_system_cluster
   WHERE code = ?;`;
 exports.deleteCluster = function (code, callback) {
-  db.query(
-    DELETE_SYSTEM_CLUSTER,
-    [code],
-    function (err) {
-      if (err) {
-        log.error('Delete cluster failed:', err);
-        return callback(err);
-      } else {
-        log.info('Delete cluster success');
-        callback();
-      }
+  db.query(DELETE_SYSTEM_CLUSTER, [code], function (err) {
+    if (err) {
+      log.error('Delete cluster failed:', err);
+      return callback(err);
+    } else {
+      log.info('Delete cluster success');
+      callback();
     }
-  );
+  });
 };
 
 const INSERT_SYSTEM_WORKER = `
@@ -107,19 +99,17 @@ const INSERT_SYSTEM_WORKER = `
 
 exports.addWorker = function (ipAddress, clusterCode, callback) {
   let d = new Date();
-  db.query(
-    INSERT_SYSTEM_WORKER,
-    [ipAddress, clusterCode, d, d],
-    function (err) {
-      if (err) {
-        log.error('Insert new worker failed:', err);
-        return callback(err);
-      } else {
-        log.info('Add worker success');
-        callback(null);
-      }
+  db.query(INSERT_SYSTEM_WORKER, [ipAddress, clusterCode, d, d], function (
+    err
+  ) {
+    if (err) {
+      log.error('Insert new worker failed:', err);
+      return callback(err);
+    } else {
+      log.info('Add worker success');
+      callback(null);
     }
-  );
+  });
 };
 
 const INSERT_SYSTEM_WORKER_TMP = `
@@ -129,7 +119,7 @@ const INSERT_SYSTEM_WORKER_TMP = `
     (?, ?, ?);`;
 const CHECK_SYSTEM_WORKER_TMP = `
   select count(*) as cc from hc_console_system_worker_tmp where ip=? and cluster_code=?
-`
+`;
 
 exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
   let d = new Date();
@@ -140,19 +130,17 @@ exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
     if (data && data[0].cc > 0) {
       return callback(null);
     }
-    db.query(
-      INSERT_SYSTEM_WORKER_TMP,
-      [ipAddress, clusterCode, d],
-      function (err) {
-        if (err) {
-          log.error('Insert new worker failed:', err);
-          return callback(err);
-        } else {
-          log.info('Add worker success');
-          callback(null);
-        }
+    db.query(INSERT_SYSTEM_WORKER_TMP, [ipAddress, clusterCode, d], function (
+      err
+    ) {
+      if (err) {
+        log.error('Insert new worker failed:', err);
+        return callback(err);
+      } else {
+        log.info('Add worker success');
+        callback(null);
       }
-    );
+    });
   });
 };
 
@@ -164,11 +152,7 @@ const DELETE_SYSTEM_WORKER = `
 `;
 
 exports.deleteWorker = function (ipAddress, clusterCode, callback) {
-  db.query(
-    DELETE_SYSTEM_WORKER,
-    [ipAddress, clusterCode],
-    callback
-  );
+  db.query(DELETE_SYSTEM_WORKER, [ipAddress, clusterCode], callback);
 };
 
 const UPDATE_SYSTEM_WORKER_BY_CLUSTER = `
@@ -199,12 +183,8 @@ const DELETE_SYSTEM_WORKER_BY_CLUSTER = `
 `;
 exports.deleteWorkersByClusterCode = function (clusterCode, callback) {
   callback = callback || function () {};
-  db.query(
-    DELETE_SYSTEM_WORKER_BY_CLUSTER,
-    [clusterCode],
-    callback
-  );
-}
+  db.query(DELETE_SYSTEM_WORKER_BY_CLUSTER, [clusterCode], callback);
+};
 
 const DELETE_SYSTEM_WORKER_TMP = `
   DELETE FROM
@@ -214,11 +194,7 @@ const DELETE_SYSTEM_WORKER_TMP = `
 `;
 
 exports.deleteTmpWorker = function (id, callback) {
-  db.query(
-    DELETE_SYSTEM_WORKER_TMP,
-    [id],
-    callback
-  );
+  db.query(DELETE_SYSTEM_WORKER_TMP, [id], callback);
 };
 
 const DELETE_SYSTEM_WORKERS = `
@@ -229,11 +205,7 @@ const DELETE_SYSTEM_WORKERS = `
 `;
 
 exports.deleteWorkers = function (clusterCode, callback) {
-  db.query(
-    DELETE_SYSTEM_WORKERS,
-    [clusterCode],
-    callback
-  );
+  db.query(DELETE_SYSTEM_WORKERS, [clusterCode], callback);
 };
 
 const QUERY_SYSTEM_WORKER = `
@@ -243,11 +215,7 @@ const QUERY_SYSTEM_WORKER = `
     cluster_code = ? AND status = 1;`;
 
 exports.queryWorker = function (clusterCode, callback) {
-  db.query(
-    QUERY_SYSTEM_WORKER,
-    [clusterCode],
-    callback
-  );
+  db.query(QUERY_SYSTEM_WORKER, [clusterCode], callback);
 };
 
 const SELECT_SYSTEM_CLUSTER_WOKER = `
@@ -259,6 +227,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.id,
     a.status,
     group_concat(a.ip) as ip
+    b.env
   from
     hc_console_system_cluster b
   join
@@ -275,6 +244,7 @@ exports.getClusterCfg = function (cb) {
     data = data || [];
     let clusterCfg = {};
     data.forEach(function (c) {
+
       if (!clusterCfg[c.code]) {
         clusterCfg[c.code] = {
           name: c.name,
@@ -285,11 +255,21 @@ exports.getClusterCfg = function (cb) {
           ipsOffline: []
         };
       }
+
       if (c.status === 1 && c.ip) {
         clusterCfg[c.code].ips = c.ip.split(',')
       } else if (c.ip) {
         clusterCfg[c.code].ipsOffline = c.ip.split(',')
       }
+
+      clusterCfg[c.code] = {
+        name: c.name,
+        token: c.token,
+        endpoint: c.endpoint,
+        id: c.id,
+        ips: c.ip.split(','),
+        env: c.env,
+      };
     });
     exports.gClusterConfig = clusterCfg;
     cb(null, clusterCfg);
@@ -317,7 +297,7 @@ exports.getClusterCfgByCode = function (clusterCode) {
     log.error(e.message, 'clusterCfg: ', opt, 'clusterCode: ', clusterCode);
     return {
       code: 'ERROR',
-      message: e.message
+      message: e.message,
     };
   } else {
     return {
@@ -336,11 +316,7 @@ const QUERY_ALL_SYSTEM_WORKER = `
     status = 1;`;
 
 exports.queryAllWorker = function (callback) {
-  db.query(
-    QUERY_ALL_SYSTEM_WORKER,
-    [],
-    callback
-  );
+  db.query(QUERY_ALL_SYSTEM_WORKER, [], callback);
 };
 
 const DELETE_SYSTEM_WORKER_BY_IP = `
@@ -467,7 +443,7 @@ exports.fixCluster = function (clusterCode, callback) {
 }
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
-function clusterInit (callback) {
+function clusterInit(callback) {
   // TODO count before addCluster
   // TODO verify clusterCfg format
   // TODO callback once
@@ -478,74 +454,97 @@ function clusterInit (callback) {
     return callback();
   }
   // 如果没有初始化账户，则不初始化cluster
-  if(!config.defaultUser || !config.defaultPassword) {
+  if (!config.defaultUser || !config.defaultPassword) {
     return callback();
   }
   _.forEach(clusterCfg, (ips, clusterCode) => {
-    if(!ips) return;
-    ips = ips.split(',').map(ip => ip.trim()).filter( eachIp => {
-      return net.isIP(eachIp);
-    });
-    if(!ips.length) {
+    if (!ips) return;
+    ips = ips
+      .split(',')
+      .map((ip) => ip.trim())
+      .filter((eachIp) => {
+        return net.isIP(eachIp);
+      });
+    if (!ips.length) {
       return; //do nothing
     }
     const endpoint = `http://${ips[0]}:9999`;
-    exports.addCluster(clusterCode, clusterCode, clusterToken, endpoint, (err) => {
-      // TODO need transcation, cause by error and recovery.
-      if(err) {
-        if(err.code === 'ER_DUP_ENTRY') {
-          // 如果worker改变，需要更新
-          exports.queryWorker(clusterCode, (err, workers) => {
-            if (err) return cb(err);
-            workers = workers.map( w => w.ip);
-            if(!_.isEqual(workers.sort(), ips.sort())) {
-              // 先删除该cluster原来的所有worker，然后重新初始化
-              exports.deleteWorkersByClusterCode(clusterCode, err => {
-                if (err) return callback(err);
-                // 同时更新 cluster endpoint
-                exports.updateClusterEndpoint(clusterCode, endpoint);
-                initWorkers(clusterCode, ips);
-              });
-            }
-          });
+    exports.addCluster(
+      clusterCode,
+      clusterCode,
+      clusterToken,
+      endpoint,
+      (err) => {
+        // TODO need transcation, cause by error and recovery.
+        if (err) {
+          if (err.code === 'ER_DUP_ENTRY') {
+            // 如果worker改变，需要更新
+            exports.queryWorker(clusterCode, (err, workers) => {
+              if (err) return cb(err);
+              workers = workers.map((w) => w.ip);
+              if (!_.isEqual(workers.sort(), ips.sort())) {
+                // 先删除该cluster原来的所有worker，然后重新初始化
+                exports.deleteWorkersByClusterCode(clusterCode, (err) => {
+                  if (err) return callback(err);
+                  // 同时更新 cluster endpoint
+                  exports.updateClusterEndpoint(clusterCode, endpoint);
+                  initWorkers(clusterCode, ips);
+                });
+              }
+            });
+          } else {
+            return callback(err);
+          }
         } else {
-          return callback(err);
+          initWorkers(clusterCode, ips);
         }
-      } else {
-        initWorkers(clusterCode, ips);
       }
-    });
+    );
   });
 }
 
 function initWorkers(clusterCode, ips, callback) {
   callback = callback || function () {};
-  async.eachSeries(ips, (ip, cb) => {
-    exports.addWorker(ip, clusterCode, cb);
-  }, (err) => {
-    if (err) {
-      return callback(err);
-    }
-    exports.getClusterCfg(function (err) {
-      if (err) callback(new Error('getClusterCfg fail before add cluster acl'));
-      let newCluster = exports.gClusterConfig[clusterCode];
-      if (!newCluster) callback(new Error('get new cluster fail after getClusterCfg'));
-      userAcl.addUserAcl(config.defaultUser, newCluster.id, clusterCode, clusterCode, 1, '["*"]', function (err) {
+  async.eachSeries(
+    ips,
+    (ip, cb) => {
+      exports.addWorker(ip, clusterCode, cb);
+    },
+    (err) => {
+      if (err) {
         return callback(err);
+      }
+      exports.getClusterCfg(function (err) {
+        if (err)
+          callback(new Error('getClusterCfg fail before add cluster acl'));
+        let newCluster = exports.gClusterConfig[clusterCode];
+        if (!newCluster)
+          callback(new Error('get new cluster fail after getClusterCfg'));
+        userAcl.addUserAcl(
+          config.defaultUser,
+          newCluster.id,
+          clusterCode,
+          clusterCode,
+          1,
+          '["*"]',
+          function (err) {
+            return callback(err);
+          }
+        );
       });
-    });
-  });
+    }
+  );
 }
 
 clusterInit((err) => {
-  if (err){
+  if (err) {
     if (err.code === 'ER_NO_SUCH_TABLE') {
       // TODO: sql顺序需要可控
-      return setTimeout(clusterInit, 1000)
+      return setTimeout(clusterInit, 1000);
     }
     if (err.code === 'ER_DUP_ENTRY') {
       return;
     }
     log.error(err);
   }
-})
+});

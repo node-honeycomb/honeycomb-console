@@ -7,94 +7,99 @@ let AddClusterModal = require('./add-cluster-modal.jsx');
 let EditClusterModal = require('./edit-cluster-modal.jsx');
 let UpdateSafeTokenModal = require('./update-safeToken-modal');
 const _ = require('lodash');
-const randomstring = require("randomstring");
+const randomstring = require('randomstring');
 import { Modal, Button, Table, Icon, Tag, Spin } from 'antd';
 const confirm = Modal.confirm;
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
 require('./clusterMgr.less');
 
 const UserService = require('../../services/user');
-const URL = require("url");
+const URL = require('url');
 class Cluster extends React.Component {
   state = {
     addClusterModalState: {
       isShow: false,
-      info: {}
+      info: {},
     },
     editClusterModalState: {
       isShow: false,
-      info: {}
+      info: {},
     },
     updateSafeTokenModalState: {
       isShow: false,
-      info: {}
+      info: {},
     },
     clusterList: window.clusterList,
-    spinning: {}
-  }
+    spinning: {},
+  };
   componentDidMount() {
     this.genIpStatus();
     if (_.get(this.props.location, 'state.isShowClusterModal')) {
-      _.forEach(this.state.clusterList, (value,key) => {
-        if(value.token === ORIGIN_TOKEN){
-          this.clusterModal("updateToken", true, value);
+      _.forEach(this.state.clusterList, (value, key) => {
+        if (value.token === ORIGIN_TOKEN) {
+          this.clusterModal('updateToken', true, value);
           return;
         }
       });
     }
   }
-  genIpStatus = async() => {
+  genIpStatus = async () => {
     for (const key in this.state.clusterList) {
       let spinning = _.cloneDeep(this.state.spinning);
       spinning[key] = true;
       await this.setState({
-        spinning
-      })
+        spinning,
+      });
       let value = this.state.clusterList[key];
       try {
-        await this.props.getStatus({clusterCode: value.code || key}).then(data => {
-        let spinning = _.cloneDeep(this.state.spinning);
-        spinning[key] = false;
-        let object = {};
-        value.ips.forEach(d => {
-          if ((data.success || []).find(v => v.ip === d)) {
-            object[d] = 'SUCCESS'
-          }
-          if ((data.error || []).find(v => v.ip === d)) {
-            object[d] = 'ERROR'
-          }
-        })
-        this.setState({
-          [value.code]: object,
-          spinning
-        })
-      })
+        await this.props
+          .getStatus({ clusterCode: value.code || key })
+          .then((data) => {
+            let spinning = _.cloneDeep(this.state.spinning);
+            spinning[key] = false;
+            let object = {};
+            value.ips.forEach((d) => {
+              if ((data.success || []).find((v) => v.ip === d)) {
+                object[d] = 'SUCCESS';
+              }
+              if ((data.error || []).find((v) => v.ip === d)) {
+                object[d] = 'ERROR';
+              }
+            });
+            this.setState({
+              [value.code]: object,
+              spinning,
+            });
+          });
       } catch (e) {
         let spinning = _.cloneDeep(this.state.spinning);
         spinning[key] = false;
         this.setState({
-          spinning
-        })
+          spinning,
+        });
         continue;
       }
-      
     }
-  }
-  clusterModal = (operation,state,data=this.state.editClusterModalState.info) => {
-    switch(operation){
+  };
+  clusterModal = (
+    operation,
+    state,
+    data = this.state.editClusterModalState.info
+  ) => {
+    switch (operation) {
       case 'add':
         this.checkClusterCode();
         this.setState({
-          addClusterModalState:{
-            isShow:state
+          addClusterModalState: {
+            isShow: state,
           },
         });
         break;
       case 'edit':
         this.setState({
-          editClusterModalState:{
-            isShow:state,
-            info:data,
+          editClusterModalState: {
+            isShow: state,
+            info: data,
           },
         });
         break;
@@ -109,129 +114,196 @@ class Cluster extends React.Component {
           onCancel() {},
         });
     }
-  }
+  };
   getClusterList = () => {
     // this.state.clusterList.f
-    this.props.getCluster().then(d => {
-      this.setState({
-        clusterList: d
-      }, () => {
-        this.genIpStatus();
-      })
-    })
-  }
+    this.props.getCluster().then((d) => {
+      this.setState(
+        {
+          clusterList: d,
+        },
+        () => {
+          this.genIpStatus();
+        }
+      );
+    });
+  };
   changeUnSafeToken = (data) => {
     let newToken = randomstring.generate(64);
     // call api change server config.admin.token
     let info = _.cloneDeep(data);
-    this.props.getAppsConfig({clusterCode:info.code},{appId:'server',type:'server'}).then(({config})=>{
-      // call api change cluster config
-      config = _.merge(config,{admin:{token:newToken}});
-      return this.props.setAppConfig({clusterCode:info.code,appConfig:JSON.stringify(config),type:'server'},{appId:'server'});
-    }).then(()=>{
-      info = _.assign({},info,{isUpdate:true,token:newToken});
-      this.props.addCluster(info);
-    }).catch((err)=>{
-      console.error(err);
-    });
-  }
+    this.props
+      .getAppsConfig(
+        { clusterCode: info.code },
+        { appId: 'server', type: 'server' }
+      )
+      .then(({ config }) => {
+        // call api change cluster config
+        config = _.merge(config, { admin: { token: newToken } });
+        return this.props.setAppConfig(
+          {
+            clusterCode: info.code,
+            appConfig: JSON.stringify(config),
+            type: 'server',
+          },
+          { appId: 'server' }
+        );
+      })
+      .then(() => {
+        info = _.assign({}, info, { isUpdate: true, token: newToken });
+        this.props.addCluster(info);
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
   checkClusterCode = () => {
-    UserService.getClusterList().then(d => {
+    UserService.getClusterList().then((d) => {
       let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
-      if(!_.isEmpty(d) && (_.isEmpty(clusterCode) || _.isEmpty(_.get(d, [clusterCode])))) {
+      if (
+        !_.isEmpty(d) &&
+        (_.isEmpty(clusterCode) || _.isEmpty(_.get(d, [clusterCode])))
+      ) {
         this.props.showModal();
       }
-    })
-  }
+    });
+  };
   showConfirm = (record) => {
     confirm({
       title: '确定要删除该集群吗？',
       content: '无法复原，请谨慎操作',
-      onOk:() => {
-        this.props.deleteCluster({},{code:record.code}).then(()=>{
+      onOk: () => {
+        this.props.deleteCluster({}, { code: record.code }).then(() => {
           this.getClusterList();
           this.checkClusterCode();
-        })
+        });
       },
       onCancel() {},
     });
-  }
+  };
   generateColumns = () => {
-    this.columns = [{
-      title: 'name',
-      key:'name',
-      render:(text,record,index)=>{
-        return(
-          <div key={index}>
-            {record.name}
-            {record.token === ORIGIN_TOKEN &&
-              (<a onClick={this.clusterModal.bind(this,"updateToken",true,record)}>
-                <Icon type="exclamation-circle" style={{ marginLeft: 8,fontSize: 16, color: 'red' }} />
-               </a>
+    this.columns = [
+      {
+        title: 'name',
+        key: 'name',
+        render: (text, record, index) => {
+          return (
+            <div key={index}>
+              {record.name}
+              {record.token === ORIGIN_TOKEN && (
+                <a
+                  onClick={this.clusterModal.bind(
+                    this,
+                    'updateToken',
+                    true,
+                    record
+                  )}
+                >
+                  <Icon
+                    type="exclamation-circle"
+                    style={{ marginLeft: 8, fontSize: 16, color: 'red' }}
+                  />
+                </a>
               )}
-          </div>
-        )
-      }
-    },{
-      title:'code',
-      key:'code',
-      dataIndex:'code'
-    },{
-      title:'endPoint',
-      key:'endPoint',
-      dataIndex:'endpoint'
-    },{
-      title:'token',
-      render:(text,record,index)=>{
-        return(
-          <div key={index}><span>***</span></div>
-        )
-      }
-    },{
-      title:'ipList',
-      className: 'ip-list',
-      render:(text,record,index)=>{
-        return(
-          <div key={index}>
-            {record.ips.map((value,key)=>{
-              return(
-                <p key={key}>
-                  <span style={{marginRight: '5px'}}>{value}</span>
-                  <Spin size="small" spinning={_.get(this.state, ['spinning', record.code]) || false}/>
-                  {_.get(this.state, [record.code, value]) === 'SUCCESS' && <Icon style={{color: 'green'}} type="check-circle" />}
-                  {_.get(this.state, [record.code, value]) === 'ERROR' && <Icon style={{color: 'red'}} type="close-circle" />}
-                </p>
-              )
-            })}
-          </div>
-        )
-      }
-    },{
-      title:'actions',
-      key:'actions',
-      render:(text,record,index)=>{
-        return (
-          <div key={index}>
-            <Button onClick={this.clusterModal.bind(this,"edit",true,record)}>编辑</Button>
-            <Button type="danger" onClick={this.showConfirm.bind(this,record)}>删除</Button>
-          </div>
-        )
-      }
-    }]
-  }
-   render() {
+            </div>
+          );
+        },
+      },
+      {
+        title: 'code',
+        key: 'code',
+        dataIndex: 'code',
+      },
+      {
+        title: 'endPoint',
+        key: 'endPoint',
+        dataIndex: 'endpoint',
+      },
+      {
+        title: 'token',
+        render: (text, record, index) => {
+          return (
+            <div key={index}>
+              <span>***</span>
+            </div>
+          );
+        },
+      },
+      {
+        title: 'ipList',
+        className: 'ip-list',
+        render: (text, record, index) => {
+          return (
+            <div key={index}>
+              {record.ips.map((value, key) => {
+                return (
+                  <p key={key}>
+                    <span style={{ marginRight: '5px' }}>{value}</span>
+                    <Spin
+                      size="small"
+                      spinning={
+                        _.get(this.state, ['spinning', record.code]) || false
+                      }
+                    />
+                    {_.get(this.state, [record.code, value]) === 'SUCCESS' && (
+                      <Icon style={{ color: 'green' }} type="check-circle" />
+                    )}
+                    {_.get(this.state, [record.code, value]) === 'ERROR' && (
+                      <Icon style={{ color: 'red' }} type="close-circle" />
+                    )}
+                  </p>
+                );
+              })}
+            </div>
+          );
+        },
+      },
+      {
+        title: 'env',
+        key: 'env',
+        dataIndex: 'env',
+      },
+      {
+        title: 'actions',
+        key: 'actions',
+        render: (text, record, index) => {
+          return (
+            <div key={index}>
+              <Button
+                onClick={this.clusterModal.bind(this, 'edit', true, record)}
+              >
+                编辑
+              </Button>
+              <Button
+                type="danger"
+                onClick={this.showConfirm.bind(this, record)}
+              >
+                删除
+              </Button>
+            </div>
+          );
+        },
+      },
+    ];
+  };
+  render() {
     this.generateColumns();
-    let dataSource = _.map(this.state.clusterList, function(value,key){
-      if(value.token === ORIGIN_TOKEN){
+    let dataSource = _.map(this.state.clusterList, function (value, key) {
+      if (value.token === ORIGIN_TOKEN) {
         window.dispatchEvent(new Event('warning'));
       }
-      return  _.assign({},value,{code:key},{key:key});
+      return _.assign({}, value, { code: key }, { key: key });
     });
     let user = UserService.getUserSync();
-    return(
+    return (
       <div className="cluster-wrap">
         <div className="addbtn-wrap">
-          <Button type="primary" onClick={this.clusterModal.bind(this,"add",true)}>新增集群</Button>
+          <Button
+            type="primary"
+            onClick={this.clusterModal.bind(this, 'add', true)}
+          >
+            新增集群
+          </Button>
         </div>
         <div className="cluster-table-warp">
           <Table
@@ -244,41 +316,40 @@ class Cluster extends React.Component {
           getCluster={this.getClusterList}
           addCluster={this.props.addCluster}
           visible={this.state.addClusterModalState.isShow}
-          onHide={this.clusterModal.bind(this,"add",false)}
+          onHide={this.clusterModal.bind(this, 'add', false)}
         />
         <EditClusterModal
           info={this.state.editClusterModalState.info}
           getCluster={this.getClusterList}
           addCluster={this.props.addCluster}
           visible={this.state.editClusterModalState.isShow}
-          onHide={this.clusterModal.bind(this,"edit",false)}
+          onHide={this.clusterModal.bind(this, 'edit', false)}
         />
         <UpdateSafeTokenModal
           getCluster={this.getClusterList}
           info={this.state.updateSafeTokenModalState.info}
           visible={this.state.updateSafeTokenModalState.isShow}
-          onHide={this.clusterModal.bind(this,"updateToken",false)}
+          onHide={this.clusterModal.bind(this, 'updateToken', false)}
         />
       </div>
-    )
+    );
   }
 }
-
 
 let mapStateToProps = (store) => {
   let clusterMeta = store.cluster;
   return {
-    clusterMeta
-  }
-}
+    clusterMeta,
+  };
+};
 
-let actions = require("../../actions");
+let actions = require('../../actions');
 
-module.exports = connect(mapStateToProps,{
-  deleteCluster:actions.cluster.deleteCluster,
-  getCluster:actions.cluster.getCluster,
-  addCluster:actions.cluster.addCluster,
-  getAppsConfig:actions.appsConfig.getAppsConfig,
-  setAppConfig:actions.appsConfig.setAppConfig,
-  getStatus:actions.app.getStatus
+module.exports = connect(mapStateToProps, {
+  deleteCluster: actions.cluster.deleteCluster,
+  getCluster: actions.cluster.getCluster,
+  addCluster: actions.cluster.addCluster,
+  getAppsConfig: actions.appsConfig.getAppsConfig,
+  setAppConfig: actions.appsConfig.setAppConfig,
+  getStatus: actions.app.getStatus,
 })(Cluster);
