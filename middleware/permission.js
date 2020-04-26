@@ -113,7 +113,7 @@ module.exports = function (req, res, next) {
   if (pathToRegex('/api/:entity/list').test(pathname)) {
     let clusterCode = req.query.clusterCode || req.body.clusterCode;
     let isPermitted = user.containsCluster(clusterCode);
-    log.debug('containsCluster', isPermitted, req.user);
+    // log.debug('containsCluster', isPermitted, req.user);
     isPermitted ? next() : res.status(401).json({
       code: 'Error',
       message: 'Unauthorized'

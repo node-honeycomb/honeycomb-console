@@ -1,5 +1,6 @@
 const promisify = require('util').promisify;
 const formstream = require('formstream');
+// const CronJob = require('cron').CronJob;
 const cluster = require('./model/cluster');
 const appConfig = require('./model/app_config');
 const appPackage = require('./model/app_package');
@@ -9,11 +10,13 @@ const utils = require('./common/utils');
 const log = require('./common/log');
 
 const reflushClusterConfigSync = promisify(cluster.getClusterCfg);
-const getSnapshortsSync = promisify(cluster.getSnapshorts);
+const getSnapshortSync = promisify(cluster.getSnapshort);
+const cleanSnapshortSync = promisify(cluster.cleanSnapshort);
 const fixClusterSync = promisify(cluster.fixCluster);
 const getClusterAppsSync = promisify(utils.getClusterApps);
 
 const getAppConfig = promisify(appConfig.getAppConfig);
+const cleanAppConfig = promisify(appConfig.cleanAppConfig);
 const getAppPackage = promisify(appPackage.getPackage);
 const callremote = promisify(utils.callremote);
 
@@ -36,39 +39,54 @@ const live = {
   }
 };
 
+function tick() {
+  run().then(() => {
+    log.info('run autocheck success');
+    setTimeout(tick, 60000);
+  }).catch((err) => {
+    log.error('run autocheck failed', err);
+    setTimeout(tick, 60000);
+  });
+}
+
+tick();
+
 async function run() {
   await reflushClusterConfigSync();
-  let sps = await getSnapshortsSync();
-
+  let clusters = cluster.getClusterCodes();
   // 遍历snapshort中的所有集群
-  for (let i = 0; i < sps.length; i++) {
-    let clusterSnp = sps[i];
-    let clusterCode = clusterSnp.clusterCode;
-    let appsSnapshort = clusterSnp.info;
+  for (let i = 0; i < clusters.length; i++) {
+    let clusterCode = clusters[i];
+    let clusterSnp = await getSnapshortSync(clusterCode);
     await fixClusterSync(clusterCode);
     let clusterInfo = cluster.getClusterCfgByCode(clusterCode);
+
+    if (!clusterSnp) {
+      continue;
+    }
 
     // 检查 server 配置，并更新 + reload
     let flagServerCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'server');
     let flagCommonCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'common');
     let flagReload = flagServerCfgChange || flagCommonCfgChange;
-    console.log('+++', flagReload);
+    if (flagReload) {
+      log.warn('global config(server/common) changed, cluster should reload');
+    }
     // 获取到当前集群的app信息
     let appsLiveCluster = await live.getClusterAppsSync(clusterInfo);
-    /*
+    let md5New = utils.md5(JSON.stringify(appsLiveCluster));
     if (md5New === clusterSnp.md5) {
-      log.info(`cluster "${clusterCode}" has no change, skip`);
       // 如果集群配置有变更，需要reload
-      if (!flagReload) {
+      if (flagReload) {
+        log.info('global config(server/common) changed, reload cluster');
         await reloadCluster(appsLiveCluster, clusterInfo).catch((e) => {
           log.error('reload cluster error', $clusterCode, e);
         });
-        return;
       }
-      break;
+      log.info(`cluster "${clusterCode}" has no change, skip`);
+      continue;
     }
-    */
-    console.log(JSON.stringify(appsLiveCluster, null, 2));
+    log.info('live app info', JSON.stringify(appsLiveCluster, null, 2));
     // 建立集群现场的appId map
     let appsLiveClusterMap = {};
     appsLiveCluster.forEach((app) => {
@@ -76,6 +94,7 @@ async function run() {
         appsLiveClusterMap[v.appId] = v;
       });
     });
+    let appsSnapshort = clusterSnp.info;
     // 遍历snapshort中的app, 将配置和app发布到新机器
     for (let n = 0; n < appsSnapshort.length ; n++) {
       let app = appsSnapshort[n];
@@ -84,30 +103,29 @@ async function run() {
       for (let m = 0; m < versions.length; m++) {
         let v = versions[m];
         let vNow = appsLiveClusterMap[v.appId];
-        let flagStartInSnapshort = false;
+        let flagRunInSnapshort = false;
         for (let k = 0; k < v.cluster.length; k++) {
           if (v.cluster[k].status === 'online') {
-            flagStartInSnapshort = true;
+            flagRunInSnapshort = true;
           }
         }
-        let flagNoneInLive = false;
-        if (vNow) {
-          for (let k = 0; k < vNow.cluster.length; k++) {
-            if (vNow.cluster[k].status === 'none') {
-              flagNoneInLive = true;
-            }
-          }
-        }
-        if (!vNow || flagNoneInLive) {
-          console.log('> recover app', v.appId);
+
+        if (!vNow) { 
+          // 线上并无snapshort中的app版本，则新增app版本上去
+          log.info(`app: ${v.appId}  missing in whole cluster: ${clusterCode}, recover app`);
           // app版本缺失，两种情况：1. 完全没有，2.单边机器有
           await recoverApp(clusterCode, clusterInfo, appName, v);
         } else {
-          // 对比版本间cluster里的差异
-          if (flagStartInSnapshort) {
-            console.log('> restart app', v.appId);
-            startApp(clusterInfo, v.appId);
+          // 线上有snapshort中的app版本
+          // 则判断集群中该版本的app是否都有
+          let flagInLive = true;
+          for (let k = 0; k < vNow.cluster.length; k++) {
+            if (vNow.cluster[k].status === 'none') {
+              flagInLive = false;
+              log.info(`app ${v.appId} missing in worker: ${vNow.cluster[k].ip} cluster: ${clusterCode}`);
+            }
           }
+          recoverApp(clusterCode, clusterInfo, appName, v, flagInLive, !flagRunInSnapshort);
         }
 
         if (flagReload) {
@@ -118,28 +136,36 @@ async function run() {
   }
 }
 
-run().then(() => {
-  console.log('>>> done');
-}).catch((err) => {
-  console.log('>> error', err);
-});
-
-async function recoverApp(clusterCode, clusterInfo, appName, v) {
+async function recoverApp(clusterCode, clusterInfo, appName, v, appExist, appStoped) {
   let appConfig = await getAppConfig(clusterCode, 'app', appName);
   let appPkg = await getAppPackage(clusterCode, v.appId);
   if (appConfig) {
-    await recoverAppConfig(clusterCode, clusterInfo, type, appName, appConfig.config);
+    await recoverAppConfig(clusterCode, clusterInfo, 'app', appName, appConfig.config);
   }
-  if (appPkg) {
-    await recoverAppPackage(clusterCode, clusterInfo, appPkg);
+  if (!appPkg) {
+    log.error(`app ${v.appId} package not stored, skip package recover`);
+  } else {
+    if (!appExist) {
+      log.info(`app ${v.appId} recover package`);
+      await recoverAppPackage(clusterCode, clusterInfo, appPkg);
+    } else {
+      log.info(`app ${v.appId} package is well`);
+    }
   }
-  await reloadApp(clusterInfo, v.appId);
+
+  if (appStoped) {
+    await stopApp(clusterInfo, v.appId);
+  } else {
+    await startApp(clusterInfo, v.appId);
+    await reloadApp(clusterInfo, v.appId);
+  }
 };
 
 async function recoverServerConfig(clusterCode, clusterInfo, type, name) {
   let clusterServerCfg = await live.getCluserConfig(clusterInfo, type, name);
-  let clusterSnapShortCfg = await getAppConfig(clusterCode, type, type);
+  let clusterSnapShortCfg = await getAppConfig(clusterCode, type, name);
   if (!clusterSnapShortCfg) {
+    log.warn(`cluster config, ${type}/${name} not found, skip`);
     return;
   }
   let presistCfg = JSON.stringify(clusterSnapShortCfg.config);
@@ -174,7 +200,7 @@ async function recoverAppConfig(clusterCode, clusterInfo,  type, appName, config
  * 发布app包
  */
 async function recoverAppPackage(clusterCode, clusterInfo, file) {
-  console.log('>> recover app package', file);
+  log.info('>> recover app package', file);
   let form = formstream();
   form.file('pkg', file.package, file.appId + '.tgz');
   let opt = _.cloneDeep(clusterInfo);
@@ -186,7 +212,7 @@ async function recoverAppPackage(clusterCode, clusterInfo, file) {
   let res = await callremote(path, opt).catch((err) => {
     log.error('recover app package failed', err.message);
   });
-  console.log('>> recover app package success', res);
+  log.info('>> recover app package success', res);
 }
 
 /**
@@ -227,3 +253,14 @@ async function startApp(clusterInfo, appId) {
     log.error('reload app failed', err.message);
   });
 }
+
+async function stopApp(clusterInfo, appId) {
+  let path = `/api/stop/${appId}`;
+  let opt = _.cloneDeep(clusterInfo);
+  opt.method = 'POST';
+  opt.timeout = 30000;
+  await callremote(path, opt).catch((err) => {
+    log.error('stop app failed', err.message);
+  });
+}
+

@@ -168,7 +168,7 @@ exports.sign = function (queryPath, options, token) {
   }
   stringToSign = `${options.method}\n${accept}\n${contentMd5}\n${contentType}\n${date}\n${queryPath}`;
   options.headers['Content-Type'] = contentType;
-  log.debug('String to be signed: ', stringToSign,queryPath);
+  // log.debug('String to be signed: ', stringToSign,queryPath);
   let signature = exports.sha1(stringToSign, token);
   options.headers.Authorization = `system admin:${signature}`;
   options.headers.Date = date;

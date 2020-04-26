@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` varchar(128),
   `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
   `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
   `status` tinyint(4) NOT NULL DEFAULT '1', -- COMMENT '0： 无效， 1：有效',
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_worker_tmp` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
   `cluster_code` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker 所属集群',
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间',
@@ -32,7 +32,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_worker_tmp` (
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` varchar(50), -- COMMENT '用户名',
   `password` varchar(64), -- COMMENT 'password',
   `status` INTEGER NOT NULL DEFAULT '1', -- COMMENT '0： 无效， 1：有效',
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user` (
 );
 
 CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
-  `id` INTEGER PRIMARY KEY,
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `name` varchar(50) DEFAULT NULL, --COMMENT '用户名',
   `cluster_id` INTEGER NOT NULL,
   `cluster_code` varchar(50) NOT NULL,
@@ -57,6 +57,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
 
 -- 储存集群的app的配置
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_apps_config` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `cluster_code` varchar(50) NOT NULL,
   `type` varchar(16) DEFAULT '', 
   `app` varchar(50) DEFAULT '', -- COMMENT '应用名: server, common, apps/xxx',
@@ -68,6 +69,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_apps_config` (
 
 -- 储存集群app包
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_app_pkgs` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `cluster_code` varchar(50) NOT NULL,
   `app_id` varchar(50), -- COMMENT '应用id',
   `app_name` varchar(50),
@@ -80,6 +82,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_app_pkgs` (
 
 -- 储存集群的快照，所有在线app及版本
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `cluster_code` varchar(50) NOT NULL,
   `info` text, -- COMMENT '集群的app及版本信息',
   `md5` varchar(32), -- COMMENT 'status md5',

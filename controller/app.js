@@ -237,6 +237,7 @@ exports.deleteApp = function (req, callback) {
           log.error('delete apppackage failed', err.message);
         }
       });
+      saveSnapShort(clusterCode);
       return callback(null, results.data);
     }
   });

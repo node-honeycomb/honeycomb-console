@@ -17,11 +17,11 @@ AppConfig.save = (appCfg, callback) => {
     function (err) {
       if (err) {
         log.error('Insert new user failed:', err);
-        return callback(err);
       } else {
         log.info('Add user success');
-        callback();
       }
+      callback(err);
+      AppConfig.cleanAppConfig(appCfg.clusterCode, appCfg.type, appCfg.app);
     }
   );
 };
@@ -33,7 +33,9 @@ const GET_APP_CFG = `
   SELECT 
     cluster_code, app, config, version, user, gmt_create
   FROM hc_console_system_cluster_apps_config
-  WHERE cluster_code = ? and type = ? and app = ? order by version desc limit 1;
+  WHERE cluster_code = ? and type = ? and app = ? 
+  ORDER BY id desc 
+  LIMIT 1;
 `;
 AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
   let d = new Date();
@@ -97,7 +99,7 @@ const GET_CLUSTER_APP_CFGS = `
 AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   let d = new Date();
   db.query(
-    GET_APP_CFG_ALL_CLUSTER,
+    GET_CLUSTER_APP_CFGS,
     [appCfg.clusterCode],
     function (err, data) {
       if (err) {
@@ -114,5 +116,34 @@ AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   );
 };
 
+const GET_APPS = `
+  select 
+    cluster_code, type, app, max(version)
+  from 
+    hc_console_system_cluster_apps_config
+  where
+    cluster_code = ?
+  group by
+    cluster_code, type, app
+`
+const DELETE_APPS_CONFIG = `
+  delete from hc_console_system_cluster_apps_config
+  where cluster_code = ? and type = ? and app = ? and id < (
+    select min(id) as id from (
+      select id from hc_console_system_cluster_apps_config 
+      where
+        cluster_code = ? and type = ? and app = ?
+      order by id desc limit 3
+    ) topids
+  )
+`
+AppConfig.cleanAppConfig = (clusterCode, type, app, callback) => {
+  db.query(DELETE_APPS_CONFIG, [clusterCode, type, app, clusterCode, type, app], (err) => {
+    if (err) {
+      log.error('clean app config failed', err.message);
+    }
+    callback && callback(err);
+  });
+};
 
 module.exports = AppConfig;
