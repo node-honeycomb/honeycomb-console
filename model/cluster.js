@@ -171,6 +171,26 @@ exports.deleteWorker = function (ipAddress, clusterCode, callback) {
   );
 };
 
+const UPDATE_SYSTEM_WORKER_BY_CLUSTER = `
+  update hc_console_system_worker set status = ? where ip in (?) and cluster_code = ?
+`;
+
+exports.updateWorker = function (status, ipAddress, clusterCode, callback) {
+  if (!Array.isArray(ipAddress)) {
+    ipAddress = [ipAddress];
+  }
+  if (status === 'offline') {
+    status = 0;
+  } else{
+    status = 1;
+  }
+  db.query(
+    UPDATE_SYSTEM_WORKER_BY_CLUSTER,
+    [status, ipAddress, clusterCode],
+    callback || function(){}
+  );
+};
+
 const DELETE_SYSTEM_WORKER_BY_CLUSTER = `
   DELETE FROM
     hc_console_system_worker
@@ -237,12 +257,13 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.token,
     b.endpoint,
     b.id,
+    a.status,
     group_concat(a.ip) as ip
   from
     hc_console_system_cluster b
   join
-    hc_console_system_worker a on a.status = 1 and b.status = 1 and a.cluster_code = b.code
-  group by a.cluster_code`;
+    hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
+  group by b.name, b.code, b.token, b.id, a.status`;
 
 exports.getClusterCfg = function (cb) {
   db.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
@@ -254,13 +275,21 @@ exports.getClusterCfg = function (cb) {
     data = data || [];
     let clusterCfg = {};
     data.forEach(function (c) {
-      clusterCfg[c.code] = {
-        name: c.name,
-        token: c.token,
-        endpoint: c.endpoint,
-        id: c.id,
-        ips: c.ip.split(',')
-      };
+      if (!clusterCfg[c.code]) {
+        clusterCfg[c.code] = {
+          name: c.name,
+          token: c.token,
+          endpoint: c.endpoint,
+          id: c.id,
+          ips: [],
+          ipsOffline: []
+        };
+      }
+      if (c.status === 1 && c.ip) {
+        clusterCfg[c.code].ips = c.ip.split(',')
+      } else if (c.ip) {
+        clusterCfg[c.code].ipsOffline = c.ip.split(',')
+      }
     });
     exports.gClusterConfig = clusterCfg;
     cb(null, clusterCfg);
@@ -273,10 +302,11 @@ exports.getClusterCodes = () => {
   return Object.keys(exports.gClusterConfig);
 };
 
-exports.fixClusterConfigCache = (clusterCode, ips) => {
+exports.fixClusterConfigCache = (clusterCode, ips, errips) => {
   let cluster = exports.gClusterConfig[clusterCode];
   if (cluster) {
     cluster.ips = ips;
+    cluster.ipsOffline = errips;
   }
 };
 
@@ -293,6 +323,7 @@ exports.getClusterCfgByCode = function (clusterCode) {
     return {
       endpoint: opt.endpoint,
       ips: opt.ips,
+      ipsOffline: opt.ipsOffline,
       token: opt.token
     };
   }
@@ -393,11 +424,14 @@ exports.saveSnapshort = (obj, cb) => {
 
 
 exports.fixCluster = function (clusterCode, callback) {
-  let opt = exports.getClusterCfgByCode(clusterCode);
+  let clusterInfo = exports.getClusterCfgByCode(clusterCode);
+  let opt = _.cloneDeep(clusterInfo);
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
   let path = '/api/status';
+  opt.ips = opt.ips.concat(opt.ipsOffline);
+
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
       let errMsg = err && err.message || results.message;
@@ -410,21 +444,24 @@ exports.fixCluster = function (clusterCode, callback) {
     } else {
       // log.debug('get status results:', results);
       let errList = results.data.error;
-      let oklist = results.data.success;
+      let okList = results.data.success;
       let okips = [];
-      oklist.forEach((node) => {
+      okList.forEach((node) => {
         okips.push(node.ip);
       });
-      exports.fixClusterConfigCache(clusterCode, okips);
-      if (errList.length) {
-        let errips = [];
-        errList.forEach((node) => {
-          errips.push(node.ip);
-        });
-        exports.deleteWorkerByIp(errips, callback);
-      } else {
-        callback(null);
+      let errips = [];
+      errList.forEach((node) => {
+        errips.push(node.ip);
+      });
+      exports.fixClusterConfigCache(clusterCode, okips, errips);
+      if (errips.length) {
+        exports.updateWorker('offline', errips, clusterCode);
       }
+      if (okips.length) {
+        exports.updateWorker('online', okips, clusterCode);
+      }
+      log.info(`fix cluster ${clusterCode}, okip: ${okips}, errip: ${errips}`);
+      callback(null);
     }
   });
 }

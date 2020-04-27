@@ -86,7 +86,7 @@ async function run() {
       log.info(`cluster "${clusterCode}" has no change, skip`);
       continue;
     }
-    log.info('live app info', JSON.stringify(appsLiveCluster, null, 2));
+    // log.info('live app info', JSON.stringify(appsLiveCluster, null, 2));
     // 建立集群现场的appId map
     let appsLiveClusterMap = {};
     appsLiveCluster.forEach((app) => {
@@ -143,7 +143,7 @@ async function recoverApp(clusterCode, clusterInfo, appName, v, appExist, appSto
     await recoverAppConfig(clusterCode, clusterInfo, 'app', appName, appConfig.config);
   }
   if (!appPkg) {
-    log.error(`app ${v.appId} package not stored, skip package recover`);
+    log.warn(`app ${v.appId} package not stored, skip package recover`);
   } else {
     if (!appExist) {
       log.info(`app ${v.appId} recover package`);
