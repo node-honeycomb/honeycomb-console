@@ -1,6 +1,6 @@
 {
   "name": "honeycomb-console",
-  "version": "0.0.13",
+  "version": "0.1.0",
   "build": "1",
   "description": "Honeycomb admin console",
   "main": "app.js",
