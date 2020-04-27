@@ -1,7 +1,7 @@
 CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
   `name` varchar(128),
-  `code` varchar(128) NOT NULL DEFAULT '' UNIQUE,
+  `code` varchar(50) NOT NULL DEFAULT '' UNIQUE,
   `prod` varchar(128) DEFAULT '', -- COMMENT '产品线:'
   `env` varchar(128) DEFAULT '',  -- COMMENT '环境: dev, daily, pre, production'
   `region` varchar(128) DEFAULT '', -- COMMENT '多region: 生产的多套环境'
@@ -52,4 +52,40 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_user_acl` (
   `gmt_create` datetime NOT NULL COMMENT '创建时间',
   `gmt_modified` datetime NOT NULL COMMENT '修改时间',
   UNIQUE KEY `user_cluster` (`name`,`cluster_code`)
+);
+
+CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_apps_config` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `cluster_code` varchar(50) NOT NULL DEFAULT '',
+  `type` varchar(16) DEFAULT '', 
+  `app` varchar(50) COMMENT '应用名， server, common, ',
+  `config` text COMMENT '配置文件 json string',
+  `version` bigint(11) COMMENT '版本号',
+  `user` varchar(50) COMMENT '操作人',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  KEY `idx_cluster_code` (`cluster_code`)
+);
+
+-- 储存集群app包
+CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_app_pkgs` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `cluster_code` varchar(50) NOT NULL DEFAULT '',
+  `app_id` varchar(50) COMMENT '应用id',
+  `app_name` varchar(50),
+  `weight` BIGINT(20),
+  `package` longblob COMMENT '应用包',
+  `user` varchar(50) COMMENT '操作人',
+  `gmt_create` datetime NOT NULL COMMENT '创建时间',
+  UNIQUE KEY `cluster_app` (`cluster_code`,`app_id`)
+);
+
+-- 储存集群的快照，所有在线app及版本
+CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `cluster_code` varchar(50) NOT NULL,
+  `info` text, -- COMMENT '集群的app及版本信息',
+  `md5` varchar(32), -- COMMENT 'status md5',
+  `user` varchar(50) DEFAULT '', -- COMMENT '操作人',
+  `gmt_create` datetime NOT NULL, -- COMMENT '创建时间'
+  KEY `idx_cluster_code` (`cluster_code`)
 );

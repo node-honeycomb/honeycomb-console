@@ -7,6 +7,8 @@ const async = require('async');
 const config = require('../config');
 const _ = require('lodash');
 const net = require('net');
+const utils = require('../common/utils');
+const callremote = utils.callremote;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
@@ -169,6 +171,26 @@ exports.deleteWorker = function (ipAddress, clusterCode, callback) {
   );
 };
 
+const UPDATE_SYSTEM_WORKER_BY_CLUSTER = `
+  update hc_console_system_worker set status = ? where ip in (?) and cluster_code = ?
+`;
+
+exports.updateWorker = function (status, ipAddress, clusterCode, callback) {
+  if (!Array.isArray(ipAddress)) {
+    ipAddress = [ipAddress];
+  }
+  if (status === 'offline') {
+    status = 0;
+  } else{
+    status = 1;
+  }
+  db.query(
+    UPDATE_SYSTEM_WORKER_BY_CLUSTER,
+    [status, ipAddress, clusterCode],
+    callback || function(){}
+  );
+};
+
 const DELETE_SYSTEM_WORKER_BY_CLUSTER = `
   DELETE FROM
     hc_console_system_worker
@@ -235,12 +257,13 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.token,
     b.endpoint,
     b.id,
+    a.status,
     group_concat(a.ip) as ip
   from
     hc_console_system_cluster b
   join
-    hc_console_system_worker a on a.status = 1 and b.status = 1 and a.cluster_code = b.code
-  group by a.cluster_code`;
+    hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
+  group by b.name, b.code, b.token, b.id, a.status`;
 
 exports.getClusterCfg = function (cb) {
   db.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
@@ -252,21 +275,40 @@ exports.getClusterCfg = function (cb) {
     data = data || [];
     let clusterCfg = {};
     data.forEach(function (c) {
-      clusterCfg[c.code] = {
-        name: c.name,
-        token: c.token,
-        endpoint: c.endpoint,
-        id: c.id,
-        ips: c.ip.split(',')
-      };
+      if (!clusterCfg[c.code]) {
+        clusterCfg[c.code] = {
+          name: c.name,
+          token: c.token,
+          endpoint: c.endpoint,
+          id: c.id,
+          ips: [],
+          ipsOffline: []
+        };
+      }
+      if (c.status === 1 && c.ip) {
+        clusterCfg[c.code].ips = c.ip.split(',')
+      } else if (c.ip) {
+        clusterCfg[c.code].ipsOffline = c.ip.split(',')
+      }
     });
-    log.debug('clusterCfg from db: ', clusterCfg);
     exports.gClusterConfig = clusterCfg;
     cb(null, clusterCfg);
   });
 };
 
 exports.gClusterConfig = {};
+
+exports.getClusterCodes = () => {
+  return Object.keys(exports.gClusterConfig);
+};
+
+exports.fixClusterConfigCache = (clusterCode, ips, errips) => {
+  let cluster = exports.gClusterConfig[clusterCode];
+  if (cluster) {
+    cluster.ips = ips;
+    cluster.ipsOffline = errips;
+  }
+};
 
 exports.getClusterCfgByCode = function (clusterCode) {
   let opt = exports.gClusterConfig[clusterCode] || {};
@@ -281,6 +323,7 @@ exports.getClusterCfgByCode = function (clusterCode) {
     return {
       endpoint: opt.endpoint,
       ips: opt.ips,
+      ipsOffline: opt.ipsOffline,
       token: opt.token
     };
   }
@@ -304,16 +347,124 @@ const DELETE_SYSTEM_WORKER_BY_IP = `
   DELETE FROM
     hc_console_system_worker
   WHERE
-    ip = ?;
+    ip in (?);
 `;
 
 exports.deleteWorkerByIp = function (ip, callback) {
+  if (!Array.isArray(ip)) {
+    ip = [ip];
+  }
   db.query(
     DELETE_SYSTEM_WORKER_BY_IP,
     [ip],
     callback
   );
 };
+
+const SQL_QUERY_CLUSTER_SNAPSHORT = `
+  select 
+    cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
+  from 
+    hc_console_system_cluster_snapshort 
+  where 
+    cluster_code = ?
+  order by id desc
+  limit 1
+`;
+exports.getSnapshort = (clusterCode, cb) => {
+  db.query(SQL_QUERY_CLUSTER_SNAPSHORT, [clusterCode], (err, data) => {
+    if (err) {
+      return cb(err);
+    }
+    if (!data || !data.length) {
+      return cb(null);
+    }
+    data[0].info = JSON.parse(data[0].info);
+    cb(null, data[0]);
+  });
+};
+
+const SQL_CLEAN_CLUSTER_SNAPSHORTS = `
+  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id < (
+    select min(id) from (
+      select id from hc_console_system_cluster_snapshort
+      order by id desc
+      limit 3
+    ) topids
+  )
+`;
+exports.cleanSnapshort = (clusterCode, cb) => {
+  db.query(SQL_CLEAN_CLUSTER_SNAPSHORTS, [clusterCode], (err, data) => {
+    if (err) {
+      log.error('clean snapshort failed', err.message);
+    }
+    cb && cb(err);
+  });
+};
+
+const SQL_INSERT_CLUSTER_SNAPSHORT = `insert into hc_console_system_cluster_snapshort 
+(cluster_code, info, md5, user, gmt_create) 
+values 
+(?, ?, ?, ?, ?)`;
+exports.saveSnapshort = (obj, cb) => {
+  let info = JSON.stringify(obj.info);
+  let md5 = utils.md5(info);
+  let param = [
+    obj.clusterCode,
+    info,
+    md5,
+    obj.user || '',
+    new Date()
+  ];
+  db.query(SQL_INSERT_CLUSTER_SNAPSHORT, param, (err) => {
+    cb(err);
+    exports.cleanSnapshort(obj.clusterCode);
+  });
+};
+
+
+exports.fixCluster = function (clusterCode, callback) {
+  let clusterInfo = exports.getClusterCfgByCode(clusterCode);
+  let opt = _.cloneDeep(clusterInfo);
+  if (opt.code === 'ERROR') {
+    return callback(opt);
+  }
+  let path = '/api/status';
+  opt.ips = opt.ips.concat(opt.ipsOffline);
+
+  callremote(path, opt, function (err, results) {
+    if (err || results.code !== 'SUCCESS') {
+      let errMsg = err && err.message || results.message;
+      log.error('get status info failed: ', errMsg);
+      let code = err && err.code || (results && results.code) || 'ERROR';
+      return callback({
+        code: code,
+        message: errMsg
+      });
+    } else {
+      // log.debug('get status results:', results);
+      let errList = results.data.error;
+      let okList = results.data.success;
+      let okips = [];
+      okList.forEach((node) => {
+        okips.push(node.ip);
+      });
+      let errips = [];
+      errList.forEach((node) => {
+        errips.push(node.ip);
+      });
+      exports.fixClusterConfigCache(clusterCode, okips, errips);
+      if (errips.length) {
+        exports.updateWorker('offline', errips, clusterCode);
+      }
+      if (okips.length) {
+        exports.updateWorker('online', okips, clusterCode);
+      }
+      log.info(`fix cluster ${clusterCode}, okip: ${okips}, errip: ${errips}`);
+      callback(null);
+    }
+  });
+}
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
 function clusterInit (callback) {

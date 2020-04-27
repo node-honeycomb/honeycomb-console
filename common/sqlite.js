@@ -39,3 +39,5 @@ exports.query = function (sql, param, callback) {
   db.all(sql, param, callback);
 };
 
+exports.type = 'sqlite';
+

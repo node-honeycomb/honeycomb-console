@@ -66,7 +66,7 @@ exports.status = function (req, callback) {
  * @api {get} /api/user
  */
 exports.getUser = function (req, callback) {
-  let user = req.user;
+  let user = req.user || {};
   callback(null, {
     name: user.name,
     role: user.role
