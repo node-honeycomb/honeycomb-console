@@ -21,13 +21,17 @@ if (db.ready) {
   db.ready(() => {
     cluster.getClusterCfg(() => {
       app.ready(true);
-      require('./auto_check');
+      if (config.autoCheck) {
+        require('./auto_check');
+      }
     });
   });
 } else {
   cluster.getClusterCfg(() => {
     app.ready(true);
-    require('./auto_check');
+    if (config.autoCheck) {
+      require('./auto_check');
+    }
   });
 }
 

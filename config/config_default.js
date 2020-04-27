@@ -19,6 +19,10 @@ module.exports = {
     database : 'my_db'
     */
   },
+  /**
+   * 集群自动检测，默认关闭
+   */
+  autoCheck: false,
   // 初始化默认用户名和密码，都为空是才初始化，否则不初始化，密码为明文sha256加密后的字串
   defaultUser: '',
   defaultPassword: '',
