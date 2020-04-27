@@ -18,3 +18,5 @@ auto_router.js
 .package
 .*.swp
 assets/package-lock.json
+.yo-rc.json
+assets/.honeypack_cache/*
