@@ -226,7 +226,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.endpoint,
     b.id,
     a.status,
-    group_concat(a.ip) as ip
+    group_concat(a.ip) as ip,
     b.env
   from
     hc_console_system_cluster b
