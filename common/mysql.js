@@ -24,6 +24,8 @@ pool.getConnection(function (err, conn) {
       log.error(err);
       throw err;
     }
+    flagReady = true;
+    readyFn && readyFn();
   });
 });
 if (config.meta.session_variables) {
@@ -39,6 +41,15 @@ if (config.meta.session_variables) {
     });
   }
 }
+
+let readyFn;
+let flagReady = false;
+exports.ready = function (cb) {
+  if (flagReady) {
+    return cb();
+  }
+  readyFn = cb;
+};
 
 exports.query = function (sql, param, callback) {
   pool.query(sql, param, callback);
