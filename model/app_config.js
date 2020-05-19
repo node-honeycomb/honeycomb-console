@@ -7,7 +7,7 @@ let AppConfig = {};
 
 const INSERT_APP_CFG = `INSERT INTO
     hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, user, gmt_create)
-  VALUES(?, ?, ?, ?, ?, ?, ?);`;
+  VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
 AppConfig.save = (appCfg, callback) => {
   let d = new Date();
@@ -35,7 +35,7 @@ const GET_APP_CFG = `
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and type = ? and app = ? 
   ORDER BY id desc 
-  LIMIT 1;
+  LIMIT 1
 `;
 AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
   let d = new Date();
@@ -64,7 +64,7 @@ const GET_APP_CFG_HIS = `
   SELECT 
     cluster_code, app, config, version, user, gmt_create
   FROM hc_console_system_cluster_apps_config
-  WHERE cluster_code = ? and app = ? order by version desc limit 100;
+  WHERE cluster_code = ? and app = ? order by version desc limit 100
 `;
 AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
   let d = new Date();
@@ -94,7 +94,7 @@ const GET_CLUSTER_APP_CFGS = `
     cluster_code, app, config, max(version)
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? 
-  GROUP by cluster_code, app, config;
+  GROUP by cluster_code, app, config
 `;
 AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   let d = new Date();

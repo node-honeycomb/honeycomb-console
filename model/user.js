@@ -18,7 +18,7 @@ class User {
  */
 const INSERT_SYSTEM_USER = `INSERT INTO
     hc_console_system_user (name, password, status, role, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?, ?, ?);`;
+  VALUES(?, ?, ?, ?, ?, ?)`;
 User.addUser = function (name, pwd, status, role, callback) {
   let d = new Date();
   db.query(
@@ -40,7 +40,7 @@ const UPDATE_SYSTEM_USER = `
   UPDATE
     hc_console_system_user
   SET status = ?, password = ?, role = ?, gmt_modified = ?
-  WHERE name = ?;
+  WHERE name = ?
 `;
 
 User.updateUser = function (name, pwd, status, role, callback) {
@@ -70,7 +70,7 @@ const LIST_USER = `
     hc_console_system_user
   WHERE
     status = 1
-  limit 10000;
+  limit 10000
 `;
 User.listUser = function (cb) {
   db.query(LIST_USER, cb);
@@ -97,7 +97,7 @@ const QUERY_SYSTEM_USER = `
   FROM
     hc_console_system_user
   WHERE
-    name = ?;`;
+    name = ?`;
 User.getUser = function (name, callback) {
   db.query(
     QUERY_SYSTEM_USER,
@@ -122,7 +122,7 @@ const DELETE_SYSTEM_USER = `
   UPDATE
     hc_console_system_user
   SET status = 0, gmt_modified = ?
-  WHERE name = ?;`;
+  WHERE name = ?`;
 
 User.deleteUser = function (name, callback) {
   let d = new Date();
@@ -144,7 +144,7 @@ User.deleteUser = function (name, callback) {
 const UPDATE_SYSTEM_USER_ROLE = `UPDATE
     hc_console_system_user
     SET role = ?
-    WHERE name = ? AND status = 1;`;
+    WHERE name = ? AND status = 1`;
 
 User.updateUserRole = function (name, role, callback) {
   db.query(

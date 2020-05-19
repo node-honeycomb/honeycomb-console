@@ -102,7 +102,7 @@ exports.addWorker = function (ipAddress, clusterCode, callback) {
   db.query(INSERT_SYSTEM_WORKER, [ipAddress, clusterCode, d, d], function (
     err
   ) {
-    if (err) {
+    if (err && err.code !== 'ER_DUP_ENTRY') {
       log.error('Insert new worker failed:', err);
       return callback(err);
     } else {
@@ -212,7 +212,7 @@ const QUERY_SYSTEM_WORKER = `
   SELECT ip
   FROM hc_console_system_worker
   WHERE
-    cluster_code = ? AND status = 1;`;
+    cluster_code = ? AND status = 1`;
 
 exports.queryWorker = function (clusterCode, callback) {
   db.query(QUERY_SYSTEM_WORKER, [clusterCode], callback);
@@ -313,7 +313,7 @@ const QUERY_ALL_SYSTEM_WORKER = `
   SELECT *
   FROM hc_console_system_worker
   WHERE
-    status = 1;`;
+    status = 1`;
 
 exports.queryAllWorker = function (callback) {
   db.query(QUERY_ALL_SYSTEM_WORKER, [], callback);
@@ -323,7 +323,7 @@ const DELETE_SYSTEM_WORKER_BY_IP = `
   DELETE FROM
     hc_console_system_worker
   WHERE
-    ip in (?);
+    ip in (?)
 `;
 
 exports.deleteWorkerByIp = function (ip, callback) {

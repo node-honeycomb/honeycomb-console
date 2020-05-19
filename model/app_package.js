@@ -10,7 +10,7 @@ const os = require('os');
  */
 const INSERT_APP_PKG = `INSERT INTO
     hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, user, gmt_create)
-  VALUES(?, ?, ?, ?, ?, ?, ?);`;
+  VALUES(?, ?, ?, ?, ?, ?, ?)`;
 exports.savePackage = (data, callback) => {
   let d = new Date();
   if (db.type === 'sqlite' && !config.debug) {
@@ -50,7 +50,7 @@ const GET_APP_PKG = `
     weight, 
     package
   FROM hc_console_system_cluster_app_pkgs
-  WHERE cluster_code = ? and app_id = ?;
+  WHERE cluster_code = ? and app_id = ?
 `;
 exports.getPackage = (clusterCode, appId, callback) => {
   let d = new Date();
