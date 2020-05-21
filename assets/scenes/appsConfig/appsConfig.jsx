@@ -13,6 +13,16 @@ let CodeMirror = require('react-codemirror');
 let User = require("../../services/user");
 require('codemirror/lib/codemirror.css');
 require('codemirror/mode/javascript/javascript');
+require('codemirror/addon/dialog/dialog.css');
+require('codemirror/addon/search/matchesonscrollbar.css');
+require('codemirror/addon/dialog/dialog.js');
+require('codemirror/addon/search/searchcursor.js');
+require('codemirror/addon/search/search.js');
+require('codemirror/addon/scroll/annotatescrollbar.js');
+require('codemirror/addon/search/matchesonscrollbar.js');
+require('codemirror/addon/search/jump-to-line.js');
+
+
 const URL = require("url");
 import ConfigDiff from './config-diff';
 
@@ -162,7 +172,14 @@ class AppsConfig extends React.Component {
               this.state.isEdit ?
               <div className="appsconfig-text">
                 <Spin tip="Loading..." spinning={this.state.loading}>
-                  <CodeMirror value={this.state.newAppConfig} onChange={this.changeAppsConfig} options={{lineNumbers:true,mode:'javascript'}} />
+                  <CodeMirror
+                    value={this.state.newAppConfig}
+                    onChange={this.changeAppsConfig}
+                    options={{
+                      mode:'javascript',
+                      lineNumbers:true,
+                      extraKeys: {'Alt-F': 'findPersistent'}
+                    }} />
                 </Spin>
                 <div>
                   <Button onClick={this.handleAppsConfig.bind(this,"set", this.state.configName)} type="primary">提交</Button>
