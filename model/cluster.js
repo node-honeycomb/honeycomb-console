@@ -410,7 +410,7 @@ exports.fixCluster = function (clusterCode, callback) {
     return callback(opt);
   }
   let path = '/api/status';
-  opt.ips = opt.ips.concat(opt.ipsOffline);
+  opt.ips = opt.ips.concat(opt.ipsOffline || []);
 
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
