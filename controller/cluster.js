@@ -260,7 +260,7 @@ exports.downloadClusterPatch = async function (req, res, next) {
     fs.sync().save(path.join(tmpDir, 'conf/custom/common.json'), JSON.stringify(commonCfg.config, null, 2));
   }
 
-  fs.sync().mkdir(path.join(tmpDir, 'run/appsRoots/'));
+  fs.sync().mkdir(path.join(tmpDir, 'run/appsRoot/'));
   /*
   { 
     name: 'socket-app',
@@ -294,12 +294,11 @@ exports.downloadClusterPatch = async function (req, res, next) {
         await mv(pkg.package, path.join(tmpDir, `run/appsRoots/${v.appId}.tgz`));
       }
       apps[v.appId] = {
-        dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`,
-        order: 1000
+        dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
       };
     }
   }
-  fs.sync().save(path.join(tmpDir, 'run/app.app.mount.info.yaml'), yaml.stringify(apps));
+  fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
   
   res.writeHead(200, {
     'Content-Type': 'application/force-download',
