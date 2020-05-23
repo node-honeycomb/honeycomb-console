@@ -291,7 +291,7 @@ exports.downloadClusterPatch = async function (req, res, next) {
       }
       let pkg = await getAppPackage(clusterCode, v.appId);
       if (pkg) {
-        await mv(pkg.package, path.join(tmpDir, `run/appsRoots/${v.appId}.tgz`));
+        await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
       }
       apps[v.appId] = {
         dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
