@@ -57,10 +57,20 @@ async function run() {
   // 遍历snapshort中的所有集群
   for (let i = 0; i < clusters.length; i++) {
     let clusterCode = clusters[i];
-    let clusterSnp = await getSnapshortSync(clusterCode);
+    await fixClusterSync(clusterCode);
+  }
+} 
+
+async function run2() {
+  await reflushClusterConfigSync();
+  let clusters = cluster.getClusterCodes();
+  // 遍历snapshort中的所有集群
+  for (let i = 0; i < clusters.length; i++) {
+    let clusterCode = clusters[i];
     await fixClusterSync(clusterCode);
     let clusterInfo = cluster.getClusterCfgByCode(clusterCode);
 
+    let clusterSnp = await getSnapshortSync(clusterCode);
     if (!clusterSnp) {
       continue;
     }

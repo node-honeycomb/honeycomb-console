@@ -34,7 +34,8 @@ module.exports = function (req, res, next) {
     [
       '/api/worker/register',
       '/api/worker/deleteByIp',
-      '/api/worker/listAll'
+      '/api/worker/listAll',
+      '/api/cluster/patch'
     ].some(i => pathToRegex(i).test(pathname))
   ) {
     const secret = req.headers.authorization;

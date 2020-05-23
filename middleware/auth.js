@@ -76,6 +76,7 @@ module.exports = function(app, options) {
       case '/api/worker/unregister':
       case '/api/worker/listAll':
       case '/api/worker/deleteByIp':
+      case '/api/cluster/patch':
         next();
         break;
       default:

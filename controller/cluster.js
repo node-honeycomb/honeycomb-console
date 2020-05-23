@@ -220,3 +220,96 @@ exports.fixCluster = function (req, callback) {
   cluster.fixCluster(clusterCode, callback);
 };
 
+
+const fs = require('xfs');
+const os = require('os');
+const path = require('path');
+const uuid = require('uuid').v4;
+const tar = require('tar');
+const appConfig = require('../model/app_config');
+const appPackage = require('../model/app_package');
+const promisify = require('util').promisify;
+const getSnapshortSync = promisify(cluster.getSnapshort);
+const getAppConfig = promisify(appConfig.getAppConfig);
+const getAppPackage = promisify(appPackage.getPackage);
+const mv = promisify(fs.mv);
+const yaml = require('yaml');
+/**
+ * 下载集群的patch包
+ * @api {GET} /api/cluster/patch
+ * @nowrap
+ */
+exports.downloadClusterPatch = async function (req, res, next) {
+  let clusterCode = req.query.clusterCode;
+  let clusterSnp = await getSnapshortSync(clusterCode);
+
+  let tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
+
+  if (!clusterSnp) {
+    let e = new Error('empty');
+    e.statusCode = 404;
+    return res.json({code: 'ERROR', data: 'empty'});
+  }
+  let serverCfg = await getAppConfig(clusterCode, 'server', 'server');
+
+  if (serverCfg) {
+    fs.sync().save(path.join(tmpDir, 'conf/custom/server.json'), JSON.stringify(serverCfg.config, null, 2));
+  }
+  let commonCfg = await getAppConfig(clusterCode, 'server', 'common');
+  if (commonCfg) {
+    fs.sync().save(path.join(tmpDir, 'conf/custom/common.json'), JSON.stringify(commonCfg.config, null, 2));
+  }
+
+  fs.sync().mkdir(path.join(tmpDir, 'run/appsRoots/'));
+  /*
+  { 
+    name: 'socket-app',
+    versions:[ 
+      { 
+        version: '1.0.0',
+        buildNum: '2',
+        publishAt: '5/22/2020, 2:34:00 PM',
+        appId: 'socket-app_1.0.0_2',
+        weight: 1000000.002,
+        cluster: [Array],
+        isCurrWorking: true 
+      }
+    ]
+  }
+  */
+  let apps = {};
+  for (let i = 0; i < clusterSnp.info.length; i++) {
+    let app = clusterSnp.info[i];
+    for (let n = 0; n < app.versions.length; n++) {
+      let v = app.versions[n];
+      if (!v.isCurrWorking) {
+        continue;
+      }
+      let appCfg = await getAppConfig(clusterCode, 'app', app.name);
+      if (appCfg) {
+        fs.sync().save(path.join(tmpDir, `conf/custom/apps/${app.name}.json`), JSON.stringify(appCfg.config, null, 2));
+      }
+      let pkg = await getAppPackage(clusterCode, v.appId);
+      if (pkg) {
+        await mv(pkg.package, path.join(tmpDir, `run/appsRoots/${v.appId}.tgz`));
+      }
+      apps[v.appId] = {
+        dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`,
+        order: 1000
+      };
+    }
+  }
+  fs.sync().save(path.join(tmpDir, 'run/app.app.mount.info.yaml'), yaml.stringify(apps));
+  
+  res.writeHead(200, {
+    'Content-Type': 'application/force-download',
+    'Content-Disposition': 'attachment; filename=cluster_patch.tgz'
+  });
+
+  tar.c({
+      gzip: true,
+      cwd: path.dirname(tmpDir),
+    },
+    ['cluster_patch']
+  ).pipe(res);
+};

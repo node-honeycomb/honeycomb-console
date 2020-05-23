@@ -281,7 +281,9 @@ exports.gClusterConfig = {};
 exports.getClusterCodes = () => {
   return Object.keys(exports.gClusterConfig);
 };
-
+/**
+ * 更新集群配置在内存中的缓存
+ */
 exports.fixClusterConfigCache = (clusterCode, ips, errips) => {
   let cluster = exports.gClusterConfig[clusterCode];
   if (cluster) {
@@ -398,7 +400,9 @@ exports.saveSnapshort = (obj, cb) => {
   });
 };
 
-
+/**
+ * 修复集群错误信息
+ */
 exports.fixCluster = function (clusterCode, callback) {
   let clusterInfo = exports.getClusterCfgByCode(clusterCode);
   let opt = _.cloneDeep(clusterInfo);

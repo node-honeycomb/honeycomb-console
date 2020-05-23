@@ -15,16 +15,19 @@
     "editor-json-parser": "1.1.1",
     "formidable": "1.1.1",
     "formstream": "1.1.0",
-    "hc-bee": "0.1.10",
+    "hc-bee": "1.0.3",
     "hc-signature-auth": "1.0.7",
     "honeypack": "1.0.15",
     "ip": "1.1.4",
-    "lodash": "4.17.13",
+    "lodash": "4.17.15",
     "moment": "2.19.3",
     "mysql": "2.18.1",
     "sql.js": "^1.1.0",
+    "tar": "^6.0.2",
     "urllib": "2.20.0",
-    "xfs": "^0.2.4"
+    "uuid": "^8.1.0",
+    "xfs": "^0.2.4",
+    "yaml": "^1.10.0"
   },
   "devDependencies": {
     "babel-eslint": "^8.2.3",
