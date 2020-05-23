@@ -103,7 +103,7 @@ exports.addCluster = function (req, callback) {
       clusterEnv,
       function (err) {
         if (err) {
-          log.error(err);
+          log.error(err.message);
           return callback(err);
         }
         cluster.deleteWorkers(clusterCode, (err) => {
@@ -136,7 +136,7 @@ exports.addCluster = function (req, callback) {
       clusterEnv,
       function (err) {
         if (err) {
-          log.error(err);
+          log.error(err.message);
           return callback(err);
         }
         async.eachSeries(
@@ -292,14 +292,15 @@ exports.downloadClusterPatch = async function (req, res, next) {
       let pkg = await getAppPackage(clusterCode, v.appId);
       if (pkg) {
         await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
+        apps[v.appId] = {
+          dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
+        };
       }
-      apps[v.appId] = {
-        dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
-      };
     }
   }
-  fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
-  
+  if (Object.keys(apps).length) {
+    fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
+  }
   res.writeHead(200, {
     'Content-Type': 'application/force-download',
     'Content-Disposition': 'attachment; filename=cluster_patch.tgz'

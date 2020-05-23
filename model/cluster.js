@@ -23,10 +23,10 @@ exports.addCluster = function (name, code, token, endpoint, env, callback) {
     [name, code, token, endpoint, env, d, d],
     function (err) {
       if (err) {
-        log.error('Insert new cluster failed:', err);
+        // log.error('Insert new cluster failed:', err);
         return callback(err);
       } else {
-        log.info('Add cluster success');
+        // log.info('Add cluster success');
         callback();
       }
     }
