@@ -1,7 +1,8 @@
 'use strict';
 const user = require('../model/user');
 const utils = require('../common/utils');
-const log = require('../common/log');
+
+
 /**
  * @api {post} /api/user/create
  * @body
@@ -12,6 +13,7 @@ exports.createUser = function (req, callback) {
   var curUser = req.user;
   var name = req.body.name;
   var pwd = req.body.password;
+
   pwd = utils.sha256(pwd);
 
   if (!name || !pwd) {
@@ -40,6 +42,7 @@ exports.listUser = function (req, callback) {
 exports.deleteUser = function (req, callback) {
   var uname = req.params.name;
   var curUser = req.user;
+
   if (curUser.role !== user.RoleType.RoleAdmin) {
     return callback(new Error('no permission'));
   }

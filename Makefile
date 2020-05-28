@@ -1,16 +1,14 @@
 BIN_MOCHA = ./node_modules/.bin/_mocha
 BIN_ISTANBUL = ./node_modules/.bin/istanbul
 
-REGISTRY = https://registry.npm.taobao.org
-
 VERSION = $(shell cat package.json | awk -F '"' '/version" *: *"/{print $$4}')
 BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 
 TESTS_ENV = test/env.js
 
 install:
-	@npm install --registry=${REGISTRY}
-	@cd assets && npm install --registry=${REGISTRY}
+	@cnpm install
+	@cd assets && cnpm install
 
 test:
 	NODE_ENV=test $(BIN_MOCHA) \
@@ -23,8 +21,8 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release/assets && NODE_ENV=production npm install --registry=${REGISTRY}
-	@cd out/release && NODE_ENV=production npm install --registry=${REGISTRY}
+	@cd out/release/assets && NODE_ENV=production cnpm install
+	@cd out/release && NODE_ENV=production cnpm install
 	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
@@ -54,6 +52,7 @@ clean:
 
 tag:
 	@cat package.json | awk -F '"' '/version" *: *"/{print "v"$$4}' | xargs -I {} git tag {}
+
 release-linux:
 	docker run -it --rm -v $(shell pwd):/workspace centos/nodejs-8-centos7 /bin/bash -c \
 	"cd /workspace  && registry=https://registry.npm.taobao.org make package"

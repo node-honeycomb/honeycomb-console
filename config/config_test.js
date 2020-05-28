@@ -16,9 +16,6 @@ module.exports = {
         secret: 'xxxx'
       }
     },
-    bucAuth: {
-      enable: false
-    },
     csrf: {
       enable: false
     },

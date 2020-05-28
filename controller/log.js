@@ -13,6 +13,7 @@ const cluster = require('../model/cluster');
 const callremote = utils.callremote;
 
 const appUsageCachePath = PATH.join(config.serverRoot, './logs/_app_usage_cache_');
+
 if (!fs.existsSync(appUsageCachePath)) {
   fs.sync().mkdir(appUsageCachePath);
 }
@@ -25,9 +26,10 @@ if (!fs.existsSync(appUsageCachePath)) {
  * @param res
  */
 exports.queryLog = function (req, res) {
-  let clusterCode = req.query.clusterCode;
+  const clusterCode = req.query.clusterCode;
 
-  let logFileName = processFileName(req.query);
+  const logFileName = processFileName(req.query);
+
   if (!logFileName) {
     return res.send({
       code: 'ERROR',
@@ -35,18 +37,22 @@ exports.queryLog = function (req, res) {
     });
   }
 
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     res.statusCode = 500;
+
     return res.json(opt);
   }
-  let path = '/api/log';
+  const path = '/api/log';
 
   function processFileName(data) {
-    let tmp = data.fileName || '';
-    let m = moment(data.logDate);
+    const tmp = data.fileName || '';
+    const m = moment(data.logDate);
+
     return tmp.replace(/\{(\w+)\}/g, function (m0, m1) {
       let v;
+
       switch (m1) {
         case 'year':
           v = m.format('YYYY');
@@ -60,6 +66,7 @@ exports.queryLog = function (req, res) {
         default:
           v = m0;
       }
+
       return v;
     });
   }
@@ -85,9 +92,10 @@ exports.queryLog = function (req, res) {
  * @param res
  */
 exports.listLogs = function (req, res) {
-  let clusterCode = req.query.clusterCode;
+  const clusterCode = req.query.clusterCode;
 
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
@@ -95,17 +103,20 @@ exports.listLogs = function (req, res) {
   opt.ips = [opt.ips[0]];
   if (opt.code === 'ERROR') {
     res.statusCode = 500;
+
     return res.json(opt);
   }
-  let path = '/api/logs';
+  const path = '/api/logs';
 
   callremote(path, opt, function (err, results) {
     if (err) {
       log.error(err);
+
       return res.json({code: err.code || 'ERROR', message: err.message});
     }
-    let data = results.data.success[0] && results.data.success[0].data || [];
-    let tmp = [];
+    const data = results.data.success[0] && results.data.success[0].data || [];
+    const tmp = [];
+
     data.forEach(function (v) {
       for (let i = 0; i < config.ignoreLogFiles.length; i++) {
         if (config.ignoreLogFiles[i].test(v)) {
@@ -121,12 +132,15 @@ exports.listLogs = function (req, res) {
           return true;
         }
 
-        let logAppFile = logFileName.match(/^([^/.]+).+/);
+        const logAppFile = logFileName.match(/^([^/.]+).+/);
+
         if (!logAppFile) return false;
-        let appName = logAppFile[1];
+        const appName = logAppFile[1];
+
         if (req.user.containsApp(clusterCode, appName)) {
           return true;
         }
+
         return false;
       });
     } else {
@@ -143,25 +157,31 @@ exports.listLogs = function (req, res) {
  * @param callback
  */
 exports.queryAppUsages = function (req, callback) {
-  let from = req.query.from;
-  let to = req.query.to;
+  const from = req.query.from;
+  const to = req.query.to;
   let ips = req.query.ips || '';
-  let clusterCode = req.query.clusterCode;
+  const clusterCode = req.query.clusterCode;
+
   if (!from || !to || !clusterCode) {
     log.error('params: ', 'from:', from, 'to:', to, 'clusterCode:', clusterCode);
+
     return callback(new Error('Missing params.'));
   }
   if (ips) {
     ips = ips.split(',');
   }
 
-  let start = from.split('-'); // [2016, 12, 12, 20]
-  let end = to.split('-'); // [2016, 12, 12, 21]
-  let ms = moment([end[0], end[1] - 1, end[2], end[3]]) - moment([start[0], start[1] - 1, start[2], start[3]]);
-  let hours = ms / 3600000; // 1000 * 60 * 60;
-  let fileNames = [`app-usage.${start[0]}-${start[1]}-${start[2]}-${start[3]}.log`];
+  const start = from.split('-'); // [2016, 12, 12, 20]
+  const end = to.split('-'); // [2016, 12, 12, 21]
+  // eslint-disable-next-line
+  const ms = moment([end[0], end[1] - 1, end[2], end[3]]) - moment([start[0], start[1] - 1, start[2], start[3]]);
+  const hours = ms / 3600000; // 1000 * 60 * 60;
+  const fileNames = [`app-usage.${start[0]}-${start[1]}-${start[2]}-${start[3]}.log`];
+
   for (let i = 1; i < hours; i++) {
-    let file = moment([start[0], start[1] - 1, start[2], start[3]]).add(i, 'hour').format('YYYY-MM-DD-HH');
+    // eslint-disable-next-line
+    const file = moment([start[0], start[1] - 1, start[2], start[3]]).add(i, 'hour').format('YYYY-MM-DD-HH');
+
     fileNames.push(`app-usage.${file}.log`);
   }
   log.debug('fileNames: ', fileNames);
@@ -177,13 +197,17 @@ exports.queryAppUsages = function (req, callback) {
   });
 
   function mergeResult(r1, r2) {
-    let ips = Object.keys(r2);
+    const ips = Object.keys(r2);
+
+    // eslint-disable-next-line
     ips.some(function (ip) {
       if (!r1[ip]) {
         r1[ip] = _.cloneDeep(r2[ip]);
       } else {
-        let appUsages = r2[ip];
-        let apps = Object.keys(appUsages);
+        const appUsages = r2[ip];
+        const apps = Object.keys(appUsages);
+
+        // eslint-disable-next-line
         apps.some(function (app) {
           if (!r1[ip][app]) {
             r1[ip][app] = _.cloneDeep(appUsages[app]);
@@ -194,11 +218,13 @@ exports.queryAppUsages = function (req, callback) {
         });
       }
     });
+
     return r1;
   }
 
   function getUsageFromServer(fileName, cb) {
-    let opt = cluster.getClusterCfgByCode(clusterCode);
+    const opt = cluster.getClusterCfgByCode(clusterCode);
+
     if (opt.code === 'ERROR') {
       return cb(opt);
     }
@@ -208,7 +234,8 @@ exports.queryAppUsages = function (req, callback) {
     opt.data = {
       fileName: fileName
     };
-    let path = '/api/appUsages';
+    const path = '/api/appUsages';
+
     callremote(path, opt, function (err, usages) {
       if (err) {
         return cb(err);
@@ -216,25 +243,31 @@ exports.queryAppUsages = function (req, callback) {
       if (usages.code !== 'SUCCESS') {
         return cb(usages);
       }
-      let data = usages.data.success;
-      let result = {};
+      const data = usages.data.success;
+      const result = {};
+
       data.forEach(function (item) {
-        let ip = item.ip;
-        let lines = item.usage.split('\n');
-        let tmp = {};
+        const ip = item.ip;
+        const lines = item.usage.split('\n');
+        const tmp = {};
+
         lines.forEach(function (line) {
           // 20171227-03:59:28
-          let t = line.substr(9, 8);
+          const t = line.substr(9, 8);
+
           line = line.substr(18);
           line = line.replace(/\s/g, '');
-          let appUsage = qs.parse(line, ';', ':');
-          let appIds = Object.keys(appUsage);
+          const appUsage = qs.parse(line, ';', ':');
+          const appIds = Object.keys(appUsage);
+
           appIds.forEach(function (appId) {
-            let appUsages = appUsage[appId].split('^');
+            const appUsages = appUsage[appId].split('^');
             let cpu = 0;
             let mem = 0;
+
             appUsages.forEach(function (usage) {
-              let usages = usage.split(',');
+              const usages = usage.split(',');
+
               cpu += Number(usages[1]);
               mem += Number(usages[2]);
             });

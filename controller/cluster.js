@@ -1,14 +1,10 @@
-'use strict';
 const async = require('async');
-const log = require('../common/log');
-const cluster = require('../model/cluster');
-const userAcl = require('../model/user_acl');
 const lodash = require('lodash');
-const utils = require('../common/utils');
-const callremote = utils.callremote;
+
 
 function getFilterCluster(gClusterConfig, req) {
-  let clusterConfig = {};
+  const clusterConfig = {};
+
   Object.keys(gClusterConfig).forEach((clusterCode) => {
     if (req.user.containsCluster(clusterCode)) {
       clusterConfig[clusterCode] = lodash.cloneDeep(
@@ -23,6 +19,7 @@ function getFilterCluster(gClusterConfig, req) {
       clusterConfig[clusterCode].token = 'Unauthorized';
     }
   });
+
   return clusterConfig;
 }
 
@@ -30,11 +27,13 @@ function getFilterCluster(gClusterConfig, req) {
  * @api {GET} /service/cluster/:code
  */
 exports.getClusterConfig = function (req, callback) {
-  let clusterCode = req.params.code;
+  const clusterCode = req.params.code;
+
   cluster.getClusterCfg(function (err) {
     if (err) {
       log.error('Get cluster config from db failed.', err);
-      let e = new Error('Get cluster config from db failed.' + err.message);
+      const e = new Error('Get cluster config from db failed.' + err.message);
+
       return callback(e);
     }
     callback(null, cluster.gClusterConfig[clusterCode]);
@@ -48,7 +47,8 @@ exports.listCluster = function (req, callback) {
   cluster.getClusterCfg(function (err) {
     if (err) {
       log.error('Get cluster config from db failed.', err);
-      let e = new Error('Get cluster config from db failed.' + err.message);
+      const e = new Error('Get cluster config from db failed.' + err.message);
+
       return callback(e);
     }
     callback(null, getFilterCluster(cluster.gClusterConfig, req));
@@ -59,8 +59,9 @@ exports.listCluster = function (req, callback) {
  * @api {post} /api/cluster/create
  */
 exports.addCluster = function (req, callback) {
-  let clusterCode = req.body.code;
-  let isUpdate = req.body.isUpdate;
+  const clusterCode = req.body.code;
+  const isUpdate = req.body.isUpdate;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: isUpdate ? 'UPDATE_CLUSTER' : 'ADD_CLUSTER',
@@ -70,18 +71,21 @@ exports.addCluster = function (req, callback) {
     opItemId: clusterCode,
     opEnv: req.body.env,
   });
-  let clusterName = req.body.name;
-  let clusterEnv = req.body.env;
+  const clusterName = req.body.name;
+  const clusterEnv = req.body.env;
   let token = req.body.token;
+
   if (token === '***********') {
-    let opt = cluster.getClusterCfgByCode(clusterCode);
+    const opt = cluster.getClusterCfgByCode(clusterCode);
+
     if (opt.code === 'ERROR') {
       return callback(opt);
     }
     token = opt.token;
   }
-  let endpoint = req.body.endpoint;
-  let ips = req.body.ips;
+  const endpoint = req.body.endpoint;
+  const ips = req.body.ips;
+
   log.debug(
     'cluster info:',
     clusterName,
@@ -104,6 +108,7 @@ exports.addCluster = function (req, callback) {
       function (err) {
         if (err) {
           log.error(err.message);
+
           return callback(err);
         }
         cluster.deleteWorkers(clusterCode, (err) => {
@@ -118,9 +123,10 @@ exports.addCluster = function (req, callback) {
             (err) => {
               if (err) {
                 log.error(err);
+
                 return callback(err);
               }
-              //callback(null, cluster.gClusterConfig);
+              // callback(null, cluster.gClusterConfig);
               callback(null, getFilterCluster(cluster.gClusterConfig, req));
             }
           );
@@ -137,6 +143,7 @@ exports.addCluster = function (req, callback) {
       function (err) {
         if (err) {
           log.error(err.message);
+
           return callback(err);
         }
         async.eachSeries(
@@ -147,6 +154,7 @@ exports.addCluster = function (req, callback) {
           (err) => {
             if (err) {
               log.error(err);
+
               return callback(err);
             }
             cluster.getClusterCfg(function (err) {
@@ -154,7 +162,8 @@ exports.addCluster = function (req, callback) {
                 callback(
                   new Error('getClusterCfg fail before add cluster acl')
                 );
-              let newCluster = cluster.gClusterConfig[clusterCode];
+              const newCluster = cluster.gClusterConfig[clusterCode];
+
               if (!newCluster)
                 callback(new Error('get new cluster fail after getClusterCfg'));
               userAcl.addUserAcl(
@@ -165,7 +174,7 @@ exports.addCluster = function (req, callback) {
                 1,
                 '["*"]',
                 function (err) {
-                  //callback(err, cluster.gClusterConfig);
+                  // callback(err, cluster.gClusterConfig);
                   callback(err, getFilterCluster(cluster.gClusterConfig, req));
                 }
               );
@@ -181,7 +190,8 @@ exports.addCluster = function (req, callback) {
  * @api {post} /api/cluster/:code/delete
  */
 exports.removeCluster = function (req, callback) {
-  let clusterCode = req.params.code;
+  const clusterCode = req.params.code;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_CLUSTER',
@@ -194,17 +204,20 @@ exports.removeCluster = function (req, callback) {
   cluster.deleteCluster(clusterCode, function (err) {
     if (err) {
       log.error('delete cluster failed:', err);
-      return callback({ code: err.code || 'ERROR', message: err.message });
+
+      return callback({code: err.code || 'ERROR', message: err.message});
     }
     cluster.deleteWorkers(clusterCode, function (err) {
       if (err) {
         log.error('delete cluster worker failed:', err);
-        return callback({ code: err.code || 'ERROR', message: err.message });
+
+        return callback({code: err.code || 'ERROR', message: err.message});
       }
       userAcl.deleteClusterAllAcl(clusterCode, function (err) {
         if (err) {
           log.error('delete cluster acl failed:', err);
-          return callback({ code: err.code || 'ERROR', message: err.message });
+
+          return callback({code: err.code || 'ERROR', message: err.message});
         }
         callback(null, 'delete cluster success');
       });
@@ -216,7 +229,8 @@ exports.removeCluster = function (req, callback) {
  * @api {GET} /api/cluster/fix
  */
 exports.fixCluster = function (req, callback) {
-  let clusterCode = req.query.clusterCode;
+  const clusterCode = req.query.clusterCode;
+
   cluster.fixCluster(clusterCode, callback);
 };
 
@@ -226,69 +240,85 @@ const os = require('os');
 const path = require('path');
 const uuid = require('uuid').v4;
 const tar = require('tar');
+const yaml = require('yaml');
+
+const promisify = require('util').promisify;
 const appConfig = require('../model/app_config');
 const appPackage = require('../model/app_package');
-const promisify = require('util').promisify;
 const getSnapshortSync = promisify(cluster.getSnapshort);
 const getAppConfig = promisify(appConfig.getAppConfig);
 const getAppPackage = promisify(appPackage.getPackage);
+const log = require('../common/log');
+const userAcl = require('../model/user_acl');
+const cluster = require('../model/cluster');
+
 const mv = promisify(fs.mv);
-const yaml = require('yaml');
+
 /**
  * 下载集群的patch包
  * @api {GET} /api/cluster/patch
  * @nowrap
  */
-exports.downloadClusterPatch = async function (req, res, next) {
-  let clusterCode = req.query.clusterCode;
-  let clusterSnp = await getSnapshortSync(clusterCode);
+exports.downloadClusterPatch = async function (req, res) {
+  const clusterCode = req.query.clusterCode;
+  const clusterSnp = await getSnapshortSync(clusterCode);
 
-  let tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
+  const tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
 
   if (!clusterSnp) {
     res.statusCode = 404;
+
     return res.json({code: 'ERROR', data: 'empty'});
   }
-  let serverCfg = await getAppConfig(clusterCode, 'server', 'server');
+  const serverCfg = await getAppConfig(clusterCode, 'server', 'server');
 
   if (serverCfg) {
+    // eslint-disable-next-line
     fs.sync().save(path.join(tmpDir, 'conf/custom/server.json'), JSON.stringify(serverCfg.config, null, 2));
   }
-  let commonCfg = await getAppConfig(clusterCode, 'server', 'common');
+  const commonCfg = await getAppConfig(clusterCode, 'server', 'common');
+
   if (commonCfg) {
+    // eslint-disable-next-line
     fs.sync().save(path.join(tmpDir, 'conf/custom/common.json'), JSON.stringify(commonCfg.config, null, 2));
   }
 
   fs.sync().mkdir(path.join(tmpDir, 'run/appsRoot/'));
   /*
-  { 
+  {
     name: 'socket-app',
-    versions:[ 
-      { 
+    versions:[
+      {
         version: '1.0.0',
         buildNum: '2',
         publishAt: '5/22/2020, 2:34:00 PM',
         appId: 'socket-app_1.0.0_2',
         weight: 1000000.002,
         cluster: [Array],
-        isCurrWorking: true 
+        isCurrWorking: true
       }
     ]
   }
   */
-  let apps = {};
+  const apps = {};
+
   for (let i = 0; i < clusterSnp.info.length; i++) {
-    let app = clusterSnp.info[i];
+    const app = clusterSnp.info[i];
+
     for (let n = 0; n < app.versions.length; n++) {
-      let v = app.versions[n];
+      const v = app.versions[n];
+
       if (!v.isCurrWorking) {
         continue;
       }
-      let appCfg = await getAppConfig(clusterCode, 'app', app.name);
+      const appCfg = await getAppConfig(clusterCode, 'app', app.name);
+
       if (appCfg) {
+        // eslint-disable-next-line
         fs.sync().save(path.join(tmpDir, `conf/custom/apps/${app.name}.json`), JSON.stringify(appCfg.config, null, 2));
       }
-      let pkg = await getAppPackage(clusterCode, v.appId);
+      const pkg = await getAppPackage(clusterCode, v.appId);
+
       if (pkg) {
         await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
         apps[v.appId] = {
@@ -306,9 +336,9 @@ exports.downloadClusterPatch = async function (req, res, next) {
   });
 
   tar.c({
-      gzip: true,
-      cwd: path.dirname(tmpDir),
-    },
-    ['cluster_patch']
+    gzip: true,
+    cwd: path.dirname(tmpDir),
+  },
+  ['cluster_patch']
   ).pipe(res);
 };

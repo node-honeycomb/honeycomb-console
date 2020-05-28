@@ -1,8 +1,8 @@
 'use strict';
+const jsonParser = require('editor-json-parser');
 const utils = require('../common/utils');
 const cluster = require('../model/cluster');
 const appConfig = require('../model/app_config');
-const jsonParser = require('editor-json-parser');
 const callremote = utils.callremote;
 
 
@@ -13,14 +13,16 @@ const callremote = utils.callremote;
  * @param res
  */
 exports.getAppConfig = function (req, res) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let appName = req.params.appName;
-  let type = req.query.type;
-  let path = `/api/config/${type}/${appName}`;
+  const appName = req.params.appName;
+  const type = req.query.type;
+  const path = `/api/config/${type}/${appName}`;
+
   callremote(path, opt, function (err, results) {
     if (err) {
       res.json({
@@ -40,13 +42,15 @@ exports.getAppConfig = function (req, res) {
  * @param res
  */
 exports.getAppConfigPersistent = function (req, res) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let app = req.params.appName;
-  let type = req.params.type;
+  const app = req.params.appName;
+  const type = req.params.type;
+
   appConfig.getAppConfig(clusterCode, type, app, (err, data) => {
     if (err) {
       return res.json({
@@ -68,12 +72,14 @@ exports.getAppConfigPersistent = function (req, res) {
  * @param res
  */
 exports.getAppConfigHistory = function (req, res) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let app = req.params.appName;
+  const app = req.params.appName;
+
   appConfig.getAppConfigAllHistory({clusterCode, app}, (err, data) => {
     if (err) {
       return res.json({
@@ -89,7 +95,6 @@ exports.getAppConfigHistory = function (req, res) {
 };
 
 
-
 /**
  * @api {post} /api/config/:appName/update
  * @nowrap
@@ -97,8 +102,9 @@ exports.getAppConfigHistory = function (req, res) {
  * @param res
  */
 exports.setAppConfig = function (req, res) {
-  let appName = req.params.appName;
-  let type = req.body.type;
+  const appName = req.params.appName;
+  const type = req.body.type;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'SET_APP_CONFIG',
@@ -107,12 +113,14 @@ exports.setAppConfig = function (req, res) {
     opItem: 'APP_CONFIG',
     opItemId: appName
   });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.body.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return res.json(opt);
   }
-  let path = `/api/config/${type}/${appName}`;
+  const path = `/api/config/${type}/${appName}`;
+
   opt.method = 'POST';
   try {
     opt.data = jsonParser.parse(req.body.appConfig);
@@ -122,13 +130,14 @@ exports.setAppConfig = function (req, res) {
       message: e.message
     });
   }
-  let cfgObj = {
+  const cfgObj = {
     type,
     clusterCode,
     app: appName,
     config: opt.data,
     user: req.session.username
   };
+
   appConfig.save(cfgObj, (err) => {
     if (err) {
       return res.json({
@@ -143,7 +152,6 @@ exports.setAppConfig = function (req, res) {
           message: err.message
         });
       } else {
-
         res.json({code: 'SUCCESS'});
       }
     });

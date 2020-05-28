@@ -1,19 +1,25 @@
 const log = require('../common/log');
 const db = require('../common/db');
-const config = require('../config');
 
 
-let AppConfig = {};
+const AppConfig = {};
 
 const INSERT_APP_CFG = `INSERT INTO
-    hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, user, gmt_create)
+  hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, user, gmt_create)
   VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
 AppConfig.save = (appCfg, callback) => {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     INSERT_APP_CFG,
-    [appCfg.clusterCode, appCfg.type, appCfg.app, JSON.stringify(appCfg.config), d.getTime(), appCfg.user, d],
+    [
+      appCfg.clusterCode,
+      appCfg.type, appCfg.app,
+      JSON.stringify(appCfg.config),
+      d.getTime(),
+      appCfg.user, d
+    ],
     function (err) {
       if (err) {
         log.error('Insert new user failed:', err);
@@ -37,14 +43,15 @@ const GET_APP_CFG = `
   ORDER BY id desc 
   LIMIT 1
 `;
+
 AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
-  let d = new Date();
   db.query(
     GET_APP_CFG,
     [clusterCode, type, app],
     function (err, data) {
       if (err) {
         log.error('get app config failed:', err);
+
         return callback(err);
       } else {
         log.info('get app config success');
@@ -66,14 +73,15 @@ const GET_APP_CFG_HIS = `
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and app = ? order by version desc limit 100
 `;
+
 AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
-  let d = new Date();
   db.query(
     GET_APP_CFG_HIS,
     [appCfg.clusterCode, appCfg.app],
     function (err, data) {
       if (err) {
         log.error('get app config failed:', err);
+
         return callback(err);
       } else {
         log.info('get app config success');
@@ -96,14 +104,15 @@ const GET_CLUSTER_APP_CFGS = `
   WHERE cluster_code = ? 
   GROUP by cluster_code, app, config
 `;
+
 AppConfig.getClusterAppConfigs = (appCfg, callback) => {
-  let d = new Date();
   db.query(
     GET_CLUSTER_APP_CFGS,
     [appCfg.clusterCode],
     function (err, data) {
       if (err) {
         log.error('get app config failed:', err);
+
         return callback(err);
       } else {
         log.info('get app config success');
@@ -116,16 +125,7 @@ AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   );
 };
 
-const GET_APPS = `
-  select 
-    cluster_code, type, app, max(version)
-  from 
-    hc_console_system_cluster_apps_config
-  where
-    cluster_code = ?
-  group by
-    cluster_code, type, app
-`
+
 const DELETE_APPS_CONFIG = `
   delete from hc_console_system_cluster_apps_config
   where cluster_code = ? and type = ? and app = ? and id < (
@@ -136,7 +136,8 @@ const DELETE_APPS_CONFIG = `
       order by id desc limit 3
     ) topids
   )
-`
+`;
+
 AppConfig.cleanAppConfig = (clusterCode, type, app, callback) => {
   db.query(DELETE_APPS_CONFIG, [clusterCode, type, app, clusterCode, type, app], (err) => {
     if (err) {

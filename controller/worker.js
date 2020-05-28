@@ -1,17 +1,15 @@
-
-'use strict';
-const async = require('async');
 const config = require('../config');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
-const userAcl = require('../model/user_acl');
+
 
 /**
  * @api {post} /api/worker/:id/delete
  */
 exports.removeWorker = function (req, callback) {
-  let clusterCode = req.query.clusterCode || 'default';
-  let ip = req.query.ip;
+  const clusterCode = req.query.clusterCode || 'default';
+  const ip = req.query.ip;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'REMOVE_WORKER',
@@ -24,6 +22,7 @@ exports.removeWorker = function (req, callback) {
   cluster.deleteWorker(ip, clusterCode, function (err) {
     if (err) {
       log.error(`delete worker: ${ip} failed:`, err);
+
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, 'remove worker success');
@@ -34,8 +33,9 @@ exports.removeWorker = function (req, callback) {
  * @api {post} /api/worker/create
  */
 exports.addWorker = function (req, callback) {
-  let ip = req.body.ip;
-  let clusterCode = req.body.clusterCode || 'default';
+  const ip = req.body.ip;
+  const clusterCode = req.body.clusterCode || 'default';
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'ADD_WORKER',
@@ -48,6 +48,7 @@ exports.addWorker = function (req, callback) {
   cluster.addWorker(ip, clusterCode, function (err) {
     if (err) {
       log.error(`add worker: ${ip} failed:`, err);
+
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, 'add worker success');
@@ -62,15 +63,15 @@ exports.addWorker = function (req, callback) {
  *    token ?
  *    endpoint ?
  *    secret !
- *    
+ *
  */
 exports.registerWorker = function (req, callback) {
-  let ip = req.body.ip;
-  let code = req.body.cluster;
-  let name = code;
-  let token = req.body.token || config.clusterToken;
-  let endpoint = req.body.endpoint || `http://${ip}:9999`;
-  let secret = req.headers.authorization;
+  const ip = req.body.ip;
+  const code = req.body.cluster;
+  const name = code;
+  const token = req.body.token || config.clusterToken;
+  const endpoint = req.body.endpoint || `http://${ip}:9999`;
+  const secret = req.headers.authorization;
 
   if (!ip || !code || !secret) {
     return callback(new Error('param missing, ip/code/secret needed'));
@@ -102,6 +103,7 @@ exports.registerWorker = function (req, callback) {
       cluster.addWorker(ip, code, (err) => {
         if (err && !/unique|duplicate/i.test(err.message)) {
           log.error(`register worker: ${ip} failed:`, err.message);
+
           return callback({code: err.code || 'ERROR', message: err.message});
         }
         callback(null, 'register worker success');
@@ -124,19 +126,21 @@ exports.registerWorker = function (req, callback) {
  * @api {post} /api/worker/unregister/:id
  */
 exports.unregisterWorker = function (req, callback) {
-  let ip = req.params.id;
+  const id = req.params.id;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DEL_TMP_WORKER',
     opType: 'PAGE_MODEL',
     opLogLevel: 'NORMAL',
     opItem: 'WORKER',
-    opItemId: ip
+    opItemId: id
   });
-  log.info('delete tmp worker: ', ip, clusterCode);
+  log.info('delete tmp worker: ', id);
   cluster.deleteTmpWorker(id, function (err) {
     if (err) {
-      log.error(`delete tmp worker: ${ip} failed:`, err);
+      log.error(`delete tmp worker: ${id} failed:`, err);
+
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, 'del tmp worker success');
@@ -156,6 +160,7 @@ exports.listAllWorker = function (req, callback) {
   cluster.queryAllWorker((err, workers) => {
     if (err) {
       log.error('query all workers failed:', err);
+
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, workers);
@@ -167,6 +172,7 @@ exports.listAllWorker = function (req, callback) {
  */
 exports.deleteWorkerByIp = function (req, callback) {
   const {ip} = req.body;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DEL_WORKER',
@@ -179,6 +185,7 @@ exports.deleteWorkerByIp = function (req, callback) {
   cluster.deleteWorkerByIp(ip, function (err) {
     if (err) {
       log.error(`delete worker: ${ip} failed:`, err);
+
       return callback({code: err.code || 'ERROR', message: err.message});
     }
     callback(null, 'del worker success');

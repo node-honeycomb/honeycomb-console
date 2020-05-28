@@ -1,17 +1,19 @@
-'use strict';
+const pathToRegex = require('path-to-regexp');
+
 const utils = require('../common/utils');
 const User = require('../model/user');
 const config = require('../config');
-const pathToRegex = require('path-to-regexp');
 
 /**
  * [exports description]
  * @return {[type]} [description]
  */
-module.exports = function(app, options) {
+module.exports = function (app, options) {
   const ignorePathRegex = options.ignore ? pathToRegex(options.ignore) : null;
-  return function(req, res, next) {
-    let path = req.path;
+
+  return function (req, res, next) {
+    const path = req.path;
+
     if (ignorePathRegex && ignorePathRegex.test(path)) {
       return next();
     }
@@ -21,12 +23,14 @@ module.exports = function(app, options) {
         req.session.user = null;
         req.session = null;
         res.redirect(req.headers.referer || config.prefix);
+
         return;
       }
+
       return next();
     }
 
-    let user = req.body.username;
+    const user = req.body.username;
     let pwd = req.body.password;
 
     switch (path) {
@@ -44,6 +48,7 @@ module.exports = function(app, options) {
           }
           User.addUser(user, pwd, 1, 1, err => {
             let target = config.prefix;
+
             if (err) {
               target += '?error=' + err.message;
             }
@@ -66,6 +71,7 @@ module.exports = function(app, options) {
             //   role: user.role
             // };
             req.session.username = user.name;
+
             return res.redirect(config.prefix);
           } else {
             return res.redirect(config.prefix + '?error=login_failed');
@@ -82,6 +88,7 @@ module.exports = function(app, options) {
       default:
         User.countUser((err, count) => {
           let errmsg;
+
           if (err) {
             errmsg = err.message;
           } else {

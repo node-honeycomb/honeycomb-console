@@ -1,13 +1,10 @@
-'use strict';
 /**
  * app的主入口文件
  */
 const App = require('hc-bee');
 const app = new App();
+
 const config = require('./config');
-const promisify = require('util').promisify;
-const utils = require('./common/utils');
-const callremote = utils.callremote;
 
 app.server.setTimeout(300000);
 

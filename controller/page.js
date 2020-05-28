@@ -1,9 +1,8 @@
-'use strict';
+const path = require('path');
+
+const config = require('../config');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
-const config = require('../config');
-const lodash = require('lodash');
-const path = require('path');
 
 /**
  * @api  /pages/
@@ -33,7 +32,8 @@ exports.pages = function (req, callback) {
   cluster.getClusterCfg(function (err) {
     if (err) {
       log.error('Get cluster config from db failed.', err);
-      let e = new Error('Get cluster config from db failed.' + err.message);
+      const e = new Error('Get cluster config from db failed.' + err.message);
+
       return callback(e);
     }
     callback(null, {

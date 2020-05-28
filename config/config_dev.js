@@ -25,11 +25,6 @@ module.exports = {
     appAuth: {
       enable: true
     },
-    webpack: {
-      enable: true,
-      module: 'honeypack',
-      router: '/assets'
-    }
   },
   extension: {
     redirect: {
