@@ -20,6 +20,7 @@ SQLJS().then((SQL) => {
 
   statments = statments.split(/\n\n/);
   async.eachSeries(statments, (st, done) => {
+    db.run(st);
     done();
   }, (err) => {
     if (err) {

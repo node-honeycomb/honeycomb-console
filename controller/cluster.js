@@ -241,16 +241,17 @@ const path = require('path');
 const uuid = require('uuid').v4;
 const tar = require('tar');
 const yaml = require('yaml');
-
 const promisify = require('util').promisify;
+
+const log = require('../common/log');
+const cluster = require('../model/cluster');
+const userAcl = require('../model/user_acl');
 const appConfig = require('../model/app_config');
 const appPackage = require('../model/app_package');
 const getSnapshortSync = promisify(cluster.getSnapshort);
 const getAppConfig = promisify(appConfig.getAppConfig);
 const getAppPackage = promisify(appPackage.getPackage);
-const log = require('../common/log');
-const userAcl = require('../model/user_acl');
-const cluster = require('../model/cluster');
+
 
 const mv = promisify(fs.mv);
 
