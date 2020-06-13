@@ -7,10 +7,14 @@ const callremote = utils.callremote;
 
 
 /**
+ * 查询某一个app/集群的配置
  * @api {get} /api/config/:appName/get
  * @nowrap
- * @param req
- * @param res
+ * @query
+ *  type {String} 查询类型 app（应用配置查询） | server（集群配置查询, common 和 server 时使用）
+ *  clusterCode {String} 集群code
+ * @param
+ *  appName {String} 应用名
  */
 exports.getAppConfig = function (req, res) {
   const clusterCode = req.query.clusterCode;
@@ -96,10 +100,13 @@ exports.getAppConfigHistory = function (req, res) {
 
 
 /**
+ * 更新某一个app的配置
  * @api {post} /api/config/:appName/update
  * @nowrap
- * @param req
- * @param res
+ * @query
+ *  type {String} 更新类型 app | server
+ * @body
+ *  clusterCode {String} 集群code
  */
 exports.setAppConfig = function (req, res) {
   const appName = req.params.appName;

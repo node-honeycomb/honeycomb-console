@@ -36,6 +36,7 @@ function saveSnapShort(clusterCode) {
 }
 
 /**
+ * 获取app列表
  * @api {get} /api/app/list
  * @param req
  * @param callback
@@ -82,9 +83,15 @@ exports.listApp = function (req, callback) {
 };
 
 /**
+ * 发布一个app当当前集群
  * @api {post} /api/app/publish
  * @param req
  * @param callback
+ * @query
+ *  clusterCode {String} 集群code
+ *  recover {Enum} 作用位置 true/false
+ * @body
+ *  file {File} 文件tgz包
  */
 exports.publishApp = function (req, callback) {
   const clusterCode = req.query.clusterCode;
@@ -179,6 +186,7 @@ exports.publishApp = function (req, callback) {
 };
 
 /**
+ * 清理某个app的多余的版本
  * @api {POST} /api/app/:appId/clean_exit_record
  * @param req
  * @param callback
@@ -226,6 +234,7 @@ exports.cleanAppExitRecord = function (req, callback) {
 };
 
 /**
+ * 删除某一个app
  * @api {post} /api/app/:appId/delete
  * @param req
  * @param callback
@@ -277,6 +286,7 @@ exports.deleteApp = function (req, callback) {
 };
 
 /**
+ * 重启某一个app
  * @api {post} /api/app/:appId/restart
  */
 exports.restartApp = function (req, callback) {
@@ -320,6 +330,7 @@ exports.restartApp = function (req, callback) {
 };
 
 /**
+ * 重载某一个app
  * @api {post} /api/app/:appId/reload
  * @param req
  * @param callback
@@ -365,6 +376,7 @@ exports.reloadApp = function (req, callback) {
 };
 
 /**
+ * 启动一个app
  * @api {post} /api/app/:appId/start
  * @param req
  * @param callback
@@ -410,6 +422,7 @@ exports.startApp = function (req, callback) {
 };
 
 /**
+ * 停止一个app
  * @api {post} /api/app/:appId/stop
  * @param req
  * @param callback

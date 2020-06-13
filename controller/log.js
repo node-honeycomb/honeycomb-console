@@ -20,6 +20,7 @@ if (!fs.existsSync(appUsageCachePath)) {
 
 
 /**
+ * 获取日志列表
  * @api {get} /api/log
  * @nowrap
  * @param req

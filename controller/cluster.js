@@ -41,6 +41,7 @@ exports.getClusterConfig = function (req, callback) {
 };
 
 /**
+ * 获取当前用户的集群列表
  * @api {GET} /api/cluster/list
  */
 exports.listCluster = function (req, callback) {
@@ -56,7 +57,16 @@ exports.listCluster = function (req, callback) {
 };
 
 /**
+ * 创建一个集群
  * @api {post} /api/cluster/create
+ * @body
+ *  code {String} 集群code
+ *  isUpdate {String} 是否是更新 true | false
+ *  name {String} 集群名称
+ *  env {String} 集群环境 dev | prod | pre
+ *  token {String} 集群token
+ *  endpoint {String} 集群endpoint http://
+ *  ips {String} 集群内的IP列表, 一行一个
  */
 exports.addCluster = function (req, callback) {
   const clusterCode = req.body.code;
@@ -187,6 +197,7 @@ exports.addCluster = function (req, callback) {
 };
 
 /**
+ * 删除一个集群
  * @api {post} /api/cluster/:code/delete
  */
 exports.removeCluster = function (req, callback) {
@@ -226,6 +237,7 @@ exports.removeCluster = function (req, callback) {
 };
 
 /**
+ * 订正集群的token
  * @api {GET} /api/cluster/fix
  */
 exports.fixCluster = function (req, callback) {

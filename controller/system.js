@@ -5,6 +5,7 @@ const cluster = require('../model/cluster');
 const callremote = utils.callremote;
 
 /**
+ * 登录
  * @api /logout
  * @nowrap
  */
@@ -15,27 +16,11 @@ exports.logout = function (req, res) {
   res.redirect('/');
 };
 
-// /**
-//  * @api {post} /loginAuth
-//  */
-// exports.loginAuth = function (req, callback) {
-//   let opt = req.body;
-//   if (opt.username === config.username &&
-//     utils.sha256(opt.password) === config.password) {
-//     req.session.user = {
-//       id: opt.username,
-//       name: opt.username,
-//       nickname: opt.username
-//     };
-//     callback(null, {code: 'SUCCESS'});
-//   } else {
-//     log.error('用户名密码错误');
-//     callback({code: 'ERROR', message: '用户名密码错误'});
-//   }
-// };
-
 /**
+ * 获取当前集群状态
  * @api {get} /api/status
+ * @query
+ *  clusterCode {String} 集群code
  */
 exports.status = function (req, callback) {
   const clusterCode = req.query.clusterCode;
@@ -66,6 +51,7 @@ exports.status = function (req, callback) {
 };
 
 /**
+ * 获取当前用户
  * @api {get} /api/user
  */
 exports.getUser = function (req, callback) {
@@ -155,7 +141,10 @@ exports.deleteCoredump = function (req, callback) {
 
 
 /**
+ * 获取位置的 process
  * @api {get} /api/unknowProcess
+ * @query
+ *  clusterCode {String} 集群code
  */
 exports.unknowProcess = function (req, callback) {
   const clusterCode = req.query.clusterCode;
@@ -186,6 +175,7 @@ exports.unknowProcess = function (req, callback) {
 };
 
 /**
+ * 删除某个未知的 process
  * @api {post} /api/unknowProcess/:pid/delete
  * @param req
  * @param callback
