@@ -34,34 +34,53 @@ module.exports = function (app, options) {
     const user = req.body.username;
     let pwd = req.body.password;
 
+    const throwError = (error) => {
+      res.status(500);
+
+      return res.send(error);
+    };
+
     switch (path) {
       case '/initUser':
         if (!user || !pwd) {
-          return res.redirect(config.prefix + '?error=user_or_pwd_empty');
+          res.status(500);
         }
+
         pwd = utils.sha256(pwd);
+
         User.countUser((err, data) => {
           if (err) {
             return next(err);
           }
-          if (data > 0) {
-            return next(new Error('root user all ready inited'));
-          }
-          User.addUser(user, pwd, 1, 1, err => {
-            let target = config.prefix;
 
+          if (data > 0) {
+            return throwError({
+              code: ECODE.USER_CREATED,
+              message: EMSG.USER_CREATED
+            });
+          }
+
+          User.addUser(user, pwd, 1, 1, err => {
             if (err) {
-              target += '?error=' + err.message;
+              req.log.error('create user failed');
+              req.log.error(err);
+
+
+              return throwError({
+                code: ECODE.INIT_USER_FAILED,
+                message: EMSG.INIT_USER_FAILED
+              });
             }
-            res.redirect(target);
+
+            res.send({
+              code: 'SUCCESS'
+            });
           });
         });
         break;
       case '/loginAuth':
         if (!user || !pwd) {
-          res.status(500);
-
-          return res.send({
+          return throwError({
             code: ECODE.LOGIN_FAILED,
             message: EMSG.LOGIN_TICKET_EMPTY
           });
@@ -69,16 +88,14 @@ module.exports = function (app, options) {
 
         User.getUser(user, (err, user) => {
           if (err) {
-            res.status(500);
-
             if (err.message === 'user not found') {
-              return res.send({
+              return throwError({
                 code: ECODE.LOGIN_FAILED,
                 message: EMSG.USER_NOT_FOUND
               });
             }
 
-            return res.send({
+            return throwError({
               code: ECODE.LOGIN_FAILED,
               message: EMSG.QUERY_USER_UFAILED
             });
@@ -90,9 +107,7 @@ module.exports = function (app, options) {
 
             return res.send({code: 'SUCCESS'});
           } else {
-            res.status(500);
-
-            return res.send({
+            return throwError({
               code: ECODE.LOGIN_FAILED,
               message: EMSG.LOGIN_FAILED
             });

@@ -36,6 +36,7 @@ exports.pages = function (req, callback) {
 
       return callback(e);
     }
+
     callback(null, {
       tpl: 'index.html',
       data: {
@@ -52,24 +53,4 @@ exports.pages = function (req, callback) {
       }
     }, 'html');
   });
-};
-
-/**
- * @api {get} /login
- */
-exports.login = function (req, callback) {
-  if (req.user) {
-    return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
-  } else {
-    callback(null, {
-      tpl: 'login.html',
-      data: {
-        prefix: config.prefix !== '/' ? config.prefix : '',
-        clusterCfg: JSON.stringify(cluster.gClusterConfig),
-        csrfToken: req.csrfToken(),
-        user: req.user,
-        publishPage: config.publishPage
-      }
-    }, 'html');
-  }
 };

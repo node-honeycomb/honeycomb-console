@@ -7,11 +7,16 @@ import notification from '@coms/notification';
 
 import './index.less';
 
-const {userCount} = window.CONFIG;
+const {userCount, prefix} = window.CONFIG;
+
+// 当系统中一个用户都没有时, 调用初始化模式
+const isInit = userCount === 0;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-  const onSubmit = useCallback(async (value) => {
+
+
+  const onCreate = useCallback(async (value) => {
     if (!value) {
       return;
     }
@@ -21,10 +26,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const result = await userApi.login({username, password});
+      await userApi.login({username, password});
 
       message.success('登录成功！');
-      console.log(result);
+      window.location.href = `${prefix}/pages/list`;
     } catch (e) {
       notification.error({
         message: '登录失败',
@@ -35,15 +40,45 @@ const Login = () => {
     setLoading(false);
   }, []);
 
+  const onInit = useCallback(async (value) => {
+    if (!value) {
+      return;
+    }
+
+    const {username, password} = value;
+
+    setLoading(true);
+
+    try {
+      await userApi.initUser({username, password});
+
+      message.success('初始化用户成功！正在跳转登录页面');
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+    } catch (e) {
+      notification.error({
+        message: '初始化失败',
+        description: e.message
+      });
+    }
+
+    setLoading(false);
+  });
+
 
   return (
     <div className="login">
       <div className="login-box">
-        <h1 className="login-box-title">用户登录</h1>
+        <h1 className="login-box-title">
+          {
+            isInit ? '系统初始化' : '用户登录'
+          }
+        </h1>
         <Form
           className="login-form"
           initialValues={{remember: true}}
-          onFinish={onSubmit}
+          onFinish={isInit ? onInit : onCreate}
         >
           <Form.Item
             name="username"
@@ -82,7 +117,9 @@ const Login = () => {
               className="login-form-button"
               loading={loading}
             >
-              登录
+              {
+                isInit ? '创建用户' : '登录'
+              }
             </Button>
           </Form.Item>
         </Form>
