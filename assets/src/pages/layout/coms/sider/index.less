@@ -1,0 +1,33 @@
+.hc-sider {
+  width: 260px;
+  height: calc(100vh - 80px);
+  padding: 20px;
+  background: white;
+  box-shadow: 0 0 10px #eee;
+  overflow: auto;
+  position: absolute;
+  left: 5px;
+  border-radius: 5px;
+  top: 73px;
+
+  .sider-menu {
+    height: 36px;
+    line-height: 36px;
+    padding-left: 10px;
+    cursor: pointer;
+
+    a {
+      display: inline-block;
+      width: 100%;
+    }
+
+    &.second:hover {
+      background: rgb(238, 248, 238);
+    }
+
+    &.first {
+      padding-left: 0;
+      color: #79879c;
+    }
+  }
+}

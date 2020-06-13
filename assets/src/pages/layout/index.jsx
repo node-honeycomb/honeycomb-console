@@ -1,9 +1,9 @@
 import React from 'react';
-import _ from 'lodash';
 import PropTypes from 'prop-types';
 
 import {connect} from 'dva';
 
+import Sider from './coms/sider';
 import HcHeader from './coms/header';
 import ClusterDrawer from './coms/cluster';
 
@@ -53,6 +53,7 @@ class AppLayout extends React.Component {
           visible={clusterVisible}
           onClose={this.onToggleCluster}
         />
+        <Sider />
         <div className="main-content">
           {
             this.props.children
