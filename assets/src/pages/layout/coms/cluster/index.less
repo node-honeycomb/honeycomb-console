@@ -1,0 +1,45 @@
+@import '../../../../index.less';
+
+.cluster-drawer {
+  height: calc(100vh - 78px);
+  position: fixed;
+  top: 73px;
+  width: 260px;
+  left: 5px;
+  background: #242e42;
+  transition: 0.2s;
+  transform: translate(-110%);
+  overflow: auto;
+  padding: 40px 20px;
+  border-radius: 5px;
+
+
+  .cluster-title {
+    color: #79879c;
+    font-size: 12px;
+    margin-bottom: 12px;
+  }
+
+  .cluster-item {
+    height: 36px;
+    color: #eff4f9;
+    font-weight: 500;
+    line-height: 36px;
+    padding: 0 10%;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #36435c;
+      color: @primary-color;
+    }
+
+    .anticon {
+      margin-right: 10px;
+    }
+  }
+
+  &.visible {
+    transform: translate(0);
+  }
+}

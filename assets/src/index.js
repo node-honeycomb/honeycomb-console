@@ -4,6 +4,7 @@ import {createBrowserHistory} from 'history';
 
 import router from './router';
 import loginRouter from './login-router';
+import globalModel from './model/global';
 
 import './index.less';
 
@@ -14,6 +15,8 @@ const app = dva({
 });
 
 app.use(createLoading());
+
+[globalModel].forEach(app.model);
 
 app.router(isLogin ? loginRouter : router);
 
