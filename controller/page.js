@@ -62,7 +62,7 @@ exports.login = function (req, callback) {
     return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
   } else {
     callback(null, {
-      tpl: 'index.html',
+      tpl: 'login.html',
       data: {
         prefix: config.prefix !== '/' ? config.prefix : '',
         clusterCfg: JSON.stringify(cluster.gClusterConfig),

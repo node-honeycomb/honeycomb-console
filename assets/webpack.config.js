@@ -68,7 +68,7 @@ const config = {
   resolve: {
     extensions: ['.js', '.jsx', '.json'],
     alias: {
-      '@services': path.resolve(__dirname, './src/services'),
+      '@api': path.resolve(__dirname, './src/services'),
       '@coms': path.resolve(__dirname, './src/components'),
       '@lib': path.resolve(__dirname, './src/lib'),
       '@model': path.resolve(__dirname, './src/model'),

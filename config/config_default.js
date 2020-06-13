@@ -59,7 +59,7 @@ module.exports = {
       enable: true,
       module: '../middleware/auth.js',
       config: {
-        ignore: ['/signatureAuth/**']
+        ignore: ['/signatureAuth/**', '/assets/**'],
       }
     },
     store: {

@@ -1,8 +1,9 @@
 const pathToRegex = require('path-to-regexp');
 
-const utils = require('../common/utils');
-const User = require('../model/user');
 const config = require('../config');
+const User = require('../model/user');
+const utils = require('../common/utils');
+const {ECODE, EMSG} = require('../common/error');
 
 /**
  * [exports description]
@@ -58,23 +59,43 @@ module.exports = function (app, options) {
         break;
       case '/loginAuth':
         if (!user || !pwd) {
-          return res.redirect(config.prefix + '?error=user_or_pwd_empty');
+          res.status(500);
+
+          return res.send({
+            code: ECODE.LOGIN_FAILED,
+            message: EMSG.LOGIN_TICKET_EMPTY
+          });
         }
+
         User.getUser(user, (err, user) => {
           if (err) {
-            return res.redirect(config.prefix + '?error=' + err.message);
+            res.status(500);
+
+            if (err.message === 'user not found') {
+              return res.send({
+                code: ECODE.LOGIN_FAILED,
+                message: EMSG.USER_NOT_FOUND
+              });
+            }
+
+            return res.send({
+              code: ECODE.LOGIN_FAILED,
+              message: EMSG.QUERY_USER_UFAILED
+            });
           }
+
           pwd = utils.sha256(pwd);
           if (user.password === pwd && user.status === 1) {
-            // req.session.user = {
-            //   name: user.name,
-            //   role: user.role
-            // };
             req.session.username = user.name;
 
-            return res.redirect(config.prefix);
+            return res.send({code: 'SUCCESS'});
           } else {
-            return res.redirect(config.prefix + '?error=login_failed');
+            res.status(500);
+
+            return res.send({
+              code: ECODE.LOGIN_FAILED,
+              message: EMSG.LOGIN_FAILED
+            });
           }
         });
         break;
@@ -94,6 +115,7 @@ module.exports = function (app, options) {
           } else {
             errmsg = req.query.error || '';
           }
+
           res.render('login.html', {
             prefix: config.prefix !== '/' ? config.prefix : '',
             userCount: count,

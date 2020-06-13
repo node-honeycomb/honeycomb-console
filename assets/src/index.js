@@ -2,10 +2,12 @@ import dva from 'dva';
 import createLoading from 'dva-loading';
 import {createBrowserHistory} from 'history';
 
-// eslint-disable-next-line
 import router from './router';
+import loginRouter from './login-router';
 
 import './index.less';
+
+const {isLogin} = window.CONFIG;
 
 const app = dva({
   history: createBrowserHistory(),
@@ -13,6 +15,6 @@ const app = dva({
 
 app.use(createLoading());
 
-app.router(router);
+app.router(isLogin ? loginRouter : router);
 
 app.start('#main');
