@@ -1,10 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import {Menu, Dropdown} from 'antd';
+import {Menu, Dropdown, Tooltip} from 'antd';
 import {
   UserOutlined, CopyOutlined, PauseCircleOutlined,
-  LogoutOutlined, InfoCircleOutlined, SettingOutlined
+  LogoutOutlined, InfoCircleOutlined, SettingOutlined,
+  BookOutlined
 } from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
@@ -53,6 +54,11 @@ const Header = (props) => {
         </div>
       </div>
       <div className="right">
+        <span className="menu-item">
+          <Tooltip title="帮助手册">
+            <BookOutlined />
+          </Tooltip>
+        </span>
         <span className="menu-item">
           <Dropdown
             overlay={menu}
