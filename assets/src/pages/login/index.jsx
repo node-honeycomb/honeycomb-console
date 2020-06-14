@@ -8,10 +8,11 @@ import notification from '@coms/notification';
 
 import './index.less';
 
-const {userCount} = window.CONFIG;
+const {userCount, prefix} = window.CONFIG;
 
 // 当系统中一个用户都没有时, 调用初始化模式
 const isInit = userCount === 0;
+const LOGO_IMG = `${prefix}/assets/static/logo.png`;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
@@ -73,6 +74,9 @@ const Login = () => {
     <div className="login">
       <div className="login-box">
         <h1 className="login-box-title">
+          <span className="login-logo-p">
+            <span className="login-box-logo" style={{backgroundImage: `url(${LOGO_IMG})`}}></span>
+          </span>
           {
             isInit ? '系统初始化' : '用户登录'
           }
@@ -105,9 +109,8 @@ const Login = () => {
             ]
             }
           >
-            <Input
+            <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
-              type="password"
               placeholder="密码"
             />
           </Form.Item>
