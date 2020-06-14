@@ -70,7 +70,8 @@ const LIST_USER = `
   SELECT
     name,
     role,
-    status
+    status,
+    gmt_create AS gmtCreate
   FROM
     hc_console_system_user
   WHERE

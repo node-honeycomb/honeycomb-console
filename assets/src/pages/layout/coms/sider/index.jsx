@@ -1,14 +1,39 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {Link} from 'dva/router';
+import {Link, withRouter} from 'dva/router';
 
 import WhiteSpace from '@coms/white-space';
+
 
 import menu from './menu';
 
 import './index.less';
 
-const Sider = () => {
+const getActiveMenuLink = (pathname) => {
+  if (!pathname) {
+    return null;
+  }
+
+  for (const item of menu) {
+    if (!item.link) {
+      continue;
+    }
+
+    if (pathname.includes(item.link)) {
+      return item.link;
+    }
+  }
+
+  return null;
+};
+
+const Sider = (props) => {
+  const location = props.location;
+  const pathname = location.pathname;
+
+  const activeLink = getActiveMenuLink(pathname);
+
   return (
     <div className="hc-sider">
       {
@@ -21,6 +46,7 @@ const Sider = () => {
                   {
                     first: item.first,
                     second: !item.first,
+                    active: item.link === activeLink
                   }
                 )
               }
@@ -41,4 +67,8 @@ const Sider = () => {
   );
 };
 
-export default Sider;
+Sider.propTypes = {
+  location: PropTypes.object
+};
+
+export default withRouter(Sider);

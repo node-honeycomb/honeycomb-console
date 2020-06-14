@@ -9,3 +9,8 @@ export const login = ({username, password}) => {
 export const initUser = ({username, password}) => {
   return request.post('/initUser', {username, password});
 };
+
+// 获取用户列表
+export const list = () => {
+  return request.get('/api/user/list');
+};

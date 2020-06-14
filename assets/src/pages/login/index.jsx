@@ -2,19 +2,19 @@ import React, {useState, useCallback} from 'react';
 import {Form, Input, Button, message} from 'antd';
 import {UserOutlined, LockOutlined} from '@ant-design/icons';
 
+import PAGES from '@lib/pages';
 import {userApi} from '@api/index';
 import notification from '@coms/notification';
 
 import './index.less';
 
-const {userCount, prefix} = window.CONFIG;
+const {userCount} = window.CONFIG;
 
 // 当系统中一个用户都没有时, 调用初始化模式
 const isInit = userCount === 0;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
-
 
   const onCreate = useCallback(async (value) => {
     if (!value) {
@@ -29,7 +29,9 @@ const Login = () => {
       await userApi.login({username, password});
 
       message.success('登录成功！');
-      window.location.href = `${prefix}/pages/list`;
+      setTimeout(() => {
+        window.location.href = PAGES.APP_DEV;
+      }, 1000);
     } catch (e) {
       notification.error({
         message: '登录失败',

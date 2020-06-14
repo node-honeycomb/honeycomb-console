@@ -12,6 +12,7 @@ import s2q from '@lib/search-to-query';
 
 import './index.less';
 
+// FIXME: 该组件在 window 点击多次会造成 click 不可用 以及和别的按钮的冲突
 const ClusterDrawer = (props) => {
   const {
     clusters, visible, dispatch,
