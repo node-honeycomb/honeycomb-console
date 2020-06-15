@@ -2,7 +2,7 @@ import React from 'react';
 import {
   FileSearchOutlined, TeamOutlined, AppstoreOutlined,
   CloudUploadOutlined, ControlOutlined, ClusterOutlined,
-  DeploymentUnitOutlined
+  DeploymentUnitOutlined, SettingOutlined
 } from '@ant-design/icons';
 
 import PAGES from '../../../../lib/pages';
@@ -21,6 +21,11 @@ const menu = [
     title: '应用发布',
     link: PAGES.APP_CI,
     icon: <CloudUploadOutlined />
+  },
+  {
+    title: '应用配置',
+    link: PAGES.APP_CONFIG,
+    icon: <SettingOutlined />
   },
   {
     title: '监控',
