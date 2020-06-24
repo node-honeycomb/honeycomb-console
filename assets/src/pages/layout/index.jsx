@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {message} from 'antd';
 
 import _ from 'lodash';
 import {connect} from 'dva';
@@ -16,7 +17,7 @@ import ClusterDrawer from './coms/cluster';
 
 import './index.less';
 
-const {prefix} = window.CONFIG.prefix;
+const {prefix} = window.CONFIG;
 
 class AppLayout extends React.Component {
   static propTypes = {
@@ -55,14 +56,17 @@ class AppLayout extends React.Component {
     });
 
     const AVAILABLE_PAGES = [
-      `${prefix}/${PAGES.CLUSTER_MANAGER}`,
-      `${prefix}/${PAGES.CLUSTER_AUTH}`,
-      `${prefix}/${PAGES.USER_MANAGER}`,
+      PAGES.CLUSTER_MANAGER,
+      PAGES.CLUSTER_AUTH,
+      PAGES.USER_MANAGER,
     ];
 
     if (!clusters || Object.keys(clusters).length === 0) {
       if (!AVAILABLE_PAGES.includes(location.pathname)) {
-        location.pathname = `${prefix}/${PAGES.CLUSTER_MANAGER}`;
+        location.pathname = PAGES.CLUSTER_MANAGER;
+
+        message.warn('当前无可用集群，请在集群管理中创建集群');
+
         // 无可用集群, 自动跳转集群管理
         dispatch(routerRedux.push(location));
 
