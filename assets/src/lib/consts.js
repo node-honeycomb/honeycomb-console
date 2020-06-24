@@ -17,3 +17,6 @@ export const USER_STATUS_TITLE = {
   [USER_STATUS.ACTIVE]: '正常',
   [USER_STATUS.IN_ACTIVE]: '失效'
 };
+
+// local storage select cluster code
+export const LS_LAST_SELECT_CLUSTER_CODE = 'last-cluster-code';
