@@ -5,7 +5,7 @@ import {
   DeploymentUnitOutlined, SettingOutlined
 } from '@ant-design/icons';
 
-import PAGES from '../../../../lib/pages';
+import PAGES from '@lib/pages';
 
 const menu = [
   {
