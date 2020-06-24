@@ -2,6 +2,7 @@ import _ from 'lodash';
 
 import {clusterApi} from '@api';
 import {tryParse} from '@lib/util';
+import {LS_LAST_SELECT_CLUSTER_CODE} from '@lib/consts';
 
 
 const key = 'cluster-usage-count';
@@ -57,6 +58,8 @@ export default {
           clusters
         }
       });
+
+      return clusters;
     },
   },
   reducers: {
@@ -90,6 +93,8 @@ export default {
 
       const freqClusterCodes = getFreqClusterCodes();
       const freqClusters = [];
+
+      localStorage.setItem(LS_LAST_SELECT_CLUSTER_CODE, clusterCode);
 
       for (let i = 0; i < freqClusterCodes.length; i++) {
         const code = freqClusterCodes[i];

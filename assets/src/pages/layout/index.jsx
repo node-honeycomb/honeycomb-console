@@ -1,17 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {message} from 'antd';
 
 import _ from 'lodash';
 import {connect} from 'dva';
-import {withRouter} from 'dva/router';
+import {withRouter, routerRedux} from 'dva/router';
 
+import PAGES from '@lib/pages';
 import s2q from '@lib/search-to-query';
+import callClusterSelect from '@coms/cluster-select';
+import {LS_LAST_SELECT_CLUSTER_CODE} from '@lib/consts';
 
 import Sider from './coms/sider';
 import HcHeader from './coms/header';
 import ClusterDrawer from './coms/cluster';
 
 import './index.less';
+
+const {prefix} = window.CONFIG;
 
 class AppLayout extends React.Component {
   static propTypes = {
@@ -23,25 +29,80 @@ class AppLayout extends React.Component {
       ips: PropTypes.arrayOf(PropTypes.string),
       name: PropTypes.string
     }),
-    currentClusterCode: PropTypes.string
+    currentClusterCode: PropTypes.string,
+    location: PropTypes.object
   }
 
   state = {
     clusterVisible: false
   }
 
+  /**
+   * 首页逻辑:
+   * (1) 读取集群，如果没有集群，自动跳转集群管理页面，建议用户创建集群
+   * (2) 如果有集群，并且 query 中有 clusterCode，选择集群
+   * (3) 如果有集群，并且localStorage中没有记录，跳出集群选择页面
+   * (4) 如果 localStorage 中有上次的记录，并且命中，跳到该集群，不命中，返回（2）
+   */
   componentDidMount() {
     this.getCluster();
   }
 
   getCluster = async () => {
-    const {dispatch} = this.props;
+    const {dispatch, location} = this.props;
 
-    await dispatch({
+    const clusters = await dispatch({
       type: 'global/getCluster'
     });
 
-    this.readQueryCluster();
+    const AVAILABLE_PAGES = [
+      PAGES.CLUSTER_MANAGER,
+      PAGES.CLUSTER_AUTH,
+      PAGES.USER_MANAGER,
+    ];
+
+    if (!clusters || Object.keys(clusters).length === 0) {
+      if (!AVAILABLE_PAGES.includes(location.pathname)) {
+        location.pathname = PAGES.CLUSTER_MANAGER;
+
+        message.warn('当前无可用集群，请在集群管理中创建集群');
+
+        // 无可用集群, 自动跳转集群管理
+        dispatch(routerRedux.push(location));
+
+        return;
+      }
+    }
+
+    const stop = this.readQueryCluster();
+
+    !stop && await this.renderHistoryCluster(clusters);
+  }
+
+  renderHistoryCluster = async (clusters) => {
+    const {dispatch} = this.props;
+    let lastClusterCode = localStorage.getItem(LS_LAST_SELECT_CLUSTER_CODE);
+
+    if (!clusters || Object.keys(clusters) === 0) {
+      return;
+    }
+
+    if (!lastClusterCode) {
+      lastClusterCode = await callClusterSelect(clusters);
+    }
+
+    if (!clusters[lastClusterCode]) {
+      lastClusterCode = await callClusterSelect(clusters);
+    }
+
+    dispatch({
+      type: 'global/setCluster',
+      payload: {
+        clusterCode: lastClusterCode
+      }
+    });
+
+    return true;
   }
 
   readQueryCluster = () => {
@@ -51,7 +112,7 @@ class AppLayout extends React.Component {
     const clusterCode = query && query.clusterCode;
 
     if (!clusterCode) {
-      return;
+      return false;
     }
 
     dispatch({
@@ -60,6 +121,8 @@ class AppLayout extends React.Component {
         clusterCode
       }
     });
+
+    return true;
   }
 
   onCloseCluster = () => {
