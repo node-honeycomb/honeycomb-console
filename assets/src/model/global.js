@@ -91,8 +91,6 @@ export default {
       const freqClusterCodes = getFreqClusterCodes();
       const freqClusters = [];
 
-      console.log(freqClusterCodes, '==>');
-
       for (let i = 0; i < freqClusterCodes.length; i++) {
         const code = freqClusterCodes[i];
         const cluster = clusters[code];
