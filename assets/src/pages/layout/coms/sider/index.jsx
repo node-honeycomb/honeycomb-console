@@ -15,6 +15,7 @@ const getActiveMenuLink = (pathname) => {
     return null;
   }
 
+  // eslint-disable-next-line
   for (const item of menu) {
     if (!item.link) {
       continue;
@@ -29,7 +30,7 @@ const getActiveMenuLink = (pathname) => {
 };
 
 const Sider = (props) => {
-  const location = props.location;
+  const {location, currentClusterCode} = props;
   const pathname = location.pathname;
 
   const activeLink = getActiveMenuLink(pathname);
@@ -54,7 +55,10 @@ const Sider = (props) => {
             >
               {
                 item.link ? (
-                  <Link className="no-color-link" to={item.link}>
+                  <Link
+                    className="no-color-link"
+                    to={`${item.link}?clusterCode=${currentClusterCode}`}
+                  >
                     {item.icon}<WhiteSpace />{item.title}
                   </Link>
                 ) : item.title
@@ -68,7 +72,8 @@ const Sider = (props) => {
 };
 
 Sider.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
+  currentClusterCode: PropTypes.string
 };
 
 export default withRouter(Sider);

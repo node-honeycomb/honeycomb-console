@@ -10,6 +10,8 @@ import {
 
 import WhiteSpace from '@coms/white-space';
 
+import clusterTip from '../cluster-tip';
+
 import './index.less';
 
 const userName = _.get(window, 'CONFIG.user.name');
@@ -38,11 +40,16 @@ const menu = (
 );
 
 const Header = (props) => {
+  const {currentCluster} = props;
+
   return (
     <div className="hc-header">
       <div className="left">
-        <span onClick={props.onToggleCluster} className="menu-item">
-          <CopyOutlined />集群列表
+        <span
+          onClick={props.onToggleCluster}
+          className="menu-item show-cluster-sider"
+        >
+          <CopyOutlined />集群列表{clusterTip(currentCluster)}
         </span>
         <span className="menu-item">
           <PauseCircleOutlined /> 集群信息
@@ -76,7 +83,8 @@ const Header = (props) => {
 };
 
 Header.propTypes = {
-  onToggleCluster: PropTypes.func
+  onToggleCluster: PropTypes.func,
+  currentCluster: PropTypes.object
 };
 
 export default Header;
