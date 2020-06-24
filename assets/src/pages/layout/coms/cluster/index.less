@@ -14,6 +14,16 @@
   padding: 40px 20px;
   border-radius: 5px;
 
+  .health-check-btn {
+    cursor: pointer;
+    &:hover {
+      color: @primary-color;
+    }
+  }
+
+  .cluster-list-title {
+    margin-top: 20px;
+  }
 
   .cluster-title {
     color: #79879c;
@@ -29,6 +39,11 @@
     padding: 0 10%;
     font-size: 12px;
     cursor: pointer;
+
+    &.active {
+      background-color: #36435c;
+      color: @primary-color;      
+    }
 
     &:hover {
       background-color: #36435c;
