@@ -129,6 +129,32 @@ class AppLayout extends React.Component {
     this.setState({
       clusterVisible: false
     });
+
+    this.readQueryCluster();
+  }
+
+  readQueryCluster = () => {
+    const {dispatch} = this.props;
+    const query = s2q(_.get(this, 'props.location.search'));
+
+    const clusterCode = query && query.clusterCode;
+
+    if (!clusterCode) {
+      return;
+    }
+
+    dispatch({
+      type: 'global/setCluster',
+      payload: {
+        clusterCode
+      }
+    });
+  }
+
+  onCloseCluster = () => {
+    this.setState({
+      clusterVisible: false
+    });
   }
 
   onToggleCluster = () => {

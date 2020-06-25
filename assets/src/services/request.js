@@ -5,7 +5,7 @@ import axios from 'axios';
 const prefix = window.CONFIG.prefix;
 const csrfToken = window.CONFIG.csrfToken;
 const headers = {
-  'x-csrf-token': csrfToken
+  'x-csrf-token': csrfToken,
 };
 
 // 公共请求响应体
@@ -14,10 +14,10 @@ const instance = axios.create({
   timeout: 1000 * 60,
   headers: {
     'Content-Type': 'application/json',
-    ...headers
+    ...headers,
   },
-  paramsSerializer: function (params) {
-    return qs.stringify(params, {arrayFormat: 'repeat'});
+  paramsSerializer: function(params) {
+    return qs.stringify(params, { arrayFormat: 'repeat' });
   },
   transformResponse: [
     (response) => {
@@ -33,8 +33,8 @@ const instance = axios.create({
         console.log(e);
         throw e;
       }
-    }
-  ]
+    },
+  ],
 });
 
 class Request {
@@ -54,18 +54,16 @@ class Request {
     }
 
     return config;
-  }
+  };
 
   _init = () => {
     // Provide aliases for supported request methods
-    ['delete', 'get', 'head', 'options'].forEach(method => {
+    ['delete', 'get', 'head', 'options'].forEach((method) => {
       this[method] = (url, config) => {
         config = this.procConfig(config);
 
-        return this.request(_.merge(
-          {},
-          config,
-          {
+        return this.request(
+          _.merge({}, config, {
             url: url,
             method: method,
           })
@@ -73,30 +71,24 @@ class Request {
       };
     });
 
-    ['post', 'put', 'patch'].forEach(method => {
+    ['post', 'put', 'patch'].forEach((method) => {
       this[method] = (url, data, config) => {
         config = this.procConfig(config);
-
         return this.request(
-          _.merge(
-            {},
-            config,
-            {
-              url,
-              method,
-              data
-            }
-          )
+          _.merge({}, config, {
+            url,
+            method,
+            data,
+          })
         );
       };
     });
-  }
+  };
 
   request = (config) => {
     return instance.request(config).then(then);
-  }
+  };
 }
-
 
 // 公共的 then 函数
 export const then = (response) => {
@@ -104,7 +96,7 @@ export const then = (response) => {
 };
 
 // 自定义错误
-export const error = ({code, message, ...rest}) => {
+export const error = ({ code, message, ...rest }) => {
   const e = new Error(message);
 
   e.code = code;
