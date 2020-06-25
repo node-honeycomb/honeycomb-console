@@ -1,0 +1,97 @@
+@import '../../index.less';
+
+.log-left-side {
+  padding: 20px 0;
+  width: 232px;
+  float: left;
+
+  .file-list-title {
+    font-weight: bolder;
+  }
+}
+
+.log-right-side {
+  padding: 20px 0;
+  float: left;
+  width: calc(100% - 232px);
+  position: relative;
+
+  .log-filter {
+    .log-info {
+      display: flex;
+    }
+  }
+
+  .log-filter-box {
+    margin-top: 20px;
+
+    & > div {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    & > span {
+      margin-right: 20px;
+    }
+  }
+
+  .log-filename {
+    font-weight: bolder;
+  }
+}
+
+.log-box {
+  margin-top: 10px;
+  border: 1px solid #eee;
+  padding: 10px;
+  height: calc(100vh - 180px);
+  overflow: auto;
+  position: relative;
+  padding-top: 30px;
+  background: rgb(249, 249, 249);
+  font-size: 13px;
+
+  .log-code {
+    white-space: pre;
+    font-family: monospace;
+    margin-top: 1em;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 0;
+    padding-bottom: 1em;
+    overflow: visible;
+  }
+
+  .error {
+    color: @error-color;
+  }
+
+  .warn {
+    color: @warning-color;
+  }
+}
+
+.log-box-op {
+  position: absolute;
+  left: 10px;
+  top: 115px;
+  z-index: 100;
+  width: calc(100% - 20px);
+
+  .left {
+    float: left;
+    background: white;
+  }
+
+  .right {
+    float: right;
+  }
+
+  span {
+    font-size: 14px;
+    cursor: pointer;
+    margin: 0 5px;
+    &:hover {
+      color: @primary-color;
+    }
+  }
+}

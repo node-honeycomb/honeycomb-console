@@ -49,8 +49,10 @@ export default {
   },
   effects: {
     // 获取当前用户的可用的集群
-    * getCluster(payload, {put}) {
+    // 彬设置默认选中的 cluster
+    * getCluster(__, {put}) {
       const clusters = yield clusterApi.list();
+
 
       yield put({
         type: 'saveCluster',

@@ -20,3 +20,8 @@ export const USER_STATUS_TITLE = {
 
 // local storage select cluster code
 export const LS_LAST_SELECT_CLUSTER_CODE = 'last-cluster-code';
+
+export const LOG_LEVEL = {
+  ERROR: 'ERROR',
+  WARN: 'WARN',
+};

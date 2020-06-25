@@ -1,8 +1,8 @@
 import React from 'react';
+import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {message} from 'antd';
 
-import _ from 'lodash';
 import {connect} from 'dva';
 import {withRouter, routerRedux} from 'dva/router';
 
