@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { connect } from 'dva';
+import React, {useState, useEffect, useCallback} from 'react';
+import _ from 'lodash';
+import {connect} from 'dva';
 import notification from '@coms/notification';
 import CommonTitle from '@coms/common-title';
 import moment from 'moment';
-import { USER_ROLE_TITLE, USER_STATUS_TITLE } from '../../lib/consts';
-import { userApi } from '@api';
-import { Table, Button, Divider, Popconfirm } from 'antd';
+import {userApi} from '@api';
+import {Table, Button, Divider, Popconfirm} from 'antd';
+import {USER_ROLE_TITLE, USER_STATUS_TITLE} from '../../lib/consts';
 import userUpsert from './coms/user-upsert';
 
 const userName = _.get(window, 'CONFIG.user.name');
 
-const UserManager = (props) => {
+const UserManager = () => {
   const [users, setUser] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -32,7 +33,7 @@ const UserManager = (props) => {
   }, []);
 
   const onAddUser = useCallback(async () => {
-    userUpsert({ getUser });
+    userUpsert({getUser});
   });
 
   useEffect(() => {
@@ -40,13 +41,14 @@ const UserManager = (props) => {
   }, []);
 
   const handleEdit = (row) => {
-    userUpsert({ row, getUser });
+    userUpsert({row, getUser});
   };
 
   const handleConfirm = async (row) => {
     const rowName = _.get(row, 'name');
+
     try {
-      await userApi.deleteUser({ name: rowName });
+      await userApi.deleteUser({name: rowName});
       getUser();
     } catch (error) {
       notification.error({
@@ -85,10 +87,11 @@ const UserManager = (props) => {
     {
       title: '操作',
       render(row) {
-        const style = { padding: '0px' };
+        const style = {padding: '0px'};
         // TODO: 用户不可删除自己, 需要做 tooltip 提示
         const rowName = _.get(row, 'name');
         const isUserSelf = rowName === userName;
+
         return (
           <div>
             <Button style={style} type="link" onClick={() => handleEdit(row)}>
@@ -111,6 +114,7 @@ const UserManager = (props) => {
       },
     },
   ];
+
   return (
     <div>
       <CommonTitle>用户管理</CommonTitle>

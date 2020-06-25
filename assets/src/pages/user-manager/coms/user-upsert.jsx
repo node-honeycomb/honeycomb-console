@@ -1,14 +1,14 @@
-import React, { useCallback, useState } from 'react';
+import React, {useCallback, useState} from 'react';
 import _ from 'lodash';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-import { Modal, Form, Input, message } from 'antd';
-import { userApi } from '@api';
+import {Modal, Form, Input, message} from 'antd';
+import {userApi} from '@api';
 import notification from '@coms/notification';
 
 const layout = {
-  labelCol: { span: 4 },
-  wrapperCol: { span: 20 },
+  labelCol: {span: 4},
+  wrapperCol: {span: 20},
 };
 
 const UserUpsert = (props) => {
@@ -17,12 +17,14 @@ const UserUpsert = (props) => {
   const [visible, setVisible] = useState(true);
 
   const isAdd = _.get(props, 'row') === undefined;
+
   console.log(isAdd);
 
   const onSubmit = () => {
     form.validateFields().then(async (value) => {
       // TODO: 调用 API，触发用户创建, 回调组件, 刷新用户列表
-      const { name, password } = value;
+      const {name, password} = value;
+
       console.log('form =>', value);
       setComfirmLoading(true);
       try {
@@ -67,7 +69,7 @@ const UserUpsert = (props) => {
           label="用户名"
           name="name"
           initialValue={_.get(props, 'row.name')}
-          rules={[{ required: true, message: '用户名不能为空！' }]}
+          rules={[{required: true, message: '用户名不能为空！'}]}
         >
           <Input />
         </Form.Item>
@@ -75,7 +77,7 @@ const UserUpsert = (props) => {
         <Form.Item
           label="密码"
           name="password"
-          rules={[{ required: true, message: '密码不能为空！' }]}
+          rules={[{required: true, message: '密码不能为空！'}]}
         >
           <Input.Password />
         </Form.Item>

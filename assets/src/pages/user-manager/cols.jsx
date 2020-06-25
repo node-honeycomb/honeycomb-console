@@ -1,9 +1,10 @@
 import React from 'react';
+import _ from 'lodash';
 import moment from 'moment';
-import { USER_ROLE_TITLE, USER_STATUS_TITLE } from '../../lib/consts';
-import { userApi } from '@api';
-import { Button, Divider, Popconfirm } from 'antd';
+import {userApi} from '@api';
+import {Button, Divider, Popconfirm} from 'antd';
 import notification from '@coms/notification';
+import {USER_ROLE_TITLE, USER_STATUS_TITLE} from '../../lib/consts';
 import userUpsert from './coms/user-upsert';
 
 const userName = _.get(window, 'CONFIG.user.name');
@@ -16,8 +17,9 @@ const handleEdit = () => {
 
 const handleConfirm = async (row) => {
   const rowName = _.get(row, 'name');
+
   try {
-    await userApi.deleteUser({ username: rowName });
+    await userApi.deleteUser({username: rowName});
   } catch (error) {
     console.log(error);
     notification.error({
@@ -56,10 +58,11 @@ const cols = () => [
   {
     title: '操作',
     render(row) {
-      const style = { padding: '0px' };
+      const style = {padding: '0px'};
       // TODO: 用户不可删除自己, 需要做 tooltip 提示
       const rowName = _.get(row, 'name');
       const isUserSelf = rowName === userName;
+
       return (
         <div>
           <Button style={style} type="link" onClick={() => handleEdit(row)}>

@@ -1,12 +1,11 @@
 import React from 'react';
-import { Table, Button } from 'antd';
+import {Table, Button} from 'antd';
 
 import CommonTitle from '@coms/common-title';
 
 // import cols from './cols';
 
 const UserManager = () => {
-
   const cols = () => [
     {
       title: '集群名称',

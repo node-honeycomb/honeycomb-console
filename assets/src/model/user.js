@@ -1,4 +1,4 @@
-import { userApi } from '@api';
+import {userApi} from '@api';
 
 export default {
   namespace: 'user',
@@ -7,9 +7,10 @@ export default {
   },
   effects: {
     // 获取当前用户的列表
-    *getUsers(payload, { put }) {
+    * getUsers(payload, {put}) {
       try {
         const users = yield userApi.list();
+
         yield put({
           type: 'saveUsers',
           payload: {
@@ -23,9 +24,11 @@ export default {
     },
   },
   reducers: {
-    saveUsers: (state, { payload }) => {
+    saveUsers: (state, {payload}) => {
       const users = payload.users;
+
       state.users = users;
+
       return state;
     },
   },

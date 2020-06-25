@@ -1,6 +1,6 @@
 import dva from 'dva';
 import createLoading from 'dva-loading';
-import { createBrowserHistory } from 'history';
+import {createBrowserHistory} from 'history';
 
 import router from './router';
 import loginRouter from './login-router';
@@ -9,7 +9,7 @@ import userModel from './model/user';
 
 import './index.less';
 
-const { isLogin } = window.CONFIG;
+const {isLogin} = window.CONFIG;
 
 const app = dva({
   history: createBrowserHistory(),

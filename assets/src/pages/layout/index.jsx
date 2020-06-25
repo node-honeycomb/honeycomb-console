@@ -17,8 +17,6 @@ import ClusterDrawer from './coms/cluster';
 
 import './index.less';
 
-const {prefix} = window.CONFIG;
-
 class AppLayout extends React.Component {
   static propTypes = {
     children: PropTypes.element,

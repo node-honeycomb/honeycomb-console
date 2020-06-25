@@ -16,8 +16,8 @@ const instance = axios.create({
     'Content-Type': 'application/json',
     ...headers,
   },
-  paramsSerializer: function(params) {
-    return qs.stringify(params, { arrayFormat: 'repeat' });
+  paramsSerializer: function (params) {
+    return qs.stringify(params, {arrayFormat: 'repeat'});
   },
   transformResponse: [
     (response) => {
@@ -74,6 +74,7 @@ class Request {
     ['post', 'put', 'patch'].forEach((method) => {
       this[method] = (url, data, config) => {
         config = this.procConfig(config);
+
         return this.request(
           _.merge({}, config, {
             url,
@@ -96,7 +97,7 @@ export const then = (response) => {
 };
 
 // 自定义错误
-export const error = ({ code, message, ...rest }) => {
+export const error = ({code, message, ...rest}) => {
   const e = new Error(message);
 
   e.code = code;

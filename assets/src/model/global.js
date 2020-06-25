@@ -49,7 +49,7 @@ export default {
   },
   effects: {
     // 获取当前用户的可用的集群
-    *getCluster(payload, { put }) {
+    * getCluster(payload, {put}) {
       const clusters = yield clusterApi.list();
 
       yield put({
@@ -63,7 +63,7 @@ export default {
     },
   },
   reducers: {
-    saveCluster: (state, { payload }) => {
+    saveCluster: (state, {payload}) => {
       const clusters = payload.clusters;
 
       state.clusters = clusters;
