@@ -5,7 +5,7 @@ import notification from '@coms/notification';
 import CommonTitle from '@coms/common-title';
 import moment from 'moment';
 import {userApi} from '@api';
-import {Table, Button, Divider, Popconfirm} from 'antd';
+import {Table, Button, Divider, Popconfirm, message} from 'antd';
 import {USER_ROLE_TITLE, USER_STATUS_TITLE} from '../../lib/consts';
 import userUpsert from './coms/user-upsert';
 
@@ -50,6 +50,7 @@ const UserManager = () => {
     try {
       await userApi.deleteUser({name: rowName});
       getUser();
+      message.success('用户删除成功');
     } catch (error) {
       notification.error({
         message: '用户删除失败',
@@ -132,14 +133,13 @@ const UserManager = () => {
 };
 
 const mapStateProps = (state) => {
-  console.log('state => ', state);
   const user = state.user;
-  const loading = state.loading;
-  const userLoading = _.get(loading.effects, 'user/getUsers');
+  // const loading = state.loading;
+  // const userLoading = _.get(loading.effects, 'user/getUsers');
 
   return {
     user,
-    loading: userLoading,
+    // loading: userLoading,
   };
 };
 

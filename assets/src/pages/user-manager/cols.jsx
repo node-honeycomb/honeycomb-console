@@ -10,8 +10,6 @@ import userUpsert from './coms/user-upsert';
 const userName = _.get(window, 'CONFIG.user.name');
 
 const handleEdit = () => {
-  console.log('edit =>', this);
-
   userUpsert();
 };
 
@@ -21,7 +19,6 @@ const handleConfirm = async (row) => {
   try {
     await userApi.deleteUser({username: rowName});
   } catch (error) {
-    console.log(error);
     notification.error({
       message: '用户删除失败',
       description: error.message,

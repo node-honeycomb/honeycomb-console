@@ -43,8 +43,6 @@ const ClusterDrawer = (props) => {
     ignoreClass: 'show-cluster-sider'
   });
 
-  console.log(freqClusters, '==>');
-
   return (
     <div
       className={classnames('cluster-drawer', {visible: visible})}

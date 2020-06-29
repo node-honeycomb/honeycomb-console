@@ -27,4 +27,4 @@ jobs:
     - run: npm install
     - run: npm run eslint
     - run: npm install honeycomb-cli
-    - run: npx honeycomb pack
+    - run: cd assets && npm install && npx honeypack build

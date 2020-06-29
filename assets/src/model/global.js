@@ -103,7 +103,7 @@ export default {
         const cluster = clusters[code];
 
         if (clusters[code]) {
-          cluster.code = cluster;
+          cluster.code = code;
           freqClusters.push(cluster);
         }
 
