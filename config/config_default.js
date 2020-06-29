@@ -119,5 +119,6 @@ module.exports = {
     keepOnlineNum: 2,
     keepOfflineNum: 5
   },
-  hideUpload: false
+  hideUpload: false,
+  docUrl: 'https://www.yuque.com/honeycomb/gz4kna'
 };

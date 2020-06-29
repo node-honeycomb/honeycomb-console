@@ -11,36 +11,52 @@ import {
   Input,
   Tooltip,
 } from 'antd';
-import PropTypes from 'prop-types';
+import _ from 'lodash';
+import moment from 'moment';
 import {connect} from 'dva';
+import PropTypes from 'prop-types';
 import {aclApi, appApi} from '@api';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
-import _ from 'lodash';
-// import ClusterSelector from './cluster-selector';
+import {tryParse} from '@lib/util';
+import {clusterType} from '@lib/prop-types';
+
+import ClusterSelector from './cluster-selector';
+
+const DEFAULT_APP = {
+  name: '*',
+  title: '*（所有APP）'
+};
 
 const ClusterAuth = (props) => {
+  const {currentClusterCode, clusters, loading: clusterLoading} = props;
+
+  const [loading, setLoading] = useState(true);
   const [aclList, setAclList] = useState([]);
   const [appList, setAppList] = useState([]);
+  const [clusterCode, setClusterCode] = useState(currentClusterCode);
 
   const getAclList = async () => {
     try {
+      setLoading(true);
       const list = await aclApi.aclList();
 
-      setAclList(list);
+      setAclList(list.filter(item => item.cluster_code === clusterCode));
     } catch (error) {
       notification.error({
-        message: '请求集群列表失败',
+        message: '请求权限列表失败',
         description: error.message,
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   const getAppList = async () => {
     try {
-      const list = await appApi.appList();
+      const {success} = await appApi.appList(clusterCode);
 
-      setAppList(list);
+      setAppList(success);
     } catch (error) {
       notification.error({
         message: '请求应用列表失败',
@@ -50,9 +66,14 @@ const ClusterAuth = (props) => {
   };
 
   useEffect(() => {
-    getAclList();
-    getAppList();
-  }, []);
+    (async () => {
+      if (!clusterCode) {
+        return;
+      }
+      await getAppList();
+      await getAclList();
+    })();
+  }, [clusterCode]);
 
   const handleAdd = useCallback(() => {
     const newData = {
@@ -77,7 +98,7 @@ const ClusterAuth = (props) => {
 
   const cols = () => [
     {
-      title: '名称',
+      title: '用户',
       dataIndex: 'name',
       render: (text) => {
         const maxLength = _.size(text);
@@ -97,8 +118,8 @@ const ClusterAuth = (props) => {
       render: (text) => {
         return (
           <Select defaultValue={text + ''} style={{width: 120}}>
-            <Select.Option value="1">Admin</Select.Option>
-            <Select.Option value="0">User</Select.Option>
+            <Select.Option value="1">管理员</Select.Option>
+            <Select.Option value="0">普通用户</Select.Option>
           </Select>
         );
       },
@@ -106,18 +127,35 @@ const ClusterAuth = (props) => {
     {
       title: '拥有的APP',
       dataIndex: 'apps',
-      render: () => {
+      render: (text) => {
         return (
-          <Select defaultValue={1}>
-            {appList.map((app) => {
-              if (app === '*')
-                return <Select.Option key={'*'}>{'*(所有 APP)'}</Select.Option>;
+          <Select
+            value={tryParse(text, [])}
+            mode="multiple"
+            style={{width: 300}}
+          >
+            {
+              [...appList, DEFAULT_APP].map((app) => {
+                if (app.name === '__ADMIN__') {
+                  return null;
+                }
 
-              return <Select.Option key={app}>{app}</Select.Option>;
-            })}
+                return (<Select.Option key={app.name}>{app.title || app.name}</Select.Option>);
+              })
+            }
           </Select>
         );
       },
+    },
+    {
+      title: '创建时间',
+      dataIndex: 'gmt_create',
+      render: text => moment(text).format('YYYY-MM-DD HH:mm:ss')
+    },
+    {
+      title: '更新时间',
+      dataIndex: 'gmt_modified',
+      render: text => moment(text).format('YYYY-MM-DD HH:mm:ss')
     },
     {
       title: '操作',
@@ -165,13 +203,17 @@ const ClusterAuth = (props) => {
     <div>
       <CommonTitle>集群授权</CommonTitle>
       <Space style={{marginBottom: '10px'}}>
-        {/* <ClusterSelector clusters={['apple']} /> */}
+        <ClusterSelector
+          clusters={clusters}
+          value={clusterCode}
+          onChange={(clusterCode) => setClusterCode(clusterCode)}
+        />
         <Button type="primary" onClick={handleAdd}>
-          添加
+          + 添加权限
         </Button>
       </Space>
       <Table
-        loading={props.loading}
+        loading={clusterLoading || loading}
         columns={cols()}
         dataSource={aclList}
         rowKey="id"
@@ -183,6 +225,8 @@ const ClusterAuth = (props) => {
 ClusterAuth.propTypes = {
   loading: PropTypes.bool,
   dispatch: PropTypes.func,
+  clusters: PropTypes.arrayOf(clusterType),
+  currentClusterCode: PropTypes.string
 };
 
 const mapStateProps = (state) => {

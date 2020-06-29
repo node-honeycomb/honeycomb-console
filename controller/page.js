@@ -49,7 +49,8 @@ exports.pages = function (req, callback) {
         appManageConfig: config.appManageConfig,
         env: config.env,
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
-        hideUpload: config.hideUpload
+        hideUpload: config.hideUpload,
+        docUrl: config.docUrl
       }
     }, 'html');
   });

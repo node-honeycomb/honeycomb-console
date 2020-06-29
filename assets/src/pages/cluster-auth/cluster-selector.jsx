@@ -1,17 +1,25 @@
 import React from 'react';
-import PropTypes from 'prop-types';
 import _ from 'lodash';
 import {Select} from 'antd';
+import PropTypes from 'prop-types';
+
+import {clusterType} from '@lib/prop-types';
 
 const ClusterSelector = (props) => {
   const clusters = _.get(props, 'clusters');
-  const defaultCluster = clusters[0];
+  const value = _.get(props, 'value');
+  const onChange = _.get(props, 'onChange');
 
   const getOptions = (clusters) => {
-    return clusters.map((cluster) => {
+    return Object.keys(clusters).map((clusterCode) => {
+      const cluster = clusters[clusterCode];
+
       return (
-        <Select.Option value={cluster.cluster_code} key={cluster.cluster_code}>
-          {cluster.cluster_code + '(' + cluster.cluster_name + ')'}
+        <Select.Option
+          value={clusterCode}
+          key={clusterCode}
+        >
+          {clusterCode + '（' + cluster.name + '）'}
         </Select.Option>
       );
     });
@@ -19,7 +27,11 @@ const ClusterSelector = (props) => {
 
   return (
     <div>
-      <Select defaultValue={defaultCluster} style={{width: 'auto'}}>
+      <Select
+        value={value}
+        style={{width: '200px'}}
+        onChange={onChange}
+      >
         {getOptions(clusters)}
       </Select>
     </div>
@@ -27,6 +39,9 @@ const ClusterSelector = (props) => {
 };
 
 ClusterSelector.propTypes = {
-  clusters: PropTypes.array,
+  clusters: PropTypes.arrayOf(clusterType),
+  value: PropTypes.string,
+  onChange: PropTypes.func
 };
+
 export default ClusterSelector;

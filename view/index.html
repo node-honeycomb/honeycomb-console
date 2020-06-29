@@ -16,7 +16,8 @@
       publishPages: JSON.parse('<%- JSON.stringify(publishPages) %>'),
       user: JSON.parse('<%- JSON.stringify(user) || "{}" %>'),
       appManageConfig: JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>'),
-      hideUpload: '<%=hideUpload%>'
+      hideUpload: '<%=hideUpload%>',
+      docUrl: '<%= docUrl %>'
     };
   </script>
   <script src="<%= prefix %>/assets/app.js"></script>

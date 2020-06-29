@@ -15,6 +15,7 @@ import clusterTip from '../cluster-tip';
 import './index.less';
 
 const userName = _.get(window, 'CONFIG.user.name');
+const {docUrl} = window.CONFIG;
 const prefix = window.CONFIG.prefix;
 
 const menu = (
@@ -63,7 +64,14 @@ const Header = (props) => {
       <div className="right">
         <span className="menu-item">
           <Tooltip title="帮助手册">
-            <BookOutlined />
+            <a
+              href={docUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="black-text"
+            >
+              <BookOutlined />
+            </a>
           </Tooltip>
         </span>
         <span className="menu-item">
