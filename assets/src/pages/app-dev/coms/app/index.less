@@ -1,0 +1,61 @@
+.app {
+  display: flex;
+  padding: 12px;
+  height: 64px;
+  line-height: 20px;
+  background-color: #fff;
+  border: 1px solid #ccd3db;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+  margin: 10px 0;
+
+  .app-info {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 45px);
+  }
+
+  .usage-echarts {
+    width: 200px;
+    margin-right: 10px;
+
+    .charts-title {
+      font-weight: bold;
+    }
+
+    .echarts-box {
+      width: 250px;
+      height: 30px;
+    }
+  }
+
+  &.active {
+
+  }
+
+  .app-icon {
+    align-items: center;
+    display: flex;
+    margin-right: 20px;
+  }
+
+  .info {
+    float: left;
+    margin-right: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    .info-title {
+      font-weight: bolder;
+      white-space: nowrap;
+    }
+  
+    .info-content {
+      font-weight: lighter;
+    }
+  }
+}

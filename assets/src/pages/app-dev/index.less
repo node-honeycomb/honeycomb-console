@@ -1,0 +1,33 @@
+@import '../../index.less';
+
+.app-dev {
+  .app-status {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .app-div-title {
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    font-style: normal;
+    font-stretch: normal;
+    line-height: 1.67;
+    letter-spacing: normal;
+    color: #36435c;
+    margin-top: 8px;
+  }
+}
+
+.usage-dropdown {
+  background-color: @text-color;
+
+  .ant-dropdown-menu-item {
+    color: white;
+
+    &:hover {
+      background-color: @text-color;
+      color: @primary-color;
+    }
+  }
+}

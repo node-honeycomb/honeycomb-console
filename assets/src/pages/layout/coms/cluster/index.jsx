@@ -43,6 +43,7 @@ const ClusterDrawer = (props) => {
     ignoreClass: 'show-cluster-sider'
   });
 
+
   return (
     <div
       className={classnames('cluster-drawer', {visible: visible})}
@@ -57,13 +58,19 @@ const ClusterDrawer = (props) => {
             const isActive = cluster.code === currentClusterCode;
 
             return (
-              <div
+              <Tooltip
                 key={cluster.code}
-                className={classnames('cluster-item', {active: isActive})}
-                onClick={onSetCluster(cluster.code)}
+                placement="right"
+                title={`${cluster.name}（${cluster.code}）`}
               >
-                <DesktopOutlined /> {cluster.name}（{cluster.code}）
-              </div>
+                <div
+                  className={classnames('cluster-item', {active: isActive})}
+                  onClick={onSetCluster(cluster.code)}
+                >
+                  <DesktopOutlined />
+                  {cluster.name}（{cluster.code}）
+                </div>
+              </Tooltip>
             );
           })
         }
@@ -84,13 +91,19 @@ const ClusterDrawer = (props) => {
             const isActive = currentClusterCode === clusterCode;
 
             return (
-              <div
+              <Tooltip
                 key={clusterCode}
-                className={classnames('cluster-item', {active: isActive})}
-                onClick={onSetCluster(clusterCode)}
+                placement="right"
+                title={`${name}（${clusterCode}）`}
               >
-                <DesktopOutlined /> {name}（{clusterCode}）
-              </div>
+                <div
+                  className={classnames('cluster-item', {active: isActive})}
+                  onClick={onSetCluster(clusterCode)}
+                >
+                  <DesktopOutlined />
+                  {name}（{clusterCode}）
+                </div>
+              </Tooltip>
             );
           })
         }

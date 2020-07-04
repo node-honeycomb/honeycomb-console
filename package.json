@@ -5,7 +5,9 @@
   "description": "Honeycomb admin console",
   "main": "app.js",
   "scripts": {
-    "start": "honeycomb start & (cd assets && npx honeypack start)",
+    "start": "multiview [ npm run server ] [ npm run client] -x",
+    "server": "honeycomb start",
+    "client": "cd assets && npx honeypack start",
     "eslint": "eslint --ext .js --ext .jsx --ignore-path .eslintignore ."
   },
   "license": "MIT",
@@ -44,6 +46,7 @@
     "install": "^0.13.0",
     "mm": "2.1.0",
     "mocha": "3.2.0",
+    "multiview": "^3.0.0",
     "should": "11.1.2",
     "supertest": "3.0.0"
   },

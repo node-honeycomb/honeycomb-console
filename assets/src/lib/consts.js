@@ -25,3 +25,7 @@ export const LOG_LEVEL = {
   ERROR: 'ERROR',
   WARN: 'WARN',
 };
+
+// 管控进程应用名
+export const ADMIN_APP_CODE = '__ADMIN__';
+export const ADMIN_APP_NAME = '管控应用';

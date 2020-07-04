@@ -6,7 +6,7 @@ const clusterTip = (cluster) => {
     return null;
   }
 
-  const {name, code, ips} = cluster;
+  const {name, code} = cluster;
 
   if (!name) {
     return null;
@@ -14,19 +14,16 @@ const clusterTip = (cluster) => {
 
   const content = (
     <span>
-      <b>当前集群</b>
-      <br />
-      集群名称：{name}
-      <br />
-      集群code：{code}
-      <br />
-      集群ip：{ips.join('，')}
+      {name}({code})
     </span>
   );
 
   return (
     <span>
-      <Tooltip title={content}>
+      <Tooltip
+        placement="right"
+        title={content}
+      >
       （{name}）
       </Tooltip>
     </span>
