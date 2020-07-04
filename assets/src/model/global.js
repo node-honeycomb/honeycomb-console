@@ -1,5 +1,7 @@
 import _ from 'lodash';
+import {message} from 'antd';
 
+import api from '@api/index';
 import {clusterApi} from '@api';
 import {tryParse} from '@lib/util';
 import {LS_LAST_SELECT_CLUSTER_CODE} from '@lib/consts';
@@ -45,14 +47,15 @@ export default {
     clusters: {},              // 集群列表
     currentClusterCode: null,  // 当前集群code
     currentCluster: {},        // 当前集群的信息
-    freqClusters: []           // 经常使用的集群
+    freqClusters: [],          // 经常使用的集群
+    checkingClusterCode: null, // 正在检查的云计算资源code
+    checkedClusters: [],       // 集群状态
   },
   effects: {
     // 获取当前用户的可用的集群
     // 彬设置默认选中的 cluster
     * getCluster(__, {put}) {
       const clusters = yield clusterApi.list();
-
 
       yield put({
         type: 'saveCluster',
@@ -63,6 +66,48 @@ export default {
 
       return clusters;
     },
+    * checkClusters(payload, {put, select}) {
+      const {checkedClusters, clusters, checkingClusterCode} = yield select(state => state.global);
+
+      if (checkingClusterCode) {
+        return message.loading('正在校验中...');
+      }
+
+      const clusterCodes = Object.keys(clusters);
+
+      // eslint-disable-next-line
+      for (const clusterCode of clusterCodes) {
+        try {
+          const result = yield api.clusterApi.status(clusterCode);
+
+          // FIXME: 考虑部分机器丢失的问题
+          checkedClusters.push([clusterCode, true, result]);
+        } catch (err) {
+          checkedClusters.push([clusterCode, false, err.message]);
+        }
+
+        yield put({
+          type: 'setCheckingClusterCode',
+          payload: {
+            clusterCode
+          }
+        });
+
+        yield put({
+          type: 'setCheckedClusters',
+          payload: {
+            checkedClusters
+          }
+        });
+      }
+
+      yield put({
+        type: 'setCheckingClusterCode',
+        payload: {
+          clusterCode: null
+        }
+      });
+    }
   },
   reducers: {
     saveCluster: (state, {payload}) => {
@@ -119,6 +164,20 @@ export default {
 
       // 浅拷贝
       return {...state};
-    }
+    },
+    setCheckingClusterCode: (state, {payload}) => {
+      const {clusterCode} = payload;
+
+      state.checkingClusterCode = clusterCode;
+
+      return {...state};
+    },
+    setCheckedClusters: (state, {payload}) => {
+      const {checkedClusters} = payload;
+
+      state.checkedClusters = checkedClusters;
+
+      return {...state};
+    },
   }
 };
