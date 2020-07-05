@@ -1,8 +1,9 @@
 import React, {useState, useEffect} from 'react';
-import {connect} from 'dva';
-import PropTypes from 'prop-types';
 import Q from 'queue';
 import {Spin} from 'antd';
+import moment from 'moment';
+import {connect} from 'dva';
+import PropTypes from 'prop-types';
 
 import api from '@api/index';
 import Ring from '@coms/ring';
@@ -12,21 +13,30 @@ import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
 
 import App from './coms/app';
-import {getClusterUsages} from './util';
 import Usages, {MODE} from './coms/usages';
+import {getClusterUsages, getCurrentWorking, parseUsgae} from './util';
 
 import './index.less';
 
-const q = new Q({
+const appQ = new Q({
   autostart: true,
   concurrency: 1
 });
+
+const usageQ = new Q({
+  autostart: true,
+  concurrency: 1
+});
+
+const now = moment().format('YYYY-MM-DD-HH');
+const before = moment().format('YYYY-MM-DD-HH');
 
 const AppDev = (props) => {
   const {currentClusterCode} = props;
   const [appList, setAppList] = useState([]);
   const [errCount, setErrCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [appUsgae, setAppUsgae] = useState({});
 
   const {result, loading: statusLoading} = useRequest({
     request: async () => {
@@ -56,6 +66,8 @@ const AppDev = (props) => {
       const {success} = await api.appApi.appList(currentClusterCode);
 
       setAppList(success);
+
+      return success;
     } catch (e) {
       setErrCount(errCount + 1);
     } finally {
@@ -63,15 +75,54 @@ const AppDev = (props) => {
     }
   };
 
+  const getUsage = async (apps = appList) => {
+    if (!currentClusterCode) {
+      return;
+    }
+
+    try {
+      const usageResult = await api.clusterApi.usage({
+        clusterCode: currentClusterCode,
+        from: before,
+        to: now
+      });
+
+      const keys = Object.keys(usageResult);
+      const usage = {};
+      const statUsage = usageResult[keys[0]];
+
+      apps.forEach(app => {
+        const workingApp = getCurrentWorking(app.versions);
+        const appId = workingApp && workingApp.appId;
+
+        usage[app.name] = parseUsgae(statUsage[appId]);
+      });
+
+
+      // TODO: 只取出第一个机器的信息，其他机器的信息引导用户去系统监控查看
+      setAppUsgae(usage);
+    } catch (e) {
+      setErrCount(errCount + 1);
+    }
+  };
+
   useInterval(() => {
-    q.push(getApiList);
-  }, 1000);
+    appQ.push(getApiList);
+  }, 1000 * 2);
+
+  useInterval(() => {
+    usageQ.push(getUsage);
+  }, 1000 * 60);
 
   useEffect(() => {
-    setErrCount(0);
-    setAppList([]);
-    setLoading(true);
-    getApiList();
+    (async () => {
+      setErrCount(0);
+      setAppList([]);
+      setLoading(true);
+      const apps = await getApiList();
+
+      await getUsage(apps);
+    })();
   }, [currentClusterCode]);
 
   const total = appList.length;
@@ -114,13 +165,15 @@ const AppDev = (props) => {
       <div className="app-div-title">应用列表</div>
       <div className="app-list">
         <BannerCard>
-          <Spin spinning={loading}>
+          <Spin className="app-list-spinning" spinning={loading}>
             {
-              appList.map(app => {
+              appList.map((app, ind) => {
                 return (
                   <App
                     key={app.name}
                     app={app}
+                    usage={appUsgae[app.name] || {}}
+                    zIndex={appList.length - ind}
                   />
                 );
               })

@@ -5,7 +5,6 @@ import {Link, withRouter} from 'dva/router';
 
 import WhiteSpace from '@coms/white-space';
 
-
 import menu from './menu';
 
 import './index.less';

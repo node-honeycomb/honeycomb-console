@@ -3,19 +3,20 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import WhiteSpace from '@coms/white-space';
-import {Tooltip as AntdTooltip, Menu, Dropdown} from 'antd';
 import AdminAppIconTip from '@coms/admin-app-icon-tip';
-import {DeploymentUnitOutlined, DownOutlined} from '@ant-design/icons';
-
-import {ADMIN_APP_NAME, ADMIN_APP_CODE} from '@lib/consts';
-import {PRIMARY_COLOR} from '@lib/color';
 import {
-  Chart,
-  Area,
-  Line,
-  Tooltip,
+  Chart, Area,
+  Line, Tooltip,
 } from 'bizcharts';
+import {DeploymentUnitOutlined} from '@ant-design/icons';
+
+import {PRIMARY_COLOR} from '@lib/color';
+import WhiteSpace from '@coms/white-space';
+import {ADMIN_APP_NAME, ADMIN_APP_CODE, APP_STATUS} from '@lib/consts';
+
+import AppOp from './app-op';
+import VersionApp from './version-app';
+import {getCurrentWorking, getAppInfo} from '../../util';
 
 import './index.less';
 
@@ -61,176 +62,123 @@ const getStat = (versions) => {
   };
 };
 
-const data = [
-  {
-    time: '2020-07-01 09:30:36', value: 20
-  },
-  {
-    time: '2020-07-02 09:30:36', value: 20
-  },
-  {
-    time: '2020-07-03 09:30:36', value: 30
-  },
-  {
-    time: '2020-07-05 09:30:36', value: 50
-  },
-  {
-    time: '2020-07-06 09:30:36', value: 20
-  },
-  {
-    time: '2020-07-07 09:30:36', value: 10
-  },
-  {
-    time: '2020-07-08 09:30:36', value: 80
-  },
-  {
-    time: '2020-07-09 09:30:36', value: 30
-  },
-  {
-    time: '2020-07-10 09:30:36', value: 100
-  },
-];
-
-const MENU_KEYS = {
-  EXPEND: 'EXPEND',
-  CONFIG: 'CONFIG',
-  LOG: 'LOG',
-};
-
-// 获取菜单
-// eslint-disable-next-line
-const getMenu = ({onClick}) => {
-  return (
-    <Menu onClick={({key}) => onClick(key)}>
-      <Menu.Item key={MENU_KEYS.EXPEND}>
-        <a>
-          展开
-        </a>
-      </Menu.Item>
-      <Menu.Item key={MENU_KEYS.CONFIG}>
-        <a>
-          应用配置
-        </a>
-      </Menu.Item>
-      <Menu.Item key={MENU_KEYS.LOG}>
-        <a>
-          应用日志
-        </a>
-      </Menu.Item>
-    </Menu>
-  );
-};
-
-
 const App = (props) => {
-  const {app} = props;
+  const {app, usage, zIndex} = props;
   const {name, versions} = app;
-  const {publishAt, total, online, exception} = getStat(versions);
+  const {publishAt, exception} = getStat(versions);
   const isAdminApp = ADMIN_APP_CODE === name;
   const [isActive, setActive] = useState(false);
+  const {memUsage, cpuUsage} = usage || {};
+
+  const workingApp = getCurrentWorking(versions);
+  const appInfo = workingApp && getAppInfo(workingApp.appId);
+  const version = appInfo && `${appInfo.version}_${appInfo.build}`;
+  const appStatus = workingApp && workingApp.cluster.map(c => c.status);
+  const isOnline = workingApp && appStatus.includes(APP_STATUS.ONLINE);
 
   const infos = [
     [
-      isAdminApp ? (<span>{ADMIN_APP_NAME}<WhiteSpace /><AdminAppIconTip /></span>) : name,
+      isAdminApp ?
+        (<span>{ADMIN_APP_NAME}<WhiteSpace /><AdminAppIconTip /></span>) :
+        name,
       `创建于${publishAt}`
     ],
     [
-      '运行版本',
-      `${online}/${total}`
+      isAdminApp ? '默认版本' : version,
+      '运行版本'
     ],
     [
-      '异常数',
-      `${exception}`
+      `${exception}`,
+      '异常数'
     ]
   ];
 
   const charts = [
     [
-      '内存（3m）',
-      data
+      '内存',
+      memUsage || []
     ],
     [
-      'cpu（3m）',
-      data
+      'cpu',
+      cpuUsage || []
     ]
   ];
 
   return (
     <div
       className={classnames('app', {active: isActive})}
-      onClick={() => setActive(!isActive)}
+      style={{zIndex: zIndex}}
     >
-      <div className="app-icon">
-        <DeploymentUnitOutlined style={{fontSize: 30}} />
-      </div>
-      <div className="app-info">
-        {
-          infos.map(([title, info]) => {
-            return (
-              <div className="info" key={title}>
-                <div className="info-title">{title}</div>
-                <div className="info-content">
-                  <AntdTooltip title={info} placement="right">
+      <div className="app-info-container" onClick={() => setActive(!isActive)}>
+        <div className="app-icon">
+          <DeploymentUnitOutlined style={{fontSize: 30, color: isOnline ? undefined : 'grey'}} />
+        </div>
+        <div className="app-info">
+          {
+            infos.map(([title, info]) => {
+              return (
+                <div className="info" key={title}>
+                  <div className="info-title">{title}</div>
+                  <div className="info-content" title={title}>
                     {info}
-                  </AntdTooltip>
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        }
-        {
-          charts.map(([title, data]) => {
-            return (
-              <div
-                className="usage-echarts"
-                key={title}
-              >
-                <div className="charts-title">{title}</div>
-                <div className="echarts-box">
-                  <Chart
-                    height={30}
-                    width={200}
-                    data={data}
-                    autoFit
-                    pure
-                  >
-                    <Tooltip shared={false} />
-                    <Area
-                      position="time*value"
-                      color={`l (270) 0:rgba(255, 255, 255, 1) 1:${PRIMARY_COLOR}`}
-                    />
-                    <Line
-                      position="time*value"
-                      color={PRIMARY_COLOR}
-                    />
-                  </Chart>
+              );
+            })
+          }
+          {
+            charts.map(([title, data]) => {
+              return (
+                <div
+                  className="usage-echarts"
+                  key={title}
+                >
+                  <div className="charts-title">{title}</div>
+                  <div className="echarts-box">
+                    <Chart
+                      height={30}
+                      width={200}
+                      data={data}
+                      autoFit
+                      pure
+                      scale={{
+                        value: {
+                          min: 0
+                        }
+                      }}
+                    >
+                      <Tooltip shared={false} />
+                      <Area
+                        position="timestamp*value"
+                        color={`l (270) 0:rgba(255, 255, 255, 1) 1:${PRIMARY_COLOR}`}
+                      />
+                      <Line
+                        position="timestamp*value"
+                        color={PRIMARY_COLOR}
+                      />
+                    </Chart>
+                  </div>
                 </div>
-              </div>
-            );
-          })
-        }
-        <div className="info">
-          <div className="info-title">操作</div>
-          <div>
-            <a>
-            重启
-            </a>
-            <WhiteSpace />|<WhiteSpace />
-            <a>
-            重载
-            </a>
-            <WhiteSpace />|<WhiteSpace />
-            <a>
-            回滚
-            </a>
-            <WhiteSpace />|<WhiteSpace />
-            <Dropdown overlay={getMenu({onClick: () => setActive(true)})}>
-              <a>
-                更多<WhiteSpace /><DownOutlined />
-              </a>
-            </Dropdown>
+              );
+            })
+          }
+          <div className="info">
+            <div className="info-title">操作</div>
+            <AppOp status={appStatus || []} showMore />
           </div>
         </div>
+      </div>
+      <div className="versions">
+        {
+          _.cloneDeep(versions).reverse().map(versionApp => {
+            return (
+              <VersionApp
+                key={versionApp.appId}
+                versionApp={versionApp}
+              />
+            );
+          })
+        }
       </div>
     </div>
   );
@@ -242,7 +190,9 @@ App.propTypes = {
     versions: PropTypes.arrayOf(PropTypes.shape({
 
     }))
-  })
+  }),
+  usage: PropTypes.object,
+  zIndex: PropTypes.number
 };
 
 export default App;
