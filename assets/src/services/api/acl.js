@@ -6,13 +6,13 @@ export const aclList = () => {
 };
 
 export const createAcl = (data) => {
-  return request.post('/api/acl/create', data);
+  return request.post('/api/acl/create', {...data});
 };
 
-export const updateAcl = (code) => {
-  return request.post(`/api/acl/${code}/update`, {});
+export const updateAcl = (id, data) => {
+  return request.post(`/api/acl/${id}/update`, data);
 };
 
-export const deleteAcl = (code) => {
-  return request.post(`/api/acl/${code}/delete`, {});
+export const deleteAcl = (id, data) => {
+  return request.post(`/api/acl/${id}/delete`, data);
 };

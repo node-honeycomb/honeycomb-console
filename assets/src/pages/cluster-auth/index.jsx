@@ -1,16 +1,7 @@
 /* eslint-disable react/display-name */
 /* eslint-disable camelcase */
 import React, {useState, useEffect, useCallback} from 'react';
-import {
-  Table,
-  Button,
-  Divider,
-  Space,
-  Select,
-  Popconfirm,
-  Input,
-  Tooltip,
-} from 'antd';
+import {Table, Button, Divider, Space, Tooltip, Tag, Modal, message} from 'antd';
 import _ from 'lodash';
 import moment from 'moment';
 import {connect} from 'dva';
@@ -18,14 +9,16 @@ import PropTypes from 'prop-types';
 import {aclApi, appApi} from '@api';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
-import {tryParse} from '@lib/util';
-import {clusterType} from '@lib/prop-types';
+import {tryParse, tryArrToStr} from '@lib/util';
+import {USER_ROLE_TITLE} from '@lib/consts';
+// import {clusterType} from '@lib/prop-types';
 
 import ClusterSelector from './cluster-selector';
+import authAdd from './auth-add';
 
 const DEFAULT_APP = {
   name: '*',
-  title: '*（所有APP）'
+  title: '*（所有APP）',
 };
 
 const ClusterAuth = (props) => {
@@ -35,13 +28,18 @@ const ClusterAuth = (props) => {
   const [aclList, setAclList] = useState([]);
   const [appList, setAppList] = useState([]);
   const [clusterCode, setClusterCode] = useState(currentClusterCode);
+  const selectedCluster = {
+    code: _.get(clusters, `${clusterCode}.code`),
+    id: _.get(clusters, `${clusterCode}.id`),
+    name: _.get(clusters, `${clusterCode}.name`),
+  };
 
   const getAclList = async () => {
     try {
       setLoading(true);
       const list = await aclApi.aclList();
 
-      setAclList(list.filter(item => item.cluster_code === clusterCode));
+      setAclList(list.filter((item) => item.cluster_code === clusterCode));
     } catch (error) {
       notification.error({
         message: '请求权限列表失败',
@@ -75,26 +73,49 @@ const ClusterAuth = (props) => {
     })();
   }, [clusterCode]);
 
-  const handleAdd = useCallback(() => {
-    const newData = {
-      id: -1,
-      name: '',
-      cluster_admin: 0,
-      apps: '',
-      cluster_code: this.state.selectedCluster.cluster_code,
-      cluster_id: this.state.selectedCluster.cluster_id,
-      cluster_name: this.state.selectedCluster.cluster_name,
-    };
-
-    setAclList([...aclList, newData]);
+  const handleAuthAdd = useCallback(() => {
+    authAdd({getAclList, selectedCluster, appList});
   });
 
-  const cancel = (index) => {
-    const arr = [...aclList];
-
-    arr.splice(index, 1);
-    setAclList(arr);
+  const handleEdit = (row) => {
+    authAdd({getAclList, selectedCluster, appList, row});
   };
+
+  const handleConfirm = useCallback(row => {
+    const values = {
+      acl: {
+        id: row.id,
+        name: row.name,
+        cluster_admin: row.cluster_admin,
+        apps: tryArrToStr(row.apps),
+        cluster_code: selectedCluster.code,
+        cluster_id: selectedCluster.id,
+        cluster_name: selectedCluster.name,
+        gmt_create: row.gmt_create,
+        gmt_modified: row.gmt_modified,
+      },
+      clusterCode: selectedCluster.code,
+    };
+
+    Modal.confirm({
+      title: `确定要删除该权限吗？`,
+      content: `无法复原，请谨慎操作`,
+      okText: '确认',
+      cancelText: '取消',
+      onOk: async () => {
+        try {
+          await aclApi.deleteAcl(row.id, values);
+          message.success('权限删除成功');
+          getAclList();
+        } catch (error) {
+          notification.error({
+            message: '权限删除失败',
+            description: error.message,
+          });
+        }
+      },
+    });
+  });
 
   const cols = () => [
     {
@@ -105,10 +126,10 @@ const ClusterAuth = (props) => {
 
         return maxLength >= 25 ? (
           <Tooltip trigger={['hover']} title={text} placement="topLeft">
-            <Input defaultValue={text} maxLength={25} />
+            <span>{text}</span>
           </Tooltip>
         ) : (
-          <Input defaultValue={text} maxLength={25} />
+          <span>{text}</span>
         );
       },
     },
@@ -116,83 +137,60 @@ const ClusterAuth = (props) => {
       title: '权限',
       dataIndex: 'cluster_admin',
       render: (text) => {
-        return (
-          <Select defaultValue={text + ''} style={{width: 120}}>
-            <Select.Option value="1">管理员</Select.Option>
-            <Select.Option value="0">普通用户</Select.Option>
-          </Select>
-        );
+        return <Tag color="red">{USER_ROLE_TITLE[text]}</Tag>;
       },
     },
     {
       title: '拥有的APP',
       dataIndex: 'apps',
       render: (text) => {
-        return (
-          <Select
-            value={tryParse(text, [])}
-            mode="multiple"
-            style={{width: 300}}
-          >
-            {
-              [...appList, DEFAULT_APP].map((app) => {
-                if (app.name === '__ADMIN__') {
-                  return null;
-                }
+        const apps = tryParse(text, []);
 
-                return (<Select.Option key={app.name}>{app.title || app.name}</Select.Option>);
-              })
-            }
-          </Select>
-        );
+        return apps.map((app) => {
+          if (app === '__ADMIN__') {
+            return null;
+          }
+
+          if (app === '*')
+            return <Tag key={DEFAULT_APP.name}>{DEFAULT_APP.title}</Tag>;
+
+          return <Tag key={app}>{app}</Tag>;
+        });
       },
     },
     {
       title: '创建时间',
       dataIndex: 'gmt_create',
-      render: text => moment(text).format('YYYY-MM-DD HH:mm:ss')
+      render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '更新时间',
       dataIndex: 'gmt_modified',
-      render: text => moment(text).format('YYYY-MM-DD HH:mm:ss')
+      render: (text) => moment(text).format('YYYY-MM-DD HH:mm:ss'),
     },
     {
       title: '操作',
       dataIndex: 'operation',
-      render: (text, record, index) => {
+      render: (text, record) => {
         const style = {padding: '0px'};
 
-        return _.get(record, 'key') === -1 ? (
+        return (
           <div>
-            <Popconfirm title="确认保存?" onConfirm={() => this.create(index)}>
-              <Button style={style} type="link">
-                编辑
-              </Button>
-            </Popconfirm>
-            <Divider type="vertical" />
-            <Popconfirm title="确认撤销?" onConfirm={() => cancel(index)}>
-              <Button style={style} type="link">
-                撤销
-              </Button>
-            </Popconfirm>
-          </div>
-        ) : (
-          <div>
-            <Popconfirm title="确认保存?" onConfirm={() => this.create(index)}>
-              <Button style={style} type="link">
-                编辑
-              </Button>
-            </Popconfirm>
-            <Divider type="vertical" />
-            <Popconfirm
-              title="确认删除?"
-              onConfirm={() => this.serverDelete(index)}
+            <Button
+              style={style}
+              type="link"
+              onClick={() => handleEdit(record)}
             >
-              <Button style={style} type="link">
-                删除
-              </Button>
-            </Popconfirm>
+              编辑
+            </Button>
+            <Divider type="vertical" />
+            <Button
+              style={style}
+              type="link"
+              onClick={() => handleConfirm(record)}
+            >
+              删除
+            </Button>
           </div>
         );
       },
@@ -208,7 +206,7 @@ const ClusterAuth = (props) => {
           value={clusterCode}
           onChange={(clusterCode) => setClusterCode(clusterCode)}
         />
-        <Button type="primary" onClick={handleAdd}>
+        <Button type="primary" onClick={handleAuthAdd}>
           + 添加权限
         </Button>
       </Space>
@@ -225,8 +223,9 @@ const ClusterAuth = (props) => {
 ClusterAuth.propTypes = {
   loading: PropTypes.bool,
   dispatch: PropTypes.func,
-  clusters: PropTypes.arrayOf(clusterType),
-  currentClusterCode: PropTypes.string
+  // clusters: PropTypes.arrayOf(clusterType),
+  clusters: PropTypes.object,
+  currentClusterCode: PropTypes.string,
 };
 
 const mapStateProps = (state) => {
