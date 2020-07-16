@@ -11,7 +11,7 @@
     "diff": "3.5.0",
     "echarts": "^3.5.1",
     "jquery": "3.4.0",
-    "lodash": "4.17.13",
+    "lodash": "4.17.19",
     "lodash.debounce": "~4.0.6",
     "moment": "2.19.3",
     "monaco-editor": "^0.12.0",
