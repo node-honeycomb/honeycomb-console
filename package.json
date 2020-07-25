@@ -5,7 +5,7 @@
   "description": "Honeycomb admin console",
   "main": "app.js",
   "scripts": {
-    "start": "multiview [ npm run server ] [ npm run client] -x",
+    "start": "concurrently 'npm:client' 'npm:server'",
     "server": "honeycomb start",
     "client": "cd assets && npx honeypack start",
     "eslint": "eslint --ext .js --ext .jsx --ignore-path .eslintignore ."
@@ -36,6 +36,7 @@
     "@commitlint/cli": "^8.2.0",
     "@commitlint/config-conventional": "^8.2.0",
     "babel-eslint": "^8.2.3",
+    "concurrently": "^5.2.0",
     "eslint": "^6.8.0",
     "eslint-config-ali": "^9.0.2",
     "eslint-config-aliyun": "^2.1.1",
@@ -46,7 +47,6 @@
     "install": "^0.13.0",
     "mm": "2.1.0",
     "mocha": "3.2.0",
-    "multiview": "^3.0.0",
     "should": "11.1.2",
     "supertest": "3.0.0"
   },
