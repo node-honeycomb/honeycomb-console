@@ -4,7 +4,6 @@ import api from '@api/index';
 import {notification} from 'antd';
 import PropTypes from 'prop-types';
 import {withRouter} from 'dva/router';
-import {FolderOpenOutlined} from '@ant-design/icons';
 
 import setQuery from '@lib/set-query';
 import s2q from '@lib/search-to-query';
@@ -34,12 +33,6 @@ const Log = (props) => {
     try {
       const files = await api.logApi.getLogFiles(currentClusterCode);
       const tree = filepaths2tree(files);
-
-      tree.forEach(item => {
-        if (!item.parent) {
-          item.icon = <FolderOpenOutlined />;
-        }
-      });
 
       setTree(tree);
 
@@ -90,16 +83,16 @@ const Log = (props) => {
 
   return (
     <div>
-      <div className="log-left-side">
-        <div className="file-list-title">日志列表</div>
+      <div className="page-left-side">
+        <div className="list-title">日志列表</div>
         <FileTree
           tree={tree}
           loading={filesLoading}
-          onSelectFile={onSelectFile}
+          onSelect={onSelectFile}
           activeKey={activeLog}
         />
       </div>
-      <div className="log-right-side">
+      <div className="page-right-side">
         <LogPanel
           clusterCode={currentClusterCode}
           logFileName={activeLog}

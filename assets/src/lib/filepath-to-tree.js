@@ -7,8 +7,26 @@ const filepaths2tree = (files = []) => {
 
   const result = [];
 
+  // 优先处理系统的日志
+  result.unshift({
+    title: '系统日志',
+    level: 0,
+    parent: null,
+    key: '系统日志'
+  });
 
-  // 优先处理应用日志
+  files
+    .filter(filepath => !filepath.includes('/'))
+    .forEach(filepath => {
+      result.push({
+        title: filepath,
+        level: 1,
+        parent: '系统日志',
+        key: filepath
+      });
+    });
+
+  // 处理应用日志
   files
     .filter(filepath => filepath.includes('/'))
     .forEach(filepath => {
@@ -19,6 +37,7 @@ const filepaths2tree = (files = []) => {
           title: directory,
           level: 0,
           parent: null,
+          key: directory
         });
       }
 
@@ -31,23 +50,6 @@ const filepaths2tree = (files = []) => {
       });
     });
 
-
-  result.push({
-    title: '系统',
-    level: 0,
-    parent: null
-  });
-
-  files
-    .filter(filepath => !filepath.includes('/'))
-    .forEach(filepath => {
-      result.push({
-        title: filepath,
-        level: 1,
-        parent: '系统',
-        key: filepath
-      });
-    });
 
   return result;
 };

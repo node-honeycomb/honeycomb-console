@@ -11,6 +11,10 @@ const TRANS = 1024 * 1024 * 1024;
  * @param {Array} status.data
  */
 export const getClusterUsages = (status) => {
+  if (!status) {
+    return [];
+  }
+
   return status.map(stt => {
     const {memoryUsage, memory} = stt.data;
     const disk = _.get(stt, 'data.diskInfo.serverRoot.size');
