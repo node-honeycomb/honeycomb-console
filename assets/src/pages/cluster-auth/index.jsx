@@ -137,7 +137,7 @@ const ClusterAuth = (props) => {
       title: '权限',
       dataIndex: 'cluster_admin',
       render: (text) => {
-        return <Tag color="red">{USER_ROLE_TITLE[text]}</Tag>;
+        return <Tag color="#55bc8a">{USER_ROLE_TITLE[text]}</Tag>;
       },
     },
     {

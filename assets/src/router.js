@@ -16,6 +16,7 @@ const AppConfig = load(() => import('./pages/app-config'));
 const UserManager = load(() => import('./pages/user-manager'));
 const ClusterManager = load(() => import('./pages/cluster-manager'));
 const ClusterAuth = load(() => import('./pages/cluster-auth'));
+const SysMonitor = load(() => import('./pages/sys-monitor'));
 
 const router = ({history}) => {
   return (
@@ -25,6 +26,7 @@ const router = ({history}) => {
           <Switch>
             <Route path={PAGES.APP_DEV} component={AppDev} />
             <Route path={PAGES.APP_CONFIG} component={AppConfig} />
+            <Route path={PAGES.SYS_MONITOR} component={SysMonitor} />
             <Route path={PAGES.USER_MANAGER} component={UserManager} />
             <Route path={PAGES.CLUSTER_MANAGER} component={ClusterManager} />
             <Route path={PAGES.CLUSTER_AUTH} component={ClusterAuth} />

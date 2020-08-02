@@ -80,7 +80,7 @@ const UserManager = (props) => {
     {
       title: '秘钥',
       dataIndex: 'token',
-      render: () => '****',
+      render: () => '***',
     },
     {
       title: 'ip列表',

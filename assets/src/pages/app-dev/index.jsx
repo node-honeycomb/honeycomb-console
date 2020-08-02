@@ -11,7 +11,7 @@ import {useRequest} from '@lib/hooks';
 import BannerCard from '@coms/banner-card';
 import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
-
+import _ from 'lodash';
 import App from './coms/app';
 import Usages, {MODE} from './coms/usages';
 import {getClusterUsages, getCurrentWorking, parseUsgae} from './util';
@@ -140,7 +140,7 @@ const AppDev = (props) => {
           partTitle="异常应用总数"
         />
         {
-          usages.length && (
+          _.get(usages, 'length') && (
             <Usages
               mode={MODE.MEM}
               usages={usages}
@@ -151,7 +151,7 @@ const AppDev = (props) => {
         }
 
         {
-          usages.length && (
+          _.get(usages, 'length') && (
             <Usages
               mode={MODE.DISK}
               usages={usages}

@@ -4,6 +4,7 @@ import * as clusterApi from './api/cluster';
 import * as aclApi from './api/acl';
 import * as appApi from './api/app';
 import * as configApi from './api/config';
+import * as usageApi from './api/monitor';
 
 export default {
   userApi,
@@ -11,5 +12,6 @@ export default {
   logApi,
   aclApi,
   appApi,
-  configApi
+  configApi,
+  usageApi,
 };

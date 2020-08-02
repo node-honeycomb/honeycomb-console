@@ -52,7 +52,9 @@ const Header = (props) => {
         >
           <CopyOutlined />集群列表{clusterTip(currentCluster)}
         </span>
-        <span className="menu-item">
+        <span
+          onClick={props.onToggleCluster}
+          className="menu-item show-cluster-sider">
           <PauseCircleOutlined /> 集群信息
         </span>
       </div>

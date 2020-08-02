@@ -1,0 +1,36 @@
+@import './../../index.less';
+
+.sys-monitor__header {
+  display: flex;
+  justify-content: space-between;
+  &__title {
+    font-size: 14px;
+    font-weight: 600;
+    line-height: 32px;
+  }
+  &__option {
+    display: flex;
+
+    .action__button {
+      padding: 6px;
+      // color: white;
+      border: none;
+      border-radius: 4px;
+      border: 1px solid @text-color;
+      // background-color: @text-color;
+      text-align: center;
+      line-height: 20px;
+      margin-left: 8px;
+      height: 32px;
+      cursor: pointer;
+    }
+  }
+}
+
+.sys-monitor__container {
+  margin-top: 12px;
+
+  .chart__box {
+    padding: 6px;
+  }
+}

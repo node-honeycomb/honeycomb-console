@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 import React, {useState, useCallback} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
@@ -5,11 +6,14 @@ import {Modal, Form, Input, message, Select} from 'antd';
 import {clusterApi} from '@api';
 import notification from '@coms/notification';
 import _ from 'lodash';
+import {tryArrToLineBreakStr} from '@lib/util';
 
 // eslint-disable-next-line max-len
 const ipRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
-// eslint-disable-next-line max-len
-const httpIpPortRegex = /^(http[s]?)?:\/\/(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]):[0-9]+$/;
+
+// eslint-disable-next-line no-empty-character-class
+const httpIpPortRegex = new RegExp(/^(http[s]?)?:\/\/((\*)[]|((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)|((\*\.)?([a-zA-Z0-9-]+\.){0,5}[a-zA-Z0-9-]+\.[a-zA-Z]{2,63}?)):[0-9]+$/g);
+
 const layout = {
   labelCol: {span: 4},
   wrapperCol: {span: 20},
@@ -111,7 +115,7 @@ const ClusterUpset = (props) => {
                   return Promise.resolve();
                 }
 
-                return Promise.reject('请按照 http(s):IP:端口号 输入');
+                return Promise.reject('请按照 http(s)://{domain|IP}:{port} 格式输入');
               },
             }),
           ]}
@@ -133,14 +137,12 @@ const ClusterUpset = (props) => {
         <Form.Item
           label="ip 列表:"
           name="ips"
-          initialValue={_.get(props, 'row.ips')}
+          initialValue={tryArrToLineBreakStr(_.get(props, 'row.ips'))}
           rules={[
             {required: true, message: 'ip 列表不能为空！'},
             () => ({
               validator(rule, value) {
                 if (value) {
-                  _.isArray(value) ? (value = _.join(value, ',')) : value;
-
                   const ips = value.trim().split(/[\n,]/g);
                   const errArr = [];
 
