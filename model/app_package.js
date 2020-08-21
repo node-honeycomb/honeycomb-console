@@ -8,7 +8,7 @@ const os = require('os');
 /**
  * 保存pkg到数据库
  */
-const INSERT_APP_PKG = `INSERT INTO
+const INSERT_APP_PKG = `REPLACE INTO
     hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, user, gmt_create)
   VALUES(?, ?, ?, ?, ?, ?, ?)`;
 exports.savePackage = (data, callback) => {
