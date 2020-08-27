@@ -5,6 +5,18 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 
+
+let storage;
+
+if (config.storage) {
+  try {
+    config.storage.log = log;
+    storage = require('../common/storage/' + config.storage.driver)(config.storage);
+  } catch (e) {
+    log.error('get storage driver error', e);
+    storage = undefined;
+  }
+}
 /**
  * 保存pkg到数据库
  */
@@ -16,19 +28,29 @@ exports.savePackage = (data, callback) => {
   if (db.type === 'sqlite' && !config.debug) {
     return callback(null);
   }
-  db.query(
-    INSERT_APP_PKG,
-    [data.clusterCode, data.appId, data.appName, data.appWeight, fs.readFileSync(data.pkg), data.user, d],
-    function (err) {
-      if (err) {
-        log.error('Insert pkg failed:', err);
-        return callback(err);
-      } else {
-        log.info('insert pkg success');
-        callback(null);
+  if (storage) {
+    storage.save(data.pkg, (err, fkey) => {
+      save('key', fkey, callback);
+    });
+  } else {
+    save('file', data.pkg, callback);
+  }
+
+  function save(type, file, callback) {
+    db.query(
+      INSERT_APP_PKG,
+      [data.clusterCode, data.appId, data.appName, data.appWeight, type === 'key' ? file : fs.readFileSync(file), data.user, d],
+      function (err) {
+        if (err) {
+          log.error('Insert pkg failed:', err);
+          return callback(err);
+        } else {
+          log.info('insert pkg success', file);
+          callback(null);
+        }
       }
-    }
-  );
+    );
+  }
 };
 
 /**
@@ -62,13 +84,23 @@ exports.getPackage = (clusterCode, appId, callback) => {
         log.error('get app pkg failed:', err);
         return callback(err);
       } else {
-        log.info('get app pkg success');
+        log.info('get app pkg success', JSON.stringify(data[0]));
         if (data[0]) {
           let tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
-          fs.writeFileSync(tmpFile, data[0].package);
-          data[0].package = tmpFile;
+          if (storage) {
+            storage.get(data[0].package, tmpFile, (err) => {
+              if (err) {
+                return callback(err);
+              }
+              data[0].package = tmpFile;
+              callback(null, data[0]);
+            });
+          } else {
+            fs.writeFileSync(tmpFile, data[0].package);
+            data[0].package = tmpFile;
+            callback(null, data[0]);
+          }
         }
-        callback(null, data[0]);
       }
     }
   );
