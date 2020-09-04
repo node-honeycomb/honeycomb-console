@@ -1,13 +1,18 @@
 import React from 'react';
+import moment from 'moment';
+import dynamic from 'dva/dynamic';
 import PropTypes from 'prop-types';
 import {Router, Route, Switch} from 'dva/router';
-import dynamic from 'dva/dynamic';
+import {ConfigProvider} from 'antd';
+import zhCN from 'antd/es/locale/zh_CN';
 
 import PAGES from './lib/pages';
 
 const load = (component) => {
   return dynamic({component});
 };
+
+moment.locale('zh-cn');
 
 const Log = load(() => import('./pages/log'));
 const Layout = load(() => import('./pages/layout'));
@@ -17,22 +22,28 @@ const UserManager = load(() => import('./pages/user-manager'));
 const ClusterManager = load(() => import('./pages/cluster-manager'));
 const ClusterAuth = load(() => import('./pages/cluster-auth'));
 const SysMonitor = load(() => import('./pages/sys-monitor'));
+const AppPublish = load(() => import('./pages/app-publish'));
 
 const router = ({history}) => {
   return (
     <Router history={history}>
       <Switch>
-        <Layout>
-          <Switch>
-            <Route path={PAGES.APP_DEV} component={AppDev} />
-            <Route path={PAGES.APP_CONFIG} component={AppConfig} />
-            <Route path={PAGES.SYS_MONITOR} component={SysMonitor} />
-            <Route path={PAGES.USER_MANAGER} component={UserManager} />
-            <Route path={PAGES.CLUSTER_MANAGER} component={ClusterManager} />
-            <Route path={PAGES.CLUSTER_AUTH} component={ClusterAuth} />
-            <Route path={PAGES.LOG} component={Log} />
-          </Switch>
-        </Layout>
+        <ConfigProvider
+          locale={zhCN}
+        >
+          <Layout>
+            <Switch>
+              <Route path={PAGES.APP_DEV} component={AppDev} />
+              <Route path={PAGES.APP_CONFIG} component={AppConfig} />
+              <Route path={PAGES.SYS_MONITOR} component={SysMonitor} />
+              <Route path={PAGES.USER_MANAGER} component={UserManager} />
+              <Route path={PAGES.CLUSTER_MANAGER} component={ClusterManager} />
+              <Route path={PAGES.CLUSTER_AUTH} component={ClusterAuth} />
+              <Route path={PAGES.APP_PUBLISH} component={AppPublish} />
+              <Route path={PAGES.LOG} component={Log} />
+            </Switch>
+          </Layout>
+        </ConfigProvider>
       </Switch>
     </Router>
   );

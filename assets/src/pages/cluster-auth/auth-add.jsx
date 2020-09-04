@@ -146,16 +146,6 @@ const AuthAdd = (props) => {
             })}
           </Select>
         </Form.Item>
-        {isAdd ? null : (
-          <Form.Item label="创建时间:" name="gmt_create">
-            <span>{_.get(props, 'row.gmt_create')}</span>
-          </Form.Item>
-        )}
-        {isAdd ? null : (
-          <Form.Item label="更新时间:" name="gmt_modified">
-            <span>{_.get(props, 'row.gmt_modified')}</span>
-          </Form.Item>
-        )}
       </Form>
     </Modal>
   );

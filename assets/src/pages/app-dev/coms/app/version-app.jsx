@@ -64,8 +64,6 @@ const renderStatus = (status, ip) => {
 };
 
 const renderAppStatus = (versionApp) => {
-  console.log(isSameStatus(versionApp), '==>', versionApp);
-
   if (isSameStatus(versionApp)) {
     return renderStatus(getStatus(versionApp)[0]);
   }

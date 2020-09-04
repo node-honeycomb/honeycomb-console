@@ -5,6 +5,8 @@ const ReplaceCSSUrl = require('webpack-plugin-replace-css-url');
 const ESBuildPlugin = require('esbuild-minimizer-webpack-plugin').default;
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const chalk = require('chalk');
 
 const webpack = require('webpack');
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
@@ -50,7 +52,7 @@ const config = {
 
   devServer: {
     stats: 'errors-only',
-    progress: true,
+    progress: false,
     hotOnly: true,
     hot: true,
     contentBase: __dirname,
@@ -156,6 +158,12 @@ const config = {
     ]
   },
   plugins: [
+    new ProgressBarPlugin(
+      {
+        format: '  build [:bar] ' + chalk.green.bold(':percent') + ' (:elapsed seconds)',
+        clear: true
+      }
+    ),
     new webpack.HotModuleReplacementPlugin(),
     new MonacoWebpackPlugin(),
     new MiniCssExtractPlugin({

@@ -19,7 +19,7 @@ const menu = [
   },
   {
     title: '应用发布',
-    link: PAGES.APP_CI,
+    link: PAGES.APP_PUBLSIH,
     icon: <CloudUploadOutlined />
   },
   {

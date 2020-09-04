@@ -5,7 +5,7 @@
   "description": "Honeycomb admin console",
   "main": "app.js",
   "scripts": {
-    "start": "concurrently 'npm:client' 'npm:server'",
+    "start": "concurrently -r 'npm:client' 'npm:server'",
     "server": "honeycomb start",
     "client": "cd assets && npx honeypack start",
     "eslint": "eslint --ext .js --ext .jsx --ignore-path .eslintignore ."

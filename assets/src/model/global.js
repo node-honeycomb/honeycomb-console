@@ -1,5 +1,5 @@
 import _ from 'lodash';
-import {message} from 'antd';
+import {message, notification} from 'antd';
 
 import api from '@api/index';
 import {clusterApi} from '@api';
@@ -55,16 +55,26 @@ export default {
     // 获取当前用户的可用的集群
     // 彬设置默认选中的 cluster
     * getCluster(__, {put}) {
-      const clusters = yield clusterApi.list();
+      try {
+        const clusters = yield clusterApi.list();
 
-      yield put({
-        type: 'saveCluster',
-        payload: {
-          clusters,
-        },
-      });
+        yield put({
+          type: 'saveCluster',
+          payload: {
+            clusters,
+          },
+        });
 
-      return clusters;
+        return clusters;
+      } catch (e) {
+        console.error(e);
+        notification.error({
+          message: '获取应用列表失败',
+          description: e.message
+        });
+
+        return {};
+      }
     },
     * checkClusters(payload, {put, select}) {
       const {checkedClusters, clusters, checkingClusterCode} = yield select(state => state.global);

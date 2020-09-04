@@ -64,7 +64,6 @@ const SysMonitor = (props) => {
 
   const handleDateChange = (data) => {
     /* data : {from, to} */
-    console.log('DateChange  ==>', data);
   };
 
   const handleRunningMonitor = () => {

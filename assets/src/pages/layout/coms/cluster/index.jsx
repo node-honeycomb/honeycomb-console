@@ -47,12 +47,12 @@ const ClusterDrawer = (props) => {
 
   const [keyword, setKeyword] = useState('');
 
-  const renderClusterItem = (clusterCode) => {
+  const renderClusterItem = (clusterCode, isFilter = true) => {
     const cluster = clusters[clusterCode];
     const {name} = cluster;
     const isActive = currentClusterCode === clusterCode;
 
-    if (!name.includes(keyword) || !clusterCode.includes(keyword)) {
+    if (isFilter && (!name.includes(keyword) && !clusterCode.includes(keyword))) {
       return null;
     }
 
@@ -115,7 +115,7 @@ const ClusterDrawer = (props) => {
         </div>
         {
           freqClusters.map(cluster => {
-            return renderClusterItem(cluster.code);
+            return renderClusterItem(cluster.code, false);
           })
         }
 

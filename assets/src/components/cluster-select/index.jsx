@@ -53,7 +53,7 @@ const ClusterSelect = (props) => {
                 <DesktopOutlined />
                 <WhiteSpace />
                 <WhiteSpace />
-                {cluster.name}（key）
+                {cluster.name}（{key}）
                 <span className="active-icon">
                   <CheckCircleOutlined />
                 </span>
