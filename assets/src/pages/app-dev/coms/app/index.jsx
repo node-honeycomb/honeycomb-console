@@ -9,6 +9,7 @@ import AdminAppIconTip from '@coms/admin-app-icon-tip';
 import {DeploymentUnitOutlined, LoadingOutlined} from '@ant-design/icons';
 
 import api from '@api/index';
+import PAGES from '@lib/pages';
 import {isAppLoading} from '@lib/util';
 import {PRIMARY_COLOR} from '@lib/color';
 import WhiteSpace from '@coms/white-space';
@@ -134,11 +135,14 @@ const App = (props) => {
 
         // 配置app
         case MENU_ACTIONS.CONFIG: {
+          // eslint-disable-next-line
+          window.open(`${PAGES.APP_CONFIG}?configAppName=${name}&clusterCode=${currentClusterCode}`);
           break;
         }
 
         // 查看app的日志
         case MENU_ACTIONS.LOG: {
+          window.open(`${PAGES.LOG}?appName=${name}&clusterCode=${currentClusterCode}`);
           break;
         }
 

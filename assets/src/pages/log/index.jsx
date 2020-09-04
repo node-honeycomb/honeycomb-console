@@ -49,13 +49,22 @@ const Log = (props) => {
 
   const readHistoryLogFilepath = (tree) => {
     const query = s2q(props.location.search);
-    const historyLogFp = query.logFilepath;
+    let historyLogFp = query.logFilepath;
+    const appName = query.appName;
 
-    if (!historyLogFp) {
+    if (!Array.isArray(tree)) {
       return;
     }
 
-    if (!Array.isArray(tree)) {
+    if (appName && !historyLogFp) {
+      const firstLogfile = tree.find(item => {
+        return item.filepath && item.filepath.startsWith(appName + '/');
+      });
+
+      historyLogFp = firstLogfile && firstLogfile.key;
+    }
+
+    if (!historyLogFp) {
       return;
     }
 

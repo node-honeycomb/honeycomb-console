@@ -230,7 +230,7 @@ const LogPanel = (props) => {
             disabled={streamMode}
           >
             {
-              currentCluster.ips.map(ip => {
+              _.get(currentCluster, 'ips', []).map(ip => {
                 return (
                   <Select.Option key={ip} value={ip}>
                     {ip}
