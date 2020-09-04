@@ -36,5 +36,7 @@ export const APP_ID_MATCH = /^(.+)_(\d+\.\d+\.\d+)_(\d+[-\w+]*|-\w+)*/;
 // app状态
 export const APP_STATUS = {
   ONLINE: 'online',
-  OFFLINE: 'offline'
+  OFFLINE: 'offline',
+  RELOAD: 'reload',
+  RELOADED: 'reloaded'
 };

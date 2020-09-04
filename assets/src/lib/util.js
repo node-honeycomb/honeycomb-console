@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import {APP_STATUS} from './consts';
 
 export const tryParse = (str, defaultValue = {}) => {
   try {
@@ -61,4 +62,25 @@ export const tryUsageStrToArr = (str) => {
   } catch (error) {
     return [];
   }
+};
+
+export const getStatus = (versionApp) => {
+  const {cluster} = versionApp;
+
+  return cluster.map(c => c.status);
+};
+
+// 判断一个 version 的版本是否相同
+export const isSameStatus = (versionApp) => {
+  return _.uniq(getStatus(versionApp)).length === 1;
+};
+
+// 判断是否有应用在loading当中
+export const isAppLoading = (versionApp) => {
+  if (!versionApp) {
+    return false;
+  }
+
+  return getStatus(versionApp).includes(APP_STATUS.RELOAD) ||
+   getStatus(versionApp).includes(APP_STATUS.RELOADED);
 };

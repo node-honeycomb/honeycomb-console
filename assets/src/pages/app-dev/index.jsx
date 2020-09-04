@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import Q from 'queue';
+import _ from 'lodash';
 import {Spin} from 'antd';
 import moment from 'moment';
 import {connect} from 'dva';
@@ -11,7 +12,7 @@ import {useRequest} from '@lib/hooks';
 import BannerCard from '@coms/banner-card';
 import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
-import _ from 'lodash';
+
 import App from './coms/app';
 import Usages, {MODE} from './coms/usages';
 import {getClusterUsages, getCurrentWorking, parseUsgae} from './util';
@@ -174,6 +175,7 @@ const AppDev = (props) => {
                     app={app}
                     usage={appUsgae[app.name] || {}}
                     zIndex={appList.length - ind}
+                    currentClusterCode={currentClusterCode}
                   />
                 );
               })

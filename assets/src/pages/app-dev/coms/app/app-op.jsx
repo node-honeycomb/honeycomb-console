@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Menu, Dropdown} from 'antd';
+import {Menu, Dropdown, Modal} from 'antd';
 import {APP_STATUS} from '@lib/consts';
 import WhiteSpace from '@coms/white-space';
 import {DownOutlined} from '@ant-design/icons';
@@ -47,11 +47,23 @@ const getMenu = ({onClick}) => {
 };
 
 const AppOp = (props) => {
-  const {status, showMore, onClick = () => null} = props;
+  const {
+    status, showMore,
+    appName, onClick = () => null
+  } = props;
 
-  const onItemClick = (key) => {
-    return () => {
-      onClick(key);
+  const onItemClick = (key, actionName = '操作') => {
+    return (e) => {
+      e.stopPropagation();
+
+      Modal.confirm({
+        title: `确定${actionName}应用「${appName}」?`,
+        content: '请谨慎操作，点击确定后将立即生效！',
+        onOk: async () => {
+          await onClick(key);
+        },
+        cancelText: '隐藏'
+      });
     };
   };
 
@@ -61,7 +73,7 @@ const AppOp = (props) => {
     }
 
     return (
-      <span>
+      <span onClick={e => e.stopPropagation()}>
         <WhiteSpace />|<WhiteSpace />
         <Dropdown overlay={getMenu({onClick})}>
           <a>
@@ -75,26 +87,21 @@ const AppOp = (props) => {
   if (status.includes(APP_STATUS.ONLINE)) {
     return (
       <div>
-        <a onClick={onItemClick(MENU_ACTIONS.RESTART)}>
+        <a onClick={onItemClick(MENU_ACTIONS.RELOAD, '重启')}>
           重启
-        </a>
-        <WhiteSpace />|<WhiteSpace />
-        <a onClick={onItemClick(MENU_ACTIONS.RELOAD)}>
-          重载
         </a>
         <WhiteSpace />|<WhiteSpace />
         {
           showMore ? (
-            <a onClick={onItemClick(MENU_ACTIONS.ROLLBACK)}>
+            <a onClick={onItemClick(MENU_ACTIONS.ROLLBACK, '回滚')}>
               回滚
             </a>
           ) : (
-            <a onClick={onItemClick(MENU_ACTIONS.STOP)}>
+            <a onClick={onItemClick(MENU_ACTIONS.STOP, '停止')}>
               停止
             </a>
           )
         }
-
         {more()}
       </div>
     );
@@ -102,11 +109,11 @@ const AppOp = (props) => {
 
   return (
     <div>
-      <a onClick={onItemClick(MENU_ACTIONS.START)}>
+      <a onClick={onItemClick(MENU_ACTIONS.START, '启动')}>
         启动
       </a>
       <WhiteSpace />|<WhiteSpace />
-      <a onClick={onItemClick(MENU_ACTIONS.DELETE)}>
+      <a onClick={onItemClick(MENU_ACTIONS.DELETE, '删除')}>
         删除
       </a>
       {more()}
@@ -117,7 +124,8 @@ const AppOp = (props) => {
 AppOp.propTypes = {
   status: PropTypes.string,
   showMore: PropTypes.boolean,
-  onClick: PropTypes.func
+  onClick: PropTypes.func,
+  appName: PropTypes.string
 };
 
 export default AppOp;

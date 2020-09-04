@@ -1,12 +1,15 @@
 import React from 'react';
-import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import {Tooltip} from 'antd';
 import WhiteSpace from '@coms/white-space';
-import {BorderlessTableOutlined, CheckCircleOutlined, InfoCircleOutlined} from '@ant-design/icons';
+import {
+  BorderlessTableOutlined, CheckCircleOutlined,
+  InfoCircleOutlined, LoadingOutlined
+} from '@ant-design/icons';
 
 import {APP_STATUS} from '@lib/consts';
+import {getStatus, isSameStatus, isAppLoading} from '@lib/util';
 
 import AppOp from './app-op';
 
@@ -22,16 +25,6 @@ const wokerTitle = () => {
   );
 };
 
-const getStatus = (versionApp) => {
-  const {cluster} = versionApp;
-
-  return cluster.map(c => c.status);
-};
-
-// 判断一个 version 的版本是否相同
-const isSameStatus = (versionApp) => {
-  return _.uniq(getStatus(versionApp)).length === 1;
-};
 
 // 获取woker的比例
 const getProWokerRatio = (versionApp) => {
@@ -76,7 +69,7 @@ const renderAppStatus = (versionApp) => {
 };
 
 const VersionApp = (props) => {
-  const {versionApp} = props;
+  const {versionApp, onAppOpClick} = props;
   const {appId, publishAt, isCurrWorking} = versionApp;
   const appStatus = getStatus(versionApp);
 
@@ -104,19 +97,35 @@ const VersionApp = (props) => {
     ],
     [
       '操作',
-      <AppOp key="op" status={appStatus} />
+      <AppOp
+        key="op"
+        status={appStatus}
+        appName={appId}
+        onClick={onAppOpClick}
+      />
     ]
   ];
 
   const iconStyle = {fontSize: 30, color: COLOR_MAP[appStatus[0]]};
+  const isLoading = isAppLoading(versionApp);
+
+  const getIcon = () => {
+    if (isLoading) {
+      return <LoadingOutlined style={iconStyle} />;
+    }
+
+    if (isCurrWorking) {
+      return <CheckCircleOutlined style={iconStyle} />;
+    }
+
+    return <BorderlessTableOutlined style={iconStyle} />;
+  };
 
   return (
     <div className="version-app" key={versionApp.appId}>
       <div className="app-icon">
         {
-          isCurrWorking ?
-            (<CheckCircleOutlined style={iconStyle} />) :
-            (<BorderlessTableOutlined style={iconStyle} />)
+          getIcon()
         }
       </div>
       <div className="version-app-info">
@@ -143,7 +152,8 @@ VersionApp.propTypes = {
     cluster: PropTypes.array,
     publishAt: PropTypes.string,
     isCurrWorking: PropTypes.bool
-  })
+  }),
+  onAppOpClick: PropTypes.func
 };
 
 export default VersionApp;
