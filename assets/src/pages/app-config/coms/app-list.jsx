@@ -82,13 +82,13 @@ const AppList = (props) => {
     defaultValue: []
   }, [currentClusterCode]);
 
-
   return (
     <Tree
       loading={loading}
       onSelect={onSelect}
       tree={getAppTree(appList.map(app => app.name))}
       activeKey={activeAppName}
+      defaultActiveKey={USER_APP}
     />
   );
 };
@@ -96,7 +96,8 @@ const AppList = (props) => {
 AppList.propTypes = {
   onSelect: PropTypes.func,
   currentClusterCode: PropTypes.string,
-  activeAppName: PropTypes.string         // 当前选中的 app name
+  activeAppName: PropTypes.string,        // 当前选中的 app name
+  defaultAppName: PropTypes.string
 };
 
 const mapState2Props = (state) => {

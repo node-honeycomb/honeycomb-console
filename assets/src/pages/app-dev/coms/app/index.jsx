@@ -116,7 +116,11 @@ const App = (props) => {
 
     const action = async () => {
       if (appName === APP_SYMBOL) {
-        appName = _.get(versions, '[0].appId');
+        if (workingApp) {
+          appName = workingApp.appId;
+        } else {
+          appName = _.get(versions, '[0].appId');
+        }
       }
 
 

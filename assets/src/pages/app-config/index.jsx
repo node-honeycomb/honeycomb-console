@@ -14,6 +14,9 @@ const AppConfig = (props) => {
   const {history, location} = props;
   const [appName, setAppName] = useState(null);
   const [appType, setAppType] = useState('app');
+  const query = qs.parse(location.search);
+
+  const configAppName = query.configAppName;
 
   const setQuery = (o) => {
     const query = qs.parse(location.search);
@@ -68,6 +71,7 @@ const AppConfig = (props) => {
           onSelect={onSelectApp}
           activeAppName={appName}
           appType={appType}
+          defaultAppName={configAppName}
         />
       </div>
       <div className="page-right-side">

@@ -15,6 +15,7 @@
   "author": "",
   "dependencies": {
     "@ant-design/aliyun-theme": "^0.0.4",
+    "ahooks": "^2.5.0",
     "antd": "^4.2.5",
     "axios": "=0.18.0",
     "bizcharts": "^4.0.7",

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {Spin} from 'antd';
@@ -45,11 +45,33 @@ const getMasterStatus = (tree, statusMap, nodeKey) => {
 // |- Folder
 const Tree = (props) => {
   const {
-    tree = [], loading, activeKey, onSelect
+    tree = [], loading, activeKey, onSelect,
+    defaultActiveKey
   } = props;
 
   // 文件夹的开关状态，默认所有都是关
   const [folderStatus, setFolderStatus] = useState({});
+
+  useEffect(() => {
+    const one = tree.find(item => item.key === defaultActiveKey);
+
+    if (!one) {
+      return;
+    }
+
+    let item;
+
+    if (one.level === 0) {
+      item = one;
+    }
+
+    if (one.level === 1) {
+      item = getMaster(tree, one.key);
+    }
+
+    folderStatus[item.key] = !folderStatus[item.key];
+    setFolderStatus({...folderStatus});
+  }, []);
 
   return (
     <Spin spinning={loading} className="file-tree">
@@ -120,6 +142,7 @@ Tree.propTypes = {
     key: PropTypes.string
   })),
   activeKey: PropTypes.string,
+  defaultActiveKey: PropTypes.string,
   onSelect: PropTypes.func
 };
 
