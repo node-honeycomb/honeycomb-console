@@ -21,7 +21,7 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release/assets && NODE_ENV=production cnpm install
+	@cd out/release/assets && NODE_ENV=development cnpm install
 	@cd out/release && NODE_ENV=production cnpm install
 	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
