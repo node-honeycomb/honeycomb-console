@@ -2,31 +2,49 @@
 import React, {useState, useEffect} from 'react';
 import _ from 'lodash';
 import {connect} from 'dva';
-import CommonTitle from '@coms/common-title';
-import {Button, Select} from 'antd';
-import BannerCard from '@coms/banner-card';
-import TimeRangeSelector from '@coms/timeRangeSelector';
-import {
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-  RedoOutlined,
-} from '@ant-design/icons';
-import PropTypes from 'prop-types';
-import {usageApi} from '@api';
-import notification from '@coms/notification';
+import {Spin} from 'antd';
 import moment from 'moment';
-import {tryUsageStrToArr} from '@lib/util';
-import {__SYSTEM__} from './data';
-import TitleCard from './coms/titleCard/index';
-import UsageChart from './coms/usageChart/index';
+import PropTypes from 'prop-types';
+import {useRequest} from '@lib/hooks';
+
+import Machine from '@coms/machine';
+import {usageApi, clusterApi} from '@api';
+import BannerCard from '@coms/banner-card';
+import CommonTitle from '@coms/common-title';
+import notification from '@coms/notification';
 
 import './index.less';
 
 const SysMonitor = (props) => {
   const {currentClusterCode} = props;
   const [loading, setLoading] = useState(false);
-  const [running, setRunning] = useState(false);
   const [usages, setUsages] = useState({});
+
+  const {result, loading: clusterLoading, error} = useRequest(
+    {
+      request: async () => {
+        if (!currentClusterCode) {
+          return {
+            success: [],
+            error: []
+          };
+        }
+
+        return await clusterApi.status(currentClusterCode);
+      },
+      onError: (error) => {
+        notification.error({
+          message: '获取集群信息失败',
+          description: error.message
+        });
+      },
+      defaultValue: {
+        success: [],
+        error: []
+      }
+    }
+    , [currentClusterCode]
+  );
 
   const getSysUsages = async (params) => {
     /**  params
@@ -62,80 +80,40 @@ const SysMonitor = (props) => {
     getSysUsages(values);
   }, [currentClusterCode]);
 
-  const handleDateChange = (data) => {
-    /* data : {from, to} */
-  };
+  if (!currentClusterCode) {
+    return null;
+  }
 
-  const handleRunningMonitor = () => {
-    setRunning(!running);
-  };
-
-  const getOptions = (usages) => {
-    return Object.keys(usages).map((item) => {
-      const sys = usages[item];
-
-      return (
-        <Select.Option value={item} key={item}>
-          {`${item}`}
-        </Select.Option>
-      );
-    });
-  };
-
-  const getMonitoringCfgs = () => [
-    {
-      type: 'utilisation',
-      title: '系统负载',
-      unit: '%',
-      legend: ['Utilization'],
-      data: tryUsageStrToArr(__SYSTEM__.cpuUsage),
-    },
-    {
-      type: 'utilisation',
-      title: 'Memory Utilization',
-      unit: '%',
-      legend: ['Utilization'],
-      data: tryUsageStrToArr(__SYSTEM__.memUsage),
-    },
-  ];
+  if (clusterLoading) {
+    return <Spin spinning>加载中...</Spin>;
+  }
 
   return (
-    <div>
-      <TitleCard title="集群状态监控" des="监控集群的运行状态"></TitleCard>
-      <BannerCard>
-        <div className="sys-monitor__header">
-          <div className="sys-monitor__header__title">{`运行状态`}</div>
-          <div className="sys-monitor__header__option">
-            <Select
-              value={[]}
-              placeholder="请选择机器"
-              style={{width: '230px', marginRight: '8px'}}
-            >
-              {getOptions(usages)}
-            </Select>
-            <TimeRangeSelector onChange={handleDateChange} />
-            <div className="action__button" onClick={handleRunningMonitor}>
-              {running ? (
-                <PauseCircleOutlined style={{fontSize: '20px'}} />
-              ) : (
-                <PlayCircleOutlined style={{fontSize: '20px'}} />
-              )}
-            </div>
-            <div className="action__button">
-              <RedoOutlined style={{fontSize: '20px'}} />
-            </div>
-          </div>
+    <div className="sys-monitor">
+      <CommonTitle>系统监控</CommonTitle>
+      <div className="main-container">
+        <div className="left-machines">
+          <div className="list-title">机器列表</div>
+          {
+            result.success.map(m => {
+              return (
+                <Machine key={m.ip} {...m} />
+              );
+            })
+          }
         </div>
-        <div className="sys-monitor__container">
-          {getMonitoringCfgs().map((config) => {
-            return (
-              <div key={config.title} className="chart__box">
-                <UsageChart usageData={{}} {...config} />
+        <div className="right-monitor">
+          <BannerCard>
+            <div className="sys-monitor__header">
+              <div className="sys-monitor__header__title">{`运行状态`}</div>
+              <div className="sys-monitor__header__option">
               </div>
-            );
-          })}
+            </div>
+            <div className="sys-monitor__container">
+            </div>
+          </BannerCard>
         </div>
-      </BannerCard>
+      </div>
     </div>
   );
 };

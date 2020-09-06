@@ -22,7 +22,7 @@ const cluster = require('../model/cluster');
  * @param callback
  */
 exports.redirect = function (req, callback) {
-  return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
+  return callback(null, path.join(config.prefix, '/pages/app-dev'), 'redirect');
 };
 
 /**

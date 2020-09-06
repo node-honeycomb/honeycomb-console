@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
+import callClusterStatus from '@coms/cluster-status';
 
 import clusterTip from '../cluster-tip';
 
@@ -53,7 +54,7 @@ const Header = (props) => {
           <CopyOutlined />集群列表{clusterTip(currentCluster)}
         </span>
         <span
-          onClick={props.onToggleCluster}
+          onClick={() => callClusterStatus({clusterCode: currentCluster.code})}
           className="menu-item show-cluster-sider">
           <PauseCircleOutlined /> 集群信息
         </span>

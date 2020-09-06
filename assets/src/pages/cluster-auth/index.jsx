@@ -10,8 +10,7 @@ import {aclApi, appApi} from '@api';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 import {tryParse, tryArrToStr} from '@lib/util';
-import {USER_ROLE_TITLE} from '@lib/consts';
-// import {clusterType} from '@lib/prop-types';
+import {USER_ROLE_TITLE, USER_ROLE} from '@lib/consts';
 
 import ClusterSelector from './cluster-selector';
 import authAdd from './auth-add';
@@ -137,7 +136,14 @@ const ClusterAuth = (props) => {
       title: '权限',
       dataIndex: 'cluster_admin',
       render: (text) => {
-        return <Tag color="#55bc8a">{USER_ROLE_TITLE[text]}</Tag>;
+        const title = USER_ROLE_TITLE[text];
+        let color = '#55bc8a';
+
+        if (Number(text) === USER_ROLE.ADMIN) {
+          color = '#f5a623';
+        }
+
+        return <Tag color={color}>{title}</Tag>;
       },
     },
     {
