@@ -18,7 +18,7 @@
     "ahooks": "^2.5.0",
     "antd": "^4.2.5",
     "axios": "=0.18.0",
-    "bizcharts": "^4.0.7",
+    "bizcharts": "^4.0.14",
     "debug": "3.1.0",
     "download.js": "^1.0.0",
     "dva": "^2.4.1",
