@@ -47,6 +47,9 @@ const Header = (props) => {
   return (
     <div className="hc-header">
       <div className="left">
+        <div className="menu-title">
+          HC-Console
+        </div>
         <span
           onClick={props.onToggleCluster}
           className="menu-item show-cluster-sider"
@@ -60,9 +63,6 @@ const Header = (props) => {
         </span>
       </div>
       <div className="center">
-        <div className="menu-title">
-          HC-Console
-        </div>
       </div>
       <div className="right">
         <span className="menu-item">

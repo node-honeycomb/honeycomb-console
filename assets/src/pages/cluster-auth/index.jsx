@@ -6,10 +6,12 @@ import _ from 'lodash';
 import moment from 'moment';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
+
 import {aclApi, appApi} from '@api';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 import {tryParse, tryArrToStr} from '@lib/util';
+import {SUCCESS_COLOR, WARN_COLOR} from '@lib/color';
 import {USER_ROLE_TITLE, USER_ROLE} from '@lib/consts';
 
 import ClusterSelector from './cluster-selector';
@@ -137,10 +139,10 @@ const ClusterAuth = (props) => {
       dataIndex: 'cluster_admin',
       render: (text) => {
         const title = USER_ROLE_TITLE[text];
-        let color = '#55bc8a';
+        let color = SUCCESS_COLOR;
 
         if (Number(text) === USER_ROLE.ADMIN) {
-          color = '#f5a623';
+          color = WARN_COLOR;
         }
 
         return <Tag color={color}>{title}</Tag>;
