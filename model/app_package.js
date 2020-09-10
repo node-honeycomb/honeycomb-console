@@ -71,7 +71,7 @@ exports.deletePackage = (clusterCode, appId, callback) => {
         log.info('delete app pkg: query pkg info successfully', JSON.stringify(data[0]));
         if (data[0]) {
           if (storage && storage.delete) {
-            storage.delete(data[0].package, () => {
+            storage.delete(data[0].package.toString(), () => {
               db.query(DELETE_APP_PKG, [clusterCode, appId], callback);
             });
           } else {
@@ -110,7 +110,7 @@ exports.getPackage = (clusterCode, appId, callback) => {
         if (data[0]) {
           let tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
           if (storage) {
-            storage.get(data[0].package, tmpFile, (err) => {
+            storage.get(data[0].package.toString(), tmpFile, (err) => {
               if (err) {
                 return callback(err);
               }
