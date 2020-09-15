@@ -124,6 +124,8 @@ exports.getPackage = (clusterCode, appId, callback) => {
             data[0].package = tmpFile;
             callback(null, data[0]);
           }
+        } else {
+          callback(null);
         }
       }
     }
