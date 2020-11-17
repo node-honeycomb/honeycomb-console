@@ -4,7 +4,7 @@ var _ = require("lodash");
 var React = require('react');
 var antd = require('antd');
 let classnames = require('classnames');
-import { Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Tooltip, Spin, Icon} from 'antd';
+import { Alert, Modal, Button, Form, Input, Cascader,Select, Row, Col, Checkbox, Tooltip, Spin, Icon} from 'antd';
 const FormItem = Form.Item;
 const Option = Select.Option;
 
@@ -14,7 +14,8 @@ class CreateUserModal extends React.Component {
       name:'',
       password:''
     },
-    isError: false
+    isError: false,
+    error: ''
   }
   onInfoChange = function(name, value){
     let editInfo = _.cloneDeep(this.state.info);
@@ -23,39 +24,53 @@ class CreateUserModal extends React.Component {
   }
   handleOk = (e) => {
     let editInfo = _.cloneDeep(this.state.info);
-    if (!editInfo.name) {
-      this.setState({
-        isNameError: true
-      });
-      return;
-    }
-    if (!editInfo.password) {
-      this.setState({
-        isError: true
-      });
-      return;
-    }
-    this.setState({
-      isError: false
-    })
+    // if (!editInfo.name) {
+    //   this.setState({
+    //     isError: true
+    //   });
+    //   return;
+    // }
+    // if (!editInfo.password) {
+    //   this.setState({
+    //     isError: true
+    //   });
+    //   return;
+    // }
+    // this.setState({
+    //   isError: false
+    // })
     this.props.createUser(editInfo).then(()=>{
       this.props.onHide && this.props.onHide.call({});
-      this.setState({info:{}});
+      this.setState({
+        info:{},
+        isError: false,
+        error: ''
+      });
+    }).catch((err) => {
+      this.setState({
+        error: err.message
+      })
     });
   }
   componentWillReceiveProps(nextProps) {
-    if (nextProps.edit) {
+    if (nextProps.edit && nextProps.visible) {
       this.setState({
         info: {
           name: nextProps.edit.name,
           password: nextProps.edit.password
-        }
+        },
+        isError: false,
+        error: ''
       });
     }
   }
   handleCancel = (e) => {
     this.props.onHide && this.props.onHide.call({});
-    this.setState({info:{}});
+    this.setState({
+      info:{},
+      isError: false,
+      error: ''
+    });
   }
   render() {
     const formItemLayout = {
@@ -90,6 +105,7 @@ class CreateUserModal extends React.Component {
               <Input onChange={this.onInfoChange.bind(this, "password")} value={this.state.info.password} type="password"/>
             </FormItem>
           </Form>
+          {this.state.error && <Alert showIcon message={this.state.error} type="error" />}
         </Modal>
       </div>
     );
