@@ -45,6 +45,25 @@ exports.sha256 = function (str) {
   return hash.digest('hex');
 };
 
+exports.genPwd = function (pwd, salt) {
+  let hash = exports.sha256(pwd);
+  if (salt) {
+    hash = exports.sha256(salt + hash);
+  }
+  return hash;
+};
+
+exports.checkPwd = function (pwd) {
+  if (pwd.length < 16) {
+    return new Error('password need 16+ characters');
+  }
+  if (!/[A-Z]/.test(pwd) || !/[a-z]/.test(pwd) || !/\d/.test(pwd) || /^[a-zA-Z0-9]+$/.test(pwd)) {
+    // console.log('>>>>',!/A-Z/.test(pwd), !/a-z/.test(pwd), !/\d/.test(pwd), /^[a-zA-Z0-9]+$/.test(pwd));
+    return new Error('password too simple, should contain all this kinds of characters: A-Z, a-z, 0-9, and special character');
+  }
+  return true;
+};
+
 exports.md5base64 = function (buf) {
   return crypto.createHash('md5').update(buf, 'utf8').digest('base64');
 };

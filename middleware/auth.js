@@ -3,6 +3,7 @@ const utils = require('../common/utils');
 const User = require('../model/user');
 const config = require('../config');
 const pathToRegex = require('path-to-regexp');
+const log = require('../common/log');
 
 /**
  * [exports description]
@@ -34,7 +35,7 @@ module.exports = function(app, options) {
         if (!user || !pwd) {
           return res.redirect(config.prefix + '?error=user_or_pwd_empty');
         }
-        pwd = utils.sha256(pwd);
+        pwd = utils.genPwd(pwd, config.salt);
         User.countUser((err, data) => {
           if (err) {
             return next(err);
@@ -57,9 +58,10 @@ module.exports = function(app, options) {
         }
         User.getUser(user, (err, user) => {
           if (err) {
-            return res.redirect(config.prefix + '?error=' + err.message);
+            log.error('login get user failed', err.message);
+            return res.redirect(config.prefix + '?error=login_failed');
           }
-          pwd = utils.sha256(pwd);
+          pwd = utils.genPwd(pwd, config.salt);
           if (user.password === pwd && user.status === 1) {
             // req.session.user = {
             //   name: user.name,

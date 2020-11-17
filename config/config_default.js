@@ -19,6 +19,7 @@ module.exports = {
     database : 'my_db'
     */
   },
+  salt: null,
   /**
    * 集群自动检测，默认关闭
    */
