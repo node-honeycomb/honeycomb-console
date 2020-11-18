@@ -4,6 +4,7 @@ const User = require('../model/user');
 const config = require('../config');
 const pathToRegex = require('path-to-regexp');
 const log = require('../common/log');
+const captcha = require('svg-captcha');
 
 /**
  * [exports description]
@@ -13,6 +14,7 @@ module.exports = function(app, options) {
   const ignorePathRegex = options.ignore ? pathToRegex(options.ignore) : null;
   return function(req, res, next) {
     let path = req.path;
+    // 排除掉的路径
     if (ignorePathRegex && ignorePathRegex.test(path)) {
       return next();
     }
@@ -29,6 +31,7 @@ module.exports = function(app, options) {
 
     let user = req.body.username;
     let pwd = req.body.password;
+    let captcha = req.bodu.captcha;
 
     switch (path) {
       case '/initUser':
@@ -53,8 +56,11 @@ module.exports = function(app, options) {
         });
         break;
       case '/loginAuth':
-        if (!user || !pwd) {
-          return res.redirect(config.prefix + '?error=user_or_pwd_empty');
+        if (!user || !pwd || !captcha) {
+          return res.redirect(config.prefix + '?error=user_or_pwd_or_captcha_empty');
+        }
+        if (captcha !== req.session.captcha) {
+          return res.redirect(config.prefix + '?error=captcha_not_match');
         }
         User.getUser(user, (err, user) => {
           if (err) {
@@ -73,6 +79,16 @@ module.exports = function(app, options) {
             return res.redirect(config.prefix + '?error=login_failed');
           }
         });
+        break;
+      case '/loginCaptcha':
+        let capt = captcha.create({
+          size: 6, 
+          noise: 3, 
+          background: '#fff',
+          ignoreChars: '0o1il'
+        });
+        req.session.captcha = capt.text;
+        res.type('svg').status(200).send(capt.data);
         break;
       case '/api/worker/register':
       case '/api/worker/unregister':
