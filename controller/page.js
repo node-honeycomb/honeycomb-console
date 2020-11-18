@@ -36,6 +36,7 @@ exports.pages = function (req, callback) {
       let e = new Error('Get cluster config from db failed.' + err.message);
       return callback(e);
     }
+
     callback(null, {
       tpl: 'index.html',
       data: {
@@ -48,7 +49,7 @@ exports.pages = function (req, callback) {
         appManageConfig: config.appManageConfig,
         env: config.env,
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
-        hideUpload: config.hideUpload
+        hideUpload: config.hideUpload,
       }
     }, 'html');
   });
@@ -68,7 +69,7 @@ exports.login = function (req, callback) {
         clusterCfg: JSON.stringify(cluster.gClusterConfig),
         csrfToken: req.csrfToken(),
         user: req.user,
-        publishPage: config.publishPage
+        publishPage: config.publishPage,
       }
     }, 'html');
   }

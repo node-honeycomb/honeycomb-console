@@ -4,7 +4,7 @@ const User = require('../model/user');
 const config = require('../config');
 const pathToRegex = require('path-to-regexp');
 const log = require('../common/log');
-const captcha = require('svg-captcha');
+const svgCaptcha = require('svg-captcha');
 
 /**
  * [exports description]
@@ -31,8 +31,8 @@ module.exports = function(app, options) {
 
     let user = req.body.username;
     let pwd = req.body.password;
-    let captcha = req.bodu.captcha;
-
+    let captcha = req.body.captcha;
+    
     switch (path) {
       case '/initUser':
         if (!user || !pwd) {
@@ -59,7 +59,7 @@ module.exports = function(app, options) {
         if (!user || !pwd || !captcha) {
           return res.redirect(config.prefix + '?error=user_or_pwd_or_captcha_empty');
         }
-        if (captcha !== req.session.captcha) {
+        if ((captcha || '').toLowerCase() !== (req.session.captcha || '').toLowerCase()) {
           return res.redirect(config.prefix + '?error=captcha_not_match');
         }
         User.getUser(user, (err, user) => {
@@ -81,7 +81,7 @@ module.exports = function(app, options) {
         });
         break;
       case '/loginCaptcha':
-        let capt = captcha.create({
+        let capt = svgCaptcha.create({
           size: 6, 
           noise: 3, 
           background: '#fff',

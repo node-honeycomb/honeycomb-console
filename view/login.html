@@ -21,6 +21,7 @@
     line-height: 24px;
   }
   p {
+    overflow: hidden;
     color: #666;
     margin: 20px;
     text-align: center;
@@ -77,6 +78,15 @@
     background-image: none;
     border: 1px solid #d9d9d9;
   }
+  .captcha{
+    display: inline-block;
+    float: left;
+    height: 32px;
+  }
+  .input-captcha{
+    width: 150px;
+    margin-left: 35px;
+  }
 </style>
 <script>
   window.prefix = '<%=prefix%>';
@@ -91,6 +101,15 @@
   </p>
   <p>
     <input class="input" type="password" name="password" placeholder="请输入密码"/>
+  </p>
+  <p>
+    <input class="input input-captcha captcha" type="text" name="captcha" placeholder="请输入验证码"/>
+    <script>
+      function changeCode(){
+        document.getElementById("captcha").src=`//${window.location.host}${window.prefix}/loginCaptcha?${Math.random()}`;
+      }
+      document.write('<im' + 'g id="captcha" onclick="changeCode();" class="captcha" src="//' + window.location.host + '' + window.prefix + '/loginCaptcha">');
+    </script>
   </p>
   <p>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
