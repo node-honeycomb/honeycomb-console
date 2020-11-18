@@ -93,6 +93,12 @@
     <input class="input" type="password" name="password" placeholder="请输入密码"/>
   </p>
   <p>
+    <input class="input" type="text" name="captcha" placeholder="请输入验证码"/>
+    <script>
+      document.write('<im' + 'g src="//' + window.location.host + '' + window.prefix + '/loginCaptcha">');
+    </script>
+  </p>
+  <p>
     <input type="hidden" name="_csrf" value="<%= csrfToken %>"/>
     <input class='submit' type="submit" value="<%= userCount > 0 ? '登录' : '创建用户'%>" />
   </p>
