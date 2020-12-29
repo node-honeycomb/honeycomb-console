@@ -7,6 +7,7 @@ import {Modal, message} from 'antd';
 import {CheckCircleOutlined, DesktopOutlined} from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
+import {removeModalDOM} from '@lib/util';
 
 import './index.less';
 
@@ -22,6 +23,7 @@ const ClusterSelect = (props) => {
 
     props.onOk(clusterCode);
     setVisible(false);
+    props.close();
   };
 
   const onClickCluster = (clusterCode) => {
@@ -68,17 +70,20 @@ const ClusterSelect = (props) => {
 
 ClusterSelect.propTypes = {
   clusters: PropTypes.object,
-  onOk: PropTypes.func
+  onOk: PropTypes.func,
+  close: PropTypes.func,
 };
 
 export default (clusters) => {
   return new Promise((res) => {
     const div = document.createElement('div');
+    const close = () => removeModalDOM(div);
 
     ReactDOM.render(
       <ClusterSelect
         clusters={clusters}
         onOk={res}
+        close={close}
       />,
       div
     );

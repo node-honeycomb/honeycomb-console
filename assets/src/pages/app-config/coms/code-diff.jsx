@@ -3,9 +3,10 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {Modal, Button} from 'antd';
 import {MonacoDiffEditor} from 'react-monaco-editor';
+import {removeModalDOM} from '@lib/util';
 
 const CodeDiff = (props) => {
-  const {newCode, oldCode, onOk} = props;
+  const {newCode, oldCode, onOk, close} = props;
   const [visible, setVisible] = useState(true);
   const [loading, setLoading] = useState(false);
 
@@ -23,6 +24,7 @@ const CodeDiff = (props) => {
 
   const onCancel = () => {
     setVisible(false);
+    close();
   };
 
   const footer = () => {
@@ -61,16 +63,18 @@ const CodeDiff = (props) => {
 CodeDiff.propTypes = {
   newCode: PropTypes.string,
   oldCode: PropTypes.string,
-  onOk: PropTypes.func
+  onOk: PropTypes.func,
+  close: PropTypes.func,
 };
 
 export default (props) => {
   const div = document.createElement('div');
 
   document.body.appendChild(div);
+  const close = () => removeModalDOM(div);
 
   ReactDOM.render(
-    <CodeDiff {...props} />,
+    <CodeDiff {...props} close={close} />,
     div
   );
 };

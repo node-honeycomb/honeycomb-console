@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import ReactDOM from 'react-dom';
 import {APP_STATUS} from './consts';
 
 export const tryParse = (str, defaultValue = {}) => {
@@ -83,4 +84,18 @@ export const isAppLoading = (versionApp) => {
 
   return getStatus(versionApp).includes(APP_STATUS.RELOAD) ||
    getStatus(versionApp).includes(APP_STATUS.RELOADED);
+};
+
+/**
+ * 清除函数调用所添加的 Modal 元素。
+ * @param {element} node dom
+ */
+export const removeModalDOM = (node) => {
+  const unmountResult = ReactDOM.unmountComponentAtNode(node);
+
+  if (unmountResult && node.parentNode) {
+    setTimeout(() => {
+      node.parentNode.removeChild(node);
+    }, 800);
+  }
 };

@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {Modal, Form, Input, message, Select} from 'antd';
 import notification from '@coms/notification';
 import _ from 'lodash';
-import {tryParse, tryArrToStr} from '@lib/util';
+import {tryParse, tryArrToStr, removeModalDOM} from '@lib/util';
 import {aclApi} from '@api';
 
 const layout = {
@@ -94,6 +94,7 @@ const AuthAdd = (props) => {
   const onClose = useCallback(() => {
     setVisible(false);
     _.isFunction(props.getAclList) && props.getAclList();
+    props.close();
   });
 
   return (
@@ -153,12 +154,14 @@ const AuthAdd = (props) => {
 
 AuthAdd.propTypes = {
   getAclList: PropTypes.func,
+  close: PropTypes.func,
 };
 
 export default (props) => {
   const div = document.createElement('div');
+  const close = () => removeModalDOM(div);
 
-  ReactDOM.render(<AuthAdd {...props} />, div);
+  ReactDOM.render(<AuthAdd {...props} close={close} />, div);
 
   document.body.appendChild(div);
 };

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {Modal, notification, Alert, message} from 'antd';
 
 import api from '@api/index';
+import {removeModalDOM} from '@lib/util';
 
 const getPercent = (a, b) => {
   if (!b) {
@@ -33,6 +34,7 @@ const UploadModal = (props) => {
 
     setVisible(false);
     onFinish();
+    close();
   };
 
   const onProgress = (loaded, total) => {
@@ -116,6 +118,7 @@ const UploadModal = (props) => {
 UploadModal.propTypes = {
   file: PropTypes.object,
   onFinish: PropTypes.func,
+  close: PropTypes.func,
   clusterName: PropTypes.string,
   clusterCode: PropTypes.string
 
@@ -129,12 +132,15 @@ export default ({
 }) => {
   const div = document.createElement('div');
 
+  const close = () => removeModalDOM(div);
+
   ReactDOM.render(
     <UploadModal
       file={file}
       onFinish={onFinish}
       clusterName={clusterName}
       clusterCode={clusterCode}
+      close={close}
     />,
     div
   );

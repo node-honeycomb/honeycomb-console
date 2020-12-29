@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import {clusterApi} from '@api';
 import {useRequest} from '@lib/hooks';
-
+import {removeModalDOM} from '@lib/util';
 import Machine from '../machine';
 import './index.less';
 
@@ -19,7 +19,7 @@ const getTips = (length) => {
 };
 
 const ClusterStatus = (props) => {
-  const {clusterCode} = props;
+  const {clusterCode, close} = props;
   const [visible, setVisible] = useState(true);
 
   const {result, loading} = useRequest({
@@ -47,11 +47,16 @@ const ClusterStatus = (props) => {
     return null;
   }
 
+  const onClose = () => {
+    setVisible(false);
+    close();
+  };
+
   return (
     <Modal
       visible={visible}
-      onOk={() => setVisible(false)}
-      onCancel={() => setVisible(false)}
+      onOk={onClose}
+      onCancel={onClose}
       title={getTips(result.success.length)}
       width="50%"
       style={{
@@ -76,16 +81,18 @@ const ClusterStatus = (props) => {
 };
 
 ClusterStatus.propTypes = {
-  clusterCode: PropTypes.string
+  clusterCode: PropTypes.string,
+  close: PropTypes.func
 };
 
 export default (props) => {
   const div = document.createElement('div');
 
   document.body.appendChild(div);
+  const close = () => removeModalDOM(div);
 
   ReactDOM.render(
-    <ClusterStatus {...props} />,
+    <ClusterStatus {...props} close={close} />,
     div
   );
 };

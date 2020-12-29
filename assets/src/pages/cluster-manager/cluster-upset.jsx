@@ -6,7 +6,7 @@ import {Modal, Form, Input, message, Select} from 'antd';
 import {clusterApi} from '@api';
 import notification from '@coms/notification';
 import _ from 'lodash';
-import {tryArrToLineBreakStr} from '@lib/util';
+import {tryArrToLineBreakStr, removeModalDOM} from '@lib/util';
 
 // eslint-disable-next-line max-len
 const ipRegex = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
@@ -73,6 +73,7 @@ const ClusterUpset = (props) => {
   const onClose = useCallback(() => {
     setVisible(false);
     _.isFunction(props.getCluster) && props.getCluster();
+    props.close();
   });
 
   return (
@@ -186,13 +187,15 @@ const ClusterUpset = (props) => {
 };
 
 ClusterUpset.propTypes = {
-  getCluster: PropTypes.func
+  getCluster: PropTypes.func,
+  close: PropTypes.func,
 };
 
 export default (props) => {
   const div = document.createElement('div');
+  const close = () => removeModalDOM(div);
 
-  ReactDOM.render(<ClusterUpset {...props} />, div);
+  ReactDOM.render(<ClusterUpset {...props} close={close} />, div);
 
   document.body.appendChild(div);
 };

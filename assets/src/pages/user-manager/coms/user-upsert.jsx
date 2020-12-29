@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {Modal, Form, Input, message} from 'antd';
 import {userApi} from '@api';
 import notification from '@coms/notification';
+import {removeModalDOM} from '@lib/util';
 
 const layout = {
   labelCol: {span: 4},
@@ -49,6 +50,7 @@ const UserUpsert = (props) => {
     setVisible(false);
     _.isFunction(props.getUser) && props.getUser();
     _.isFunction(props.onClose) && props.onClose();
+    props.close();
   });
 
   return (
@@ -87,13 +89,15 @@ const UserUpsert = (props) => {
 UserUpsert.propTypes = {
   onClose: PropTypes.func,
   getUser: PropTypes.func,
+  close: PropTypes.func,
 };
 
 // FIXME: 关闭时请将我从父元素中移除
 export default (props) => {
   const div = document.createElement('div');
+  const close = () => removeModalDOM(div);
 
-  ReactDOM.render(<UserUpsert {...props} />, div);
+  ReactDOM.render(<UserUpsert {...props} close={close} />, div);
 
   document.body.appendChild(div);
 };
