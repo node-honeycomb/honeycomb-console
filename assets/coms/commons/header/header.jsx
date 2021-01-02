@@ -40,7 +40,6 @@ const LAST_SELECTED_KEY = 'open_new_console';
 const init = () => {
   const query = qs.parse(window.location.search);
 
-  debugger;
   if(query.backToOld) {
     localStorage.removeItem(LAST_SELECTED_KEY);
 
