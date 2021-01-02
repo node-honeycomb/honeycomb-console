@@ -4,6 +4,7 @@ var React = require('react');
 var ReactRouter = require('react-router');
 var antd = require('antd');
 var Link = require('react-router').Link;
+var qs = require('query-string');
 let {Menu, Icon, Popover, Card, Modal, Collapse, Button, Tag, Row, Col, message, Tooltip} = require('antd');
 const SubMenu = Menu.SubMenu;
 const confirm = Modal.confirm;
@@ -33,6 +34,42 @@ function versionCompare(v1, v2) {
 }
 
 require('./header.less');
+
+const LAST_SELECTED_KEY = 'open_new_console';
+
+const init = () => {
+  const query = qs.parse(window.location.search);
+
+  if(query.backToOld) {
+    localStorage.removeItem(LAST_SELECTED_KEY);
+
+    return;
+  }
+
+  if(!localStorage[LAST_SELECTED_KEY]) {
+    return;
+  }
+
+  openNewConsole();
+}
+
+/**
+ * 打开新版本控制台，并将选择存储到 localStorage 中，
+ * 如果下一次进入页面已经有过选择，则直接跳到新版本 console
+ * 用户从新版本跳回来的时候，会在URL上带上 backToOld=true，这时候需要将 localStorage 内的选择清空
+ */
+const openNewConsole = () => {
+  if(!window.newConsole) {
+    return;
+  }
+
+  localStorage[LAST_SELECTED_KEY] = true;
+  window.location.href = window.newConsole;
+}
+
+
+init();
+
 class Header extends React.Component {
   constructor(props, context){
     super(props, context);
@@ -352,8 +389,23 @@ class Header extends React.Component {
           </span>
         </div>)} */}
         <Menu mode="horizontal">
-          {window.oldConsole && <SubMenu key="retweet" title={<span><Icon type="retweet" /><a href={window.oldConsole}>{'返回旧版'}</a></span>}>
-          </SubMenu>}
+          {window.newConsole && (
+            <SubMenu 
+              key="retweet" 
+              title={
+              <span>
+                <Icon type="retweet"/>
+                <a 
+                  onClick={() => {
+                    openNewConsole();
+                  }}
+                >
+                  新版本
+                </a>
+              </span>
+            }>
+            </SubMenu>
+          )}
           <SubMenu key="sub1" title={<span><Icon type="user" />{this.state.currentUser}</span>}>
           </SubMenu>
           <SubMenu key="logout" title={<span><Icon type="logout" /><a href={window.prefix + '/logout'}>{'退出登录'}</a></span>}>

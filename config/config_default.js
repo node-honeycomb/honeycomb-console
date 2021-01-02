@@ -116,6 +116,7 @@ module.exports = {
   logSqlQuery: true,
   secureServerVersion: '1.0.3_3',
   oldConsole: '',
+  newConsole: '',
   appManageConfig: {
     keepOnlineNum: 2,
     keepOfflineNum: 5
