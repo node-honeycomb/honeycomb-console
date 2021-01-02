@@ -1,9 +1,10 @@
 'use strict';
+const qs = require('qs');
+const path = require('path');
+
+const config = require('../config');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
-const config = require('../config');
-const lodash = require('lodash');
-const path = require('path');
 
 /**
  * @api  /pages/
@@ -23,7 +24,13 @@ const path = require('path');
  * @param callback
  */
 exports.redirect = function (req, callback) {
-  return callback(null, path.join(config.prefix, '/pages/list'), 'redirect');
+  let query = qs.stringify(req.query);
+
+  if (query) {
+    query = '?' + query;
+  }
+
+  return callback(null, path.join(config.prefix, '/pages/list' + query), 'redirect');
 };
 
 /**
@@ -50,6 +57,7 @@ exports.pages = function (req, callback) {
         env: config.env,
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
         hideUpload: config.hideUpload,
+        newConsole: config.newConsole || ''
       }
     }, 'html');
   });
