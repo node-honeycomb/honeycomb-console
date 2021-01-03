@@ -13,7 +13,8 @@ import {
   Input, Tooltip, TimePicker, Button, Spin,
   Empty, Switch, message
 } from 'antd';
-import api from '@api/index';
+
+import api from '@api';
 import msgParser from '@lib/msg-parser';
 import {downloadText} from 'download.js';
 import WhiteSpace from '@coms/white-space';
@@ -137,7 +138,6 @@ const LogPanel = (props) => {
   /**
    * 设置filter的值
    * @param {String} key 属性名
-   * @param {Boolean} autoSearch 是否自动搜索
    */
   const setFilterKey = (key) => {
     return (v) => {

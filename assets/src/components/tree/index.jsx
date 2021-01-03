@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
+import {Spin} from 'antd';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {Spin} from 'antd';
+import scrollIntoView from 'scroll-into-view';
 import {FolderOpenOutlined, FolderOutlined} from '@ant-design/icons';
 
 import './index.less';
@@ -71,6 +72,19 @@ const Tree = (props) => {
 
     folderStatus[item.key] = !folderStatus[item.key];
     setFolderStatus({...folderStatus});
+
+    setTimeout(() => {
+      const key = `tree-node-${item.key}`;
+      const elements = document.getElementsByClassName(key);
+
+      if (!elements || elements.length === 0) {
+        return;
+      }
+
+      const dom = elements[0];
+
+      scrollIntoView(dom);
+    }, 100);
   }, []);
 
   return (
@@ -105,7 +119,8 @@ const Tree = (props) => {
                   classnames({
                     master: isMaster,
                     slave: isSlave,
-                    active: activeKey === item.key
+                    active: activeKey === item.key,
+                    [`tree-node-${item.key}`]: true
                   })
                 }
               >

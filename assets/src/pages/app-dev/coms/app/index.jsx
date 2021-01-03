@@ -272,12 +272,16 @@ const App = (props) => {
           }
           <div className="info">
             <div className="info-title">操作</div>
-            <AppOp
-              status={appStatus || []}
-              showMore
-              onClick={(key) => onAppAction(key, APP_SYMBOL)}
-              appName={name}
-            />
+            {
+              !isAdminApp && (
+                <AppOp
+                  status={appStatus || []}
+                  showMore
+                  onClick={(key) => onAppAction(key, APP_SYMBOL)}
+                  appName={name}
+                />
+              )
+            }
           </div>
         </div>
       </div>

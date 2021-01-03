@@ -11,7 +11,8 @@ import msgParser from '@lib/msg-parser';
 import filepaths2tree from '@lib/filepath-to-tree';
 
 import FileTree from './coms/file-tree';
-import LogPanel from './coms/log-panel';
+import LogPanel from '../../components/log-panel';
+
 import './index.less';
 
 const DEFAULT_ACTIVE_LOG = 'server.{year}-{month}-{day}.log';
@@ -22,6 +23,7 @@ const Log = (props) => {
   const [filesLoading, setFileLoading] = useState(false);
   const [tree, setTree] = useState([]);
   const [activeLog, setActiveLog] = useState(DEFAULT_ACTIVE_LOG);
+  const [initing, setIniting] = useState(true);
 
   // 获取日志列表
   const getLogFiles = async (currentClusterCode) => {
@@ -78,9 +80,11 @@ const Log = (props) => {
 
   useEffect(() => {
     (async () => {
+      setIniting(true);
       const tree = await getLogFiles(currentClusterCode);
 
-      await readHistoryLogFilepath(tree);
+      readHistoryLogFilepath(tree);
+      setIniting(false);
     })();
   }, [currentClusterCode]);
 
@@ -94,12 +98,17 @@ const Log = (props) => {
     <div>
       <div className="page-left-side">
         <div className="list-title">日志列表</div>
-        <FileTree
-          tree={tree}
-          loading={filesLoading}
-          onSelect={onSelectFile}
-          activeKey={activeLog}
-        />
+        {
+          !initing && (
+            <FileTree
+              tree={tree}
+              loading={filesLoading}
+              onSelect={onSelectFile}
+              activeKey={activeLog}
+              defaultActiveKey={activeLog}
+            />
+          )
+        }
       </div>
       <div className="page-right-side">
         <LogPanel
