@@ -4,8 +4,9 @@ import PropTypes from 'prop-types';
 import {connect} from 'dva';
 import qs from 'query-string';
 
+import EditAppConfig from '@coms/edit-app-config/edit-app-config';
+
 import AppList from './coms/app-list';
-import EditAppConfig from './coms/edit-app-config';
 
 import './index.less';
 

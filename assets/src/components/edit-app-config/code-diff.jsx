@@ -30,9 +30,24 @@ const CodeDiff = (props) => {
   const footer = () => {
     return (
       <div>
-        <Button onClick={onCancel}>取消</Button>
-        <Button loading={loading} onClick={onApply}>应用</Button>
-        <Button loading={loading} type="primary" onClick={() => onApply(true)}>应用并重启</Button>
+        <Button
+          onClick={onCancel}
+        >
+          取消
+        </Button>
+        <Button
+          loading={loading}
+          onClick={() => onApply()}
+        >
+          应用
+        </Button>
+        <Button
+          loading={loading}
+          type="primary"
+          onClick={() => onApply(true)}
+        >
+          应用并重启
+        </Button>
       </div>
     );
   };

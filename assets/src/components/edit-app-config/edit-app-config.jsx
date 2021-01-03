@@ -6,7 +6,7 @@ import {withRouter} from 'dva/router';
 import MonacoEditor from 'react-monaco-editor';
 import {Button, Spin, Modal, Empty, message} from 'antd';
 
-import api from '@api/index';
+import api from '@api';
 import {useRequest} from '@lib/hooks';
 import parser from 'editor-json-parser';
 import notification from '@coms/notification';
@@ -88,7 +88,15 @@ const EditAppConfig = (props) => {
           if (reload) {
             message.loading('重启应用中...');
 
-            await api.appApi.reload(currentClusterCode, appName);
+            const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
+
+            if (!appId) {
+              message.destroy();
+
+              return message.warn('当前应用没有正在运行的版本');
+            }
+
+            await api.appApi.reload(currentClusterCode, appId);
             message.destroy();
             message.success('应用重启成功！');
           }
