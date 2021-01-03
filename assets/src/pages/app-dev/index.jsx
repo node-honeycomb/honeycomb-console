@@ -9,6 +9,7 @@ import PropTypes from 'prop-types';
 import api from '@api/index';
 import Ring from '@coms/ring';
 import {useRequest} from '@lib/hooks';
+import {getErrMsg} from '@lib/error-msg';
 import BannerCard from '@coms/banner-card';
 import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
@@ -50,7 +51,7 @@ const AppDev = (props) => {
     onError: (err) => {
       notification.error({
         message: '获取集群状态失败',
-        description: err.message
+        description: getErrMsg(err.message)
       });
     },
     defaultValue: {

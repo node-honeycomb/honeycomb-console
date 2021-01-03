@@ -1,14 +1,15 @@
 const path = require('path');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
-const ReplaceCSSUrl = require('webpack-plugin-replace-css-url');
-const ESBuildPlugin = require('esbuild-minimizer-webpack-plugin').default;
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
-const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const chalk = require('chalk');
-
 const webpack = require('webpack');
+const ReplaceCSSUrl = require('webpack-plugin-replace-css-url');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
+const ESBuildPlugin = require('esbuild-minimizer-webpack-plugin').default;
+const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
+
+const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
+
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const appConfig = require('../config');
 

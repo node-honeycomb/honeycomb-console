@@ -5,7 +5,7 @@ import {Menu, Dropdown, Tooltip} from 'antd';
 import {
   UserOutlined, CopyOutlined, PauseCircleOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
-  BookOutlined
+  BookOutlined, RedoOutlined
 } from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
@@ -16,8 +16,7 @@ import clusterTip from '../cluster-tip';
 import './index.less';
 
 const userName = _.get(window, 'CONFIG.user.name');
-const {docUrl} = window.CONFIG;
-const prefix = window.CONFIG.prefix;
+const {docUrl, prefix, oldConsole} = window.CONFIG;
 
 const menu = (
   <Menu>
@@ -65,6 +64,19 @@ const Header = (props) => {
       <div className="center">
       </div>
       <div className="right">
+        {
+          oldConsole && (
+            <span>
+              <a
+                href={oldConsole + '?backToOld=true'}
+                target="self"
+              >
+                <RedoOutlined />
+                &nbsp;老版本
+              </a>
+            </span>
+          )
+        }
         <span className="menu-item">
           <Tooltip title="帮助手册">
             <a
