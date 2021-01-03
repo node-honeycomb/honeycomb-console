@@ -1,19 +1,28 @@
 import React, {useState, useEffect, useCallback} from 'react';
 import _ from 'lodash';
-import {connect} from 'dva';
-import notification from '@coms/notification';
-import CommonTitle from '@coms/common-title';
 import moment from 'moment';
-import {userApi} from '@api';
+import {connect} from 'dva';
 import {Table, Button, Divider, Popconfirm, message} from 'antd';
-import {USER_ROLE_TITLE, USER_STATUS_TITLE} from '../../lib/consts';
+
+import {userApi} from '@api';
+import {useSearch} from '@lib/hooks';
+import CommonTitle from '@coms/common-title';
+import notification from '@coms/notification';
+import {USER_ROLE_TITLE, USER_STATUS_TITLE} from '@lib/consts';
+
 import userUpsert from './coms/user-upsert';
+
 
 const userName = _.get(window, 'CONFIG.user.name');
 
 const UserManager = () => {
   const [users, setUser] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const {dataSource, onSearch} = useSearch({
+    data: users,
+    keys: ['name']
+  });
 
   const getUser = useCallback(async () => {
     try {
@@ -118,13 +127,18 @@ const UserManager = () => {
 
   return (
     <div>
-      <CommonTitle>用户管理</CommonTitle>
+      <CommonTitle
+        searchVisible
+        onSearch={onSearch}
+      >
+        用户管理
+      </CommonTitle>
       <Button type="primary" className="margin-b10" onClick={onAddUser}>
         + 添加用户
       </Button>
       <Table
         columns={cols()}
-        dataSource={users}
+        dataSource={dataSource}
         rowKey="gmtCreate"
         loading={loading}
       />

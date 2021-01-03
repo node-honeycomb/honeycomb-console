@@ -1,11 +1,14 @@
 import React, {useState, useEffect, useCallback} from 'react';
-import {Table, Button, Divider, Modal, message} from 'antd';
-import PropTypes from 'prop-types';
+import _ from 'lodash';
 import {connect} from 'dva';
+import PropTypes from 'prop-types';
+import {Table, Button, Divider, Modal, message} from 'antd';
+
 import {clusterApi} from '@api';
+import {useSearch} from '@lib/hooks';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
-import _ from 'lodash';
+
 import clusterUpset from './cluster-upset';
 
 const UserManager = (props) => {
@@ -28,6 +31,13 @@ const UserManager = (props) => {
       });
     }
   };
+
+  const {onSearch, dataSource} = useSearch({
+    data: clusterList,
+    keys: [
+      'name', 'code', 'endpoint'
+    ]
+  });
 
   useEffect(() => {
     getCluster();
@@ -124,16 +134,22 @@ const UserManager = (props) => {
     },
   ];
 
+
   return (
     <div>
-      <CommonTitle>集群管理</CommonTitle>
+      <CommonTitle
+        searchVisible
+        onSearch={onSearch}
+      >
+        集群管理
+      </CommonTitle>
       <Button type="primary" className="margin-b10" onClick={onAddCluster}>
         + 添加集群
       </Button>
       <Table
         loading={props.loading}
         columns={cols()}
-        dataSource={clusterList}
+        dataSource={dataSource}
         rowKey="id"
       />
     </div>

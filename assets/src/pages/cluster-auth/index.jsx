@@ -8,6 +8,7 @@ import {connect} from 'dva';
 import PropTypes from 'prop-types';
 
 import {aclApi, appApi} from '@api';
+import {useSearch} from '@lib/hooks';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 import {tryParse, tryArrToStr} from '@lib/util';
@@ -73,6 +74,13 @@ const ClusterAuth = (props) => {
       await getAclList();
     })();
   }, [clusterCode]);
+
+  const {onSearch, dataSource} = useSearch({
+    data: aclList,
+    keys: [
+      'name'
+    ]
+  });
 
   const handleAuthAdd = useCallback(() => {
     authAdd({getAclList, selectedCluster, appList});
@@ -207,7 +215,12 @@ const ClusterAuth = (props) => {
 
   return (
     <div>
-      <CommonTitle>集群授权</CommonTitle>
+      <CommonTitle
+        searchVisible
+        onSearch={onSearch}
+      >
+        集群授权
+      </CommonTitle>
       <Space style={{marginBottom: '10px'}}>
         <ClusterSelector
           clusters={clusters}
@@ -221,7 +234,7 @@ const ClusterAuth = (props) => {
       <Table
         loading={clusterLoading || loading}
         columns={cols()}
-        dataSource={aclList}
+        dataSource={dataSource}
         rowKey="id"
       />
     </div>
