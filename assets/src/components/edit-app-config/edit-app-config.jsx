@@ -13,6 +13,8 @@ import notification from '@coms/notification';
 
 import callCodeDiff from './code-diff';
 
+import './index.less';
+
 const EditAppConfig = (props) => {
   const {appName, currentClusterCode, appType} = props;
   const [isEdit, setIsEdit] = useState(false);
