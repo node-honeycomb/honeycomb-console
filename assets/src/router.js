@@ -32,8 +32,8 @@ const router = ({history}) => {
           locale={zhCN}
         >
           <Layout>
+            <Route path="*" component={AppDev} />
             <Switch>
-              <Route path={PAGES.APP_DEV} component={AppDev} />
               <Route path={PAGES.APP_CONFIG} component={AppConfig} />
               <Route path={PAGES.SYS_MONITOR} component={SysMonitor} />
               <Route path={PAGES.USER_MANAGER} component={UserManager} />

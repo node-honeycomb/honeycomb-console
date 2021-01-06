@@ -5,9 +5,12 @@ import {Spin} from 'antd';
 import moment from 'moment';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
+import {withRouter} from 'dva/router';
 
 import api from '@api/index';
 import Ring from '@coms/ring';
+import PAGES from '@lib/pages';
 import {useRequest} from '@lib/hooks';
 import {getErrMsg} from '@lib/error-msg';
 import BannerCard from '@coms/banner-card';
@@ -34,11 +37,13 @@ const now = moment().format('YYYY-MM-DD-HH');
 const before = moment().format('YYYY-MM-DD-HH');
 
 const AppDev = (props) => {
-  const {currentClusterCode} = props;
+  const {currentClusterCode, location} = props;
   const [appList, setAppList] = useState([]);
   const [errCount, setErrCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [appUsgae, setAppUsgae] = useState({});
+
+  const isActive = location.pathname === PAGES.APP_DEV;
 
   const {result, loading: statusLoading} = useRequest({
     request: async () => {
@@ -110,11 +115,11 @@ const AppDev = (props) => {
 
   useInterval(() => {
     appQ.push(getApiList);
-  }, 1000 * 2);
+  }, isActive ? 1000 * 2 : null);
 
   useInterval(() => {
     usageQ.push(getUsage);
-  }, 1000 * 60);
+  }, isActive ? 1000 * 60 : null);
 
   useEffect(() => {
     (async () => {
@@ -132,7 +137,14 @@ const AppDev = (props) => {
   const usages = getClusterUsages(result.success);
 
   return (
-    <div className="app-dev">
+    <div
+      className={
+        classnames({
+          'app-dev': true,
+          active: isActive,
+        })
+      }
+    >
       <BannerCard className="app-status">
         <Ring
           all={total}
@@ -191,6 +203,9 @@ const AppDev = (props) => {
 
 AppDev.propTypes = {
   currentClusterCode: PropTypes.string,
+  location: PropTypes.shape({
+    pathname: PropTypes.string
+  })
 };
 
 const mapState2Props = (state) => {
@@ -199,4 +214,4 @@ const mapState2Props = (state) => {
   };
 };
 
-export default connect(mapState2Props)(AppDev);
+export default withRouter(connect(mapState2Props)(AppDev));
