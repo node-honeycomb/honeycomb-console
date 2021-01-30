@@ -7,6 +7,8 @@ const utils = require('../common/utils');
 const fs = require('xfs');
 const async = require('async');
 
+let readyFn = null;
+let flagReady = false;
 let flag;
 if (fs.existsSync(meta.dbfile)) {
   log.info('create db');
@@ -27,6 +29,11 @@ const db = new Sqlite.Database(meta.dbfile, flag, function (err) {
       if (err) {
         return log.error(err);
       }
+      flagReady = true;
+      if (readyFn) {
+        console.log('sqllite db ready');
+        readyFn();
+      }
     });
   }
 });
@@ -38,6 +45,13 @@ exports.query = function (sql, param, callback) {
   }
   db.all(sql, param, callback);
 };
+
+exports.ready = function (cb) {
+ if (flagReady) {
+      return cb();
+  }
+  readyFn = cb;
+}
 
 exports.type = 'sqlite';
 
