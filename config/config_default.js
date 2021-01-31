@@ -123,5 +123,6 @@ module.exports = {
   },
   // 是否关闭上传功能
   hideUpload: false,
-  robot: ''
+  // 默认监控间隔：5 min
+  monitorCycle: 1000 * 60 * 5
 };

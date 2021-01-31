@@ -22,7 +22,7 @@ const q = queue({
  * 1. 异常机器
  * 2. 异常应用 exception
  */
-const detectClusters = (cluster) => {
+const detectCluster = (cluster) => {
   let path = '/api/apps';
   const clusterCode = cluster.code;
   const clusterName = cluster.name;
@@ -100,7 +100,7 @@ async function detect() {
       const cluster = clusters[clusterCode];
       cluster.code = clusterCode;
 
-      return detectClusters(cluster);
+      return detectCluster(cluster);
     });
   });
 }
