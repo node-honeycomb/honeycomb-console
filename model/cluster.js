@@ -12,15 +12,19 @@ const callremote = utils.callremote;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
-    (name, code, token, endpoint, env, gmt_create, gmt_modified)
+    (name, code, token, endpoint, env, monitor, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?, ?, ?, ?) ;`;
+    (?, ?, ?, ?, ?, ?, ?, ?) ;`;
 
-exports.addCluster = function (name, code, token, endpoint, env, callback) {
+exports.addCluster = function (
+  name, code, token, endpoint,
+  env, monitor,
+  callback
+) {
   let d = new Date();
   db.query(
     INSERT_SYSTEM_CLUSTER,
-    [name, code, token, endpoint, env, d, d],
+    [name, code, token, endpoint, env, monitor, d, d],
     function (err) {
       if (err) {
         // log.error('Insert new cluster failed:', err);
@@ -35,14 +39,18 @@ exports.addCluster = function (name, code, token, endpoint, env, callback) {
 
 const UPDATE_SYSTEM_CLUSTER = `
   UPDATE hc_console_system_cluster
-  SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, gmt_modified = ?
+  SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, monitor = ?, gmt_modified = ?
   WHERE code = ?;
 `;
-exports.updateCluster = function (name, code, token, endpoint, env, callback) {
+exports.updateCluster = function (
+  name, code, token, endpoint,
+  env, monitor,
+  callback
+) {
   let d = new Date();
   db.query(
     UPDATE_SYSTEM_CLUSTER,
-    [name, token, endpoint, env, d, code],
+    [name, token, endpoint, env, monitor, d, code],
     function (err) {
       if (err) {
         log.error('Update cluster failed:', err);
@@ -516,7 +524,7 @@ function clusterInit(callback) {
         return net.isIP(eachIp);
       });
     if (!ips.length) {
-      return; //do nothing
+      return; // do nothing
     }
     const endpoint = `http://${ips[0]}:9999`;
     exports.addCluster(

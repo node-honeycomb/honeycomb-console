@@ -70,9 +70,12 @@ exports.addCluster = function (req, callback) {
     opItemId: clusterCode,
     opEnv: req.body.env,
   });
+
   let clusterName = req.body.name;
   let clusterEnv = req.body.env;
   let token = req.body.token;
+  let monitor = req.body.monitor || null;
+
   if (token === '***********') {
     let opt = cluster.getClusterCfgByCode(clusterCode);
     if (opt.code === 'ERROR') {
@@ -101,6 +104,7 @@ exports.addCluster = function (req, callback) {
       token,
       endpoint,
       clusterEnv,
+      monitor,
       function (err) {
         if (err) {
           log.error(err.message);
@@ -134,6 +138,7 @@ exports.addCluster = function (req, callback) {
       token,
       endpoint,
       clusterEnv,
+      monitor,
       function (err) {
         if (err) {
           log.error(err.message);
