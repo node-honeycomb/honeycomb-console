@@ -5,9 +5,7 @@
 const App = require('hc-bee');
 const app = new App();
 const config = require('./config');
-const promisify = require('util').promisify;
-const utils = require('./common/utils');
-const callremote = utils.callremote;
+const startMonitor = require('./monitor');
 
 app.server.setTimeout(300000);
 
@@ -35,5 +33,6 @@ if (db.ready) {
   });
 }
 
+startMonitor();
 
 module.exports = app;

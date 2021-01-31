@@ -43,6 +43,7 @@ exports.listApp = function (req, callback) {
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
+
   let path = '/api/apps';
   callremote(path, opt, function (err, result) {
     if (err || result.code !== 'SUCCESS') {

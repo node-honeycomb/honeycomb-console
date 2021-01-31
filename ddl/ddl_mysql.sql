@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `region` varchar(128) DEFAULT '', -- COMMENT '多region: 生产的多套环境'
   `endpoint` text NOT NULL,
   `token` varchar(256) NOT NULL DEFAULT '',
+  `monitor` varchar(256) DEFAULT NULL, -- COMMENT '当前集群监控机器人地址，集群异常时会推送到该地址'
   `description` text,
   `status` tinyint(4) NOT NULL DEFAULT '1',
   `gmt_create` datetime NOT NULL,

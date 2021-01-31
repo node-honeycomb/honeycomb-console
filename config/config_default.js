@@ -9,8 +9,8 @@ module.exports = {
    *
    */
   meta: {
-    driver: 'sql.js', // mysql or sql.js, default sql.js
-    dbfile: path.join(__dirname, '../run/meta.db')
+    // driver: 'sql.js', // mysql or sql.js, default sql.js
+    // dbfile: path.join(__dirname, '../run/meta.db')
     /**
     driver   : mysql
     host     : 'localhost',
@@ -121,5 +121,7 @@ module.exports = {
     keepOnlineNum: 2,
     keepOfflineNum: 5
   },
-  hideUpload: false
+  // 是否关闭上传功能
+  hideUpload: false,
+  robot: ''
 };

@@ -1,7 +1,5 @@
 const log = require('../common/log');
 const db = require('../common/db');
-const config = require('../config');
-
 
 let AppConfig = {};
 
@@ -37,8 +35,8 @@ const GET_APP_CFG = `
   ORDER BY id desc 
   LIMIT 1
 `;
+
 AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
-  let d = new Date();
   db.query(
     GET_APP_CFG,
     [clusterCode, type, app],
@@ -67,7 +65,6 @@ const GET_APP_CFG_HIS = `
   WHERE cluster_code = ? and app = ? order by version desc limit 100
 `;
 AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
-  let d = new Date();
   db.query(
     GET_APP_CFG_HIS,
     [appCfg.clusterCode, appCfg.app],
@@ -116,16 +113,6 @@ AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   );
 };
 
-const GET_APPS = `
-  select 
-    cluster_code, type, app, max(version)
-  from 
-    hc_console_system_cluster_apps_config
-  where
-    cluster_code = ?
-  group by
-    cluster_code, type, app
-`
 const DELETE_APPS_CONFIG = `
   delete from hc_console_system_cluster_apps_config
   where cluster_code = ? and type = ? and app = ? and id < (
@@ -136,7 +123,8 @@ const DELETE_APPS_CONFIG = `
       order by id desc limit 3
     ) topids
   )
-`
+`;
+
 AppConfig.cleanAppConfig = (clusterCode, type, app, callback) => {
   db.query(DELETE_APPS_CONFIG, [clusterCode, type, app, clusterCode, type, app], (err) => {
     if (err) {
