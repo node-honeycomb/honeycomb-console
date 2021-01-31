@@ -32,7 +32,7 @@ const detectCluster = (cluster) => {
     return;
   }
 
-  return new Promise((res, rej) => {
+  return new Promise((res) => {
     callremote(path, cluster, function (err, result) {
       if (err || result.code !== 'SUCCESS') {
         let errMsg = err && err.message || result.message;
@@ -45,7 +45,7 @@ const detectCluster = (cluster) => {
           monitor: cluster.monitor,
         });
 
-        return rej(err);
+        return res();
       }
 
       let ips = [];
@@ -59,6 +59,8 @@ const detectCluster = (cluster) => {
       const exceptionAppIds = [];
 
       if (!apps || apps.length === 0) {
+        res();
+
         return;
       }
 
@@ -79,9 +81,12 @@ const detectCluster = (cluster) => {
       }
 
       if (!exceptionAppIds || exceptionAppIds.length === 0) {
+        res();
+
         return;
       }
 
+      res();
       return emitAppError({
         clusterCode,
         clusterName,
@@ -100,7 +105,7 @@ async function detect() {
       const cluster = clusters[clusterCode];
       cluster.code = clusterCode;
 
-      return detectCluster(cluster);
+      await detectCluster(cluster);
     });
   });
 }
