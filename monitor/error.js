@@ -2,6 +2,10 @@ const urllib = require('urllib');
 
 const logger = require('../common/log');
 
+/**
+ * @doc https://developers.dingtalk.com/document/app/custom-robot-access/title-72m-8ag-pqw
+ * @param {string} message 错误消息
+ */
 const getMsg = (message) => {
   return {
     msgtype: 'markdown',
