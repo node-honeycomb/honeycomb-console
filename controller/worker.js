@@ -1,10 +1,8 @@
 
 'use strict';
-const async = require('async');
 const config = require('../config');
 const log = require('../common/log');
 const cluster = require('../model/cluster');
-const userAcl = require('../model/user_acl');
 
 /**
  * @api {post} /api/worker/:id/delete
@@ -62,7 +60,6 @@ exports.addWorker = function (req, callback) {
  *    token ?
  *    endpoint ?
  *    secret !
- *    
  */
 exports.registerWorker = function (req, callback) {
   let ip = req.body.ip;

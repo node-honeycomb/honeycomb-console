@@ -22,6 +22,16 @@ const FormItem = Form.Item;
 const Option = Select.Option;
 const ipRegex1 = /^(http[s]?)?:\/\/([\S])+/;
 const ipRegex2 = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+
+const tips = (
+  <span>
+    仅支持钉钉机器人，请参考
+    <a target="_blank" href="https://www.yuque.com/honeycomb/honeycomb/ops-cluster#8yYlB">
+      文档
+    </a>
+  </span>
+);
+
 class AddClusterModal extends React.Component {
   state = {
     info: {
@@ -36,8 +46,13 @@ class AddClusterModal extends React.Component {
   onClusterInfoChange = function (name, value) {
     let editInfo = _.cloneDeep(this.state.info);
     // 兼容 Input 和 Select 的 onChange 回调入参
-    editInfo[name] = (value && value.target && value.target.value) || value;
-    this.setState({ info: editInfo });
+    if (typeof value === 'string') {
+      editInfo[name] = value;
+    } else {
+      editInfo[name] = _.get(value, 'target.value');
+    }
+
+    this.setState({info: editInfo});
   };
   handleOk = (e) => {
     let editInfo = _.cloneDeep(this.state.info);
@@ -54,7 +69,7 @@ class AddClusterModal extends React.Component {
       return;
     }
     let errorIps = editInfo.ips.find((item, key) => {
-      if (!!item.match(ipRegex1)) return;
+      if (item.match(ipRegex1)) return;
       if (!item.match(ipRegex1) && !item.match(ipRegex2)) return item;
     });
     if (!_.isEmpty(errorIps)) {
@@ -76,17 +91,17 @@ class AddClusterModal extends React.Component {
     this.props.addCluster(editInfo).then(() => {
       this.props.getCluster();
       this.props.onHide && this.props.onHide.call({});
-      this.setState({ info: {} });
+      this.setState({info: {}});
     });
   };
   handleCancel = (e) => {
     this.props.onHide && this.props.onHide.call({});
-    this.setState({ info: {} });
+    this.setState({info: {}});
   };
   render() {
     const formItemLayout = {
-      labelCol: { span: 6 },
-      wrapperCol: { span: 14 },
+      labelCol: {span: 6},
+      wrapperCol: {span: 14},
     };
     return (
       <div>
@@ -132,11 +147,12 @@ class AddClusterModal extends React.Component {
                 onChange={this.onClusterInfoChange.bind(this, 'token')}
                 value={this.state.info.token}
                 placeholder="请填写token，来自server.config.admin.token"
+                help="注：新安装的honeycomb-server，token默认值为:***honeycomb-default-token***"
               />
             </FormItem>
             <FormItem {...formItemLayout} label="ip 列表:">
               <Input
-                className={classnames({ 'ips-error': this.state.isIpsError })}
+                className={classnames({'ips-error': this.state.isIpsError})}
                 onChange={this.onClusterInfoChange.bind(this, 'ips')}
                 value={this.state.info.ips}
                 type="textarea"
@@ -154,10 +170,16 @@ class AddClusterModal extends React.Component {
                 <Option value="prod">生产(prod)</Option>
               </Select>
             </FormItem>
-            <p>
-              注：新安装的honeycomb-server，token默认值为:
-              ***honeycomb-default-token***
-            </p>
+            <FormItem
+              {...formItemLayout}
+              label="集群监控"
+              help={tips}
+            >
+              <Input
+                onChange={this.onClusterInfoChange.bind(this, 'monitor')}
+                value={this.state.info.monitor}
+              />
+            </FormItem>
           </Form>
         </Modal>
       </div>

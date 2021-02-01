@@ -73,7 +73,9 @@ exports.sha1 = function (str, secret) {
 };
 
 exports.getUidAndGid = function (changeUser) {
-  if (!changeUser) { return {}; }
+  if (!changeUser) {
+    return {};
+  }
   const uid = process.getuid();
   if (uid >= 500) {
     return {uid: process.getuid(), gid: process.getgid()};
@@ -82,7 +84,9 @@ exports.getUidAndGid = function (changeUser) {
   const str = fs.readFileSync(gidFile, 'utf-8');
   const reg  = /[^app]admin:x:+(\d+):(\d+)/;
   const res  = str.match(reg);
-  if (!res) { return {}; }
+  if (!res) {
+    return {};
+  }
   const user = {
     uid: +res[1],
     gid: +res[2]
@@ -223,7 +227,7 @@ exports.callremote = function (queryPath, options, callback) {
   } else {
     queryPath += '&ips=' + ips;
   }
-  if(endpoint.endsWith('/')){
+  if (endpoint.endsWith('/')) {
     endpoint = endpoint.substring(0, endpoint.length - 1);
   }
   delete options.endpoint;
@@ -321,7 +325,9 @@ exports.mergeAppInfo = function (ips, apps) {
 
       // 补齐cluster， 如果某个ip没有app，设置status为none
       ips.forEach(function (ip) {
-        let idx = _.findIndex(vms, function (vm) { return ip === vm.ip; });
+        let idx = _.findIndex(vms, function (vm) {
+          return ip === vm.ip;
+        });
         if (idx < 0) {
           vms.push({
             ip: ip,
@@ -377,7 +383,7 @@ exports.getClusterApps = function (clusterIinfo, cb) {
       });
 
       apps = exports.mergeAppInfo(ips, apps);
-      let res = []
+      let res = [];
       apps.forEach((app) => {
         if (/^__\w+__$/.test(app.name)) {
           return;

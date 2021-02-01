@@ -12,15 +12,19 @@ const callremote = utils.callremote;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
-    (name, code, token, endpoint, env, gmt_create, gmt_modified)
+    (name, code, token, endpoint, env, monitor, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?, ?, ?, ?) ;`;
+    (?, ?, ?, ?, ?, ?, ?, ?) ;`;
 
-exports.addCluster = function (name, code, token, endpoint, env, callback) {
+exports.addCluster = function (
+  name, code, token, endpoint,
+  env, monitor,
+  callback
+) {
   let d = new Date();
   db.query(
     INSERT_SYSTEM_CLUSTER,
-    [name, code, token, endpoint, env, d, d],
+    [name, code, token, endpoint, env, monitor, d, d],
     function (err) {
       if (err) {
         // log.error('Insert new cluster failed:', err);
@@ -35,14 +39,18 @@ exports.addCluster = function (name, code, token, endpoint, env, callback) {
 
 const UPDATE_SYSTEM_CLUSTER = `
   UPDATE hc_console_system_cluster
-  SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, gmt_modified = ?
+  SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, monitor = ?, gmt_modified = ?
   WHERE code = ?;
 `;
-exports.updateCluster = function (name, code, token, endpoint, env, callback) {
+exports.updateCluster = function (
+  name, code, token, endpoint,
+  env, monitor,
+  callback
+) {
   let d = new Date();
   db.query(
     UPDATE_SYSTEM_CLUSTER,
-    [name, token, endpoint, env, d, code],
+    [name, token, endpoint, env, monitor, d, code],
     function (err) {
       if (err) {
         log.error('Update cluster failed:', err);
@@ -165,13 +173,13 @@ exports.updateWorker = function (status, ipAddress, clusterCode, callback) {
   }
   if (status === 'offline') {
     status = 0;
-  } else{
+  } else {
     status = 1;
   }
   db.query(
     UPDATE_SYSTEM_WORKER_BY_CLUSTER,
     [status, ipAddress, clusterCode],
-    callback || function(){}
+    callback || function () {}
   );
 };
 
@@ -227,12 +235,50 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.id,
     a.status,
     group_concat(a.ip) as ip,
-    b.env
+    b.env,
+    b.monitor
   from
     hc_console_system_cluster b
   join
     hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
   group by b.name, b.code, b.token, b.id, a.status`;
+
+function adpater2cluster(data) {
+  data = data || [];
+  let clusterCfg = {};
+
+  data.forEach(function (c) {
+    if (!clusterCfg[c.code]) {
+      clusterCfg[c.code] = {
+        name: c.name,
+        token: c.token,
+        endpoint: c.endpoint,
+        id: c.id,
+        ips: [],
+        ipsOffline: [],
+        monitor: c.monitor
+      };
+    }
+
+    if (c.status === 1 && c.ip) {
+      clusterCfg[c.code].ips = c.ip.split(',');
+    } else if (c.ip) {
+      clusterCfg[c.code].ipsOffline = c.ip.split(',');
+    }
+
+    clusterCfg[c.code] = {
+      name: c.name,
+      token: c.token,
+      endpoint: c.endpoint,
+      id: c.id,
+      ips: c.ip.split(','),
+      env: c.env,
+      monitor: c.monitor
+    };
+  });
+
+  return clusterCfg;
+}
 
 exports.getClusterCfg = function (cb) {
   db.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
@@ -241,37 +287,45 @@ exports.getClusterCfg = function (cb) {
       log.error(err.message);
       return cb(e);
     }
-    data = data || [];
-    let clusterCfg = {};
-    data.forEach(function (c) {
 
-      if (!clusterCfg[c.code]) {
-        clusterCfg[c.code] = {
-          name: c.name,
-          token: c.token,
-          endpoint: c.endpoint,
-          id: c.id,
-          ips: [],
-          ipsOffline: []
-        };
-      }
-
-      if (c.status === 1 && c.ip) {
-        clusterCfg[c.code].ips = c.ip.split(',')
-      } else if (c.ip) {
-        clusterCfg[c.code].ipsOffline = c.ip.split(',')
-      }
-
-      clusterCfg[c.code] = {
-        name: c.name,
-        token: c.token,
-        endpoint: c.endpoint,
-        id: c.id,
-        ips: c.ip.split(','),
-        env: c.env,
-      };
-    });
+    const clusterCfg = adpater2cluster(data);
     exports.gClusterConfig = clusterCfg;
+    cb(null, clusterCfg);
+  });
+};
+
+const SELECT_MONITED_CLUSTER_WORKER = `
+  select
+    b.name,
+    b.code,
+    b.token,
+    b.endpoint,
+    b.id,
+    a.status,
+    group_concat(a.ip) as ip,
+    b.env,
+    b.monitor
+  from
+    hc_console_system_cluster b
+  join
+    hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
+  where
+    b.monitor is not null
+  group by b.name, b.code, b.token, b.id, a.status
+`;
+
+/**
+ * 获取所有填写了有监控机器人的集群
+ */
+exports.getMonitedClusterCfg = function (cb) {
+  db.query(SELECT_MONITED_CLUSTER_WORKER, function (err, data) {
+    if (err || !data) {
+      let e = new Error('SELECT_MONITED_CLUSTER_WORKER failed: ' + err.message);
+      log.error(err.stack);
+      return cb(e);
+    }
+
+    const clusterCfg = adpater2cluster(data);
     cb(null, clusterCfg);
   });
 };
@@ -444,7 +498,7 @@ exports.fixCluster = function (clusterCode, callback) {
       callback(null);
     }
   });
-}
+};
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
 function clusterInit(callback) {
@@ -465,12 +519,12 @@ function clusterInit(callback) {
     if (!ips) return;
     ips = ips
       .split(',')
-      .map((ip) => ip.trim())
+      .map(ip => ip.trim())
       .filter((eachIp) => {
         return net.isIP(eachIp);
       });
     if (!ips.length) {
-      return; //do nothing
+      return; // do nothing
     }
     const endpoint = `http://${ips[0]}:9999`;
     exports.addCluster(
@@ -485,7 +539,7 @@ function clusterInit(callback) {
             // 如果worker改变，需要更新
             exports.queryWorker(clusterCode, (err, workers) => {
               if (err) return cb(err);
-              workers = workers.map((w) => w.ip);
+              workers = workers.map(w => w.ip);
               if (!_.isEqual(workers.sort(), ips.sort())) {
                 // 先删除该cluster原来的所有worker，然后重新初始化
                 exports.deleteWorkersByClusterCode(clusterCode, (err) => {
