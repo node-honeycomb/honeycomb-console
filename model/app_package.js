@@ -30,6 +30,10 @@ exports.savePackage = (data, callback) => {
   }
   if (storage) {
     storage.save(data.clusterCode + '/' + data.appId + '.tgz', data.pkg, (err, fkey) => {
+      if (err) {
+        err.message = `storage save failed, app: ${data.appId}, path: ${data.pkg}` + err.message;
+        return callback(err);
+      }
       save('key', fkey, callback);
     });
   } else if (storage === false) {
@@ -107,7 +111,7 @@ exports.getPackage = (clusterCode, appId, callback) => {
         return callback(err);
       } else {
         log.info('get app pkg: query pkg info success', JSON.stringify(data[0]));
-        if (data[0]) {
+        if (data[0] && data[0].package) {
           let tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
           if (storage) {
             storage.get(data[0].package.toString(), tmpFile, (err) => {
