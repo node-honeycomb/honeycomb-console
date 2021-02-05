@@ -14,6 +14,7 @@ tests/example-apps/*.tgz
 .editorconfig
 $Recycle.Bin/
 runtime_config.json
+package-lock.json
 auto_router.js
 .package
 .*.swp
