@@ -32,6 +32,7 @@ exports.savePackage = (data, callback) => {
     storage.save(data.clusterCode + '/' + data.appId + '.tgz', data.pkg, (err, fkey) => {
       if (err) {
         err.message = `storage save failed, app: ${data.appId}, path: ${data.pkg}` + err.message;
+        log.error(err.message);
         return callback(err);
       }
       save('key', fkey, callback);
@@ -74,8 +75,11 @@ exports.deletePackage = (clusterCode, appId, callback) => {
       } else {
         log.info('delete app pkg: query pkg info successfully', JSON.stringify(data[0]));
         if (data[0]) {
-          if (storage && storage.delete) {
-            storage.delete(data[0].package.toString(), () => {
+          if (storage && storage.delete && data[0].package) {
+            storage.delete(data[0].package.toString(), (err) => {
+              if (err) {
+                log.error(`delete package from storage failed, cluster: ${clusterCode} appId: ${appId}`, err);
+              }
               db.query(DELETE_APP_PKG, [clusterCode, appId], callback);
             });
           } else {
@@ -116,6 +120,7 @@ exports.getPackage = (clusterCode, appId, callback) => {
           if (storage) {
             storage.get(data[0].package.toString(), tmpFile, (err) => {
               if (err) {
+                log.error(`get app package failed, cluster: ${clusterCode} appId: ${appId}`, err);
                 return callback(err);
               }
               data[0].package = tmpFile;
