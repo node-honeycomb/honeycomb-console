@@ -455,7 +455,7 @@ exports.saveSnapshort = (obj, cb) => {
 };
 
 /**
- * 修复集群错误信息
+ * 修复集群worker, 通过检测联通性，淘汰漂移的节点
  */
 exports.fixCluster = function (clusterCode, callback) {
   let clusterInfo = exports.getClusterCfgByCode(clusterCode);
