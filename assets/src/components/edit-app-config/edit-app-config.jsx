@@ -79,37 +79,56 @@ const EditAppConfig = (props) => {
       return;
     }
 
+    const doApply = async (fixReload) => {
+      try {
+        await api.configApi.updateAppConfig(appName, editorCode, currentClusterCode, appType);
+        message.success('配置修改成功！');
+
+        if (fixReload) {
+          message.loading('重启应用中...');
+
+          const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
+
+          if (!appId) {
+            message.destroy();
+
+            return message.warn('当前应用没有正在运行的版本');
+          }
+
+          await api.appApi.reload(currentClusterCode, appId);
+          message.destroy();
+          message.success('应用重启成功！');
+        }
+
+        await getAppConfig();
+        setIsEdit(false);
+      } catch (e) {
+        notification.error({
+          message: '修改配置失败',
+          description: e.message
+        });
+      }
+    };
+
     callCodeDiff({
       newCode: editorCode,
       oldCode: result,
-      onOk: async (reload) => {
-        try {
-          await api.configApi.updateAppConfig(appName, editorCode, currentClusterCode, appType);
-          message.success('配置修改成功！');
+      onOk: (reload) => {
+        let fixReload = reload;
 
-          if (reload) {
-            message.loading('重启应用中...');
-
-            const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
-
-            if (!appId) {
-              message.destroy();
-
-              return message.warn('当前应用没有正在运行的版本');
+        if (appName === 'common' || appName === 'server') {
+          fixReload = false;
+          Modal.confirm({
+            content: appName === 'common' ? '请注意，公共配置生效，需重启对应应用即可！' : '请注意，系统配置生效，需重启任意应用即可！',
+            onOk: () => {
+              doApply(fixReload);
+            },
+            onCancel: () => {
+              return;
             }
-
-            await api.appApi.reload(currentClusterCode, appId);
-            message.destroy();
-            message.success('应用重启成功！');
-          }
-
-          await getAppConfig();
-          setIsEdit(false);
-        } catch (e) {
-          notification.error({
-            message: '修改配置失败',
-            description: e.message
           });
+        } else {
+          doApply(fixReload);
         }
       }
     });

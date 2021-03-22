@@ -132,7 +132,7 @@ const ClusterUpset = (props) => {
           {isAdd ? (
             <Input placeholder="请填写token，来自server.config.admin.token" />
           ) : (
-            <Input.Password placeholder="请填写token，来自server.config.admin.token" />
+            <Input.Password placeholder="请填写token，来自server.config.admin.token" visibilityToggle={false} />
           )}
         </Form.Item>
         <Form.Item

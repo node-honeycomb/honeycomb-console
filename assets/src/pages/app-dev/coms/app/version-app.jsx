@@ -69,7 +69,7 @@ const renderAppStatus = (versionApp) => {
 };
 
 const VersionApp = (props) => {
-  const {versionApp, onAppOpClick} = props;
+  const {versionApp, onAppOpClick, isAdminApp} = props;
   const {appId, publishAt, isCurrWorking} = versionApp;
   const appStatus = getStatus(versionApp);
 
@@ -97,7 +97,7 @@ const VersionApp = (props) => {
     ],
     [
       '操作',
-      <AppOp
+      isAdminApp && <AppOp
         key="op"
         status={appStatus}
         appName={appId}
@@ -153,7 +153,8 @@ VersionApp.propTypes = {
     publishAt: PropTypes.string,
     isCurrWorking: PropTypes.bool
   }),
-  onAppOpClick: PropTypes.func
+  onAppOpClick: PropTypes.func,
+  isAdminApp: PropTypes.bool
 };
 
 export default VersionApp;

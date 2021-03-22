@@ -105,7 +105,6 @@ const AppDev = (props) => {
         usage[app.name] = parseUsgae(statUsage[appId]);
       });
 
-
       // TODO: 只取出第一个机器的信息，其他机器的信息引导用户去系统监控查看
       setAppUsgae(usage);
     } catch (e) {

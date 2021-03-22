@@ -133,8 +133,18 @@ const config = {
         }
       },
       {
-        test: /\.(less|css)$/,
-
+        test: /\.css$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader
+          },
+          {
+            loader: 'css-loader'
+          }
+        ]
+      },
+      {
+        test: /\.less$/,
         use: [
           {
             loader: MiniCssExtractPlugin.loader
@@ -144,7 +154,6 @@ const config = {
           },
           {
             loader: 'less-loader',
-
             options: {
               javascriptEnabled: true
             }
