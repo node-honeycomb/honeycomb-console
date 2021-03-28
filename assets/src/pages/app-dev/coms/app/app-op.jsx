@@ -123,8 +123,8 @@ const AppOp = (props) => {
 };
 
 AppOp.propTypes = {
-  status: PropTypes.string,
-  showMore: PropTypes.boolean,
+  status: PropTypes.array,
+  showMore: PropTypes.bool,
   onClick: PropTypes.func,
   appName: PropTypes.string
 };

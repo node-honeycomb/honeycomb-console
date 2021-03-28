@@ -91,7 +91,7 @@ class Ring extends React.Component {
 Ring.propTypes = {
   all: PropTypes.number,
   part: PropTypes.number,
-  title: PropTypes.string,
+  title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   allTitle: PropTypes.string,
   partTitle: PropTypes.string
 };

@@ -1,10 +1,11 @@
 import React from 'react';
 import _ from 'lodash';
-import PropTypes from 'prop-types';
-import {Tooltip} from 'antd';
 import moment from 'moment';
-import {DesktopOutlined, CloudServerOutlined, NodeIndexOutlined} from '@ant-design/icons';
+import PropTypes from 'prop-types';
+import {Tooltip, message} from 'antd';
 import {PRIMARY_COLOR} from '@lib/color';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import {DesktopOutlined, CloudServerOutlined, NodeIndexOutlined} from '@ant-design/icons';
 
 import BannerCard from '../banner-card';
 
@@ -37,7 +38,16 @@ const Machine = (props) => {
   return (
     <BannerCard className="machine">
       <div className="ip-title">
-        <DesktopOutlined style={{color: PRIMARY_COLOR}} /> {ip}
+        <DesktopOutlined style={{color: PRIMARY_COLOR}} />
+        &nbsp;
+        <Tooltip title="点击复制">
+          <CopyToClipboard
+            text={ip}
+            onCopy={() => message.success(`复制成功！`)}
+          >
+            <span className="ip-to-copy">{ip}</span>
+          </CopyToClipboard>
+        </Tooltip>
       </div>
       <div className="key-title">基础信息</div>
       <div>

@@ -19,7 +19,7 @@ import './index.less';
 
 class AppLayout extends React.Component {
   static propTypes = {
-    children: PropTypes.element,
+    children: PropTypes.any,
     dispatch: PropTypes.func,
     loading: PropTypes.object,
     currentCluster: PropTypes.shape({

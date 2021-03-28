@@ -65,8 +65,6 @@ export const useSearch = ({
       return matched;
     });
 
-    console.log(ds, data);
-
     setDataSource(ds);
   }, [data, keyword]);
 

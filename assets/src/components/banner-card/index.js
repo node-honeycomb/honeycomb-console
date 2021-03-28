@@ -17,8 +17,8 @@ const BannerCard = (props) => {
 };
 
 BannerCard.propTypes = {
-  children: PropTypes.element,
-  style: CSSStyleSheet,
+  children: PropTypes.any,
+  style: PropTypes.any,
   className: PropTypes.string
 };
 

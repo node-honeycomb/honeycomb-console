@@ -50,8 +50,6 @@ const getAppUsage = (
       }
     });
 
-    console.log(data);
-
     // 大概显示 100 个点，点太多图表显示效果差
     let chunkSize = 0;
 

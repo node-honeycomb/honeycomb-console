@@ -49,6 +49,8 @@ daily: release
 
 clean:
 	@rm -rf ./out
+	@rm -rf assets/node_modules
+	@rm -rf node_modules
 
 tag:
 	@cat package.json | awk -F '"' '/version" *: *"/{print "v"$$4}' | xargs -I {} git tag {}

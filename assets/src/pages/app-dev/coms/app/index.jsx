@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useMemo, useEffect} from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
@@ -75,6 +75,7 @@ const App = (props) => {
   const [isActive, setActive] = useState(false);
   const {memUsage, cpuUsage} = usage || {};
   const [cfgAppName, setCfgAppName] = useState(null);
+  const [hasInit, setHasInit] = useState(false);
 
   const workingApp = getCurrentWorking(versions);
   const appInfo = workingApp && getAppInfo(workingApp.appId);
@@ -84,15 +85,18 @@ const App = (props) => {
   const isLoading = isAppLoading(workingApp);
   const fontOffline = {color: isOnline ? undefined : '#ccc'};
   const fontError = {
-    color: exception > 0 ? '#f56a00' : undefined,
-    background: exception > 0 ? '#fde3cf' : undefined
+    color: exception > 0 ? '#f56a00' : undefined
   };
+
+  useEffect(() => {
+    setHasInit(true);
+  }, []);
 
   const infos = [
     [
       isAdminApp ?
         (<span style={fontOffline}>{ADMIN_APP_NAME}<WhiteSpace /><AdminAppIconTip /></span>) :
-        <span style={fontOffline}>name</span>,
+        <span style={fontOffline}>{name}</span>,
       `创建于${publishAt}`
     ],
     [
@@ -105,7 +109,7 @@ const App = (props) => {
     ]
   ];
 
-  const charts = [
+  const charts = useMemo(() => [
     [
       '内存',
       memUsage || []
@@ -114,7 +118,8 @@ const App = (props) => {
       'cpu',
       cpuUsage || []
     ]
-  ];
+  ], [usage]);
+
 
   const onAppAction = async (key, appName) => {
     if (!appName) {
@@ -228,9 +233,9 @@ const App = (props) => {
         </div>
         <div className="app-info">
           {
-            infos.map(([title, info]) => {
+            infos.map(([title, info], index) => {
               return (
-                <div className="info" key={title}>
+                <div className="info" key={index}>
                   <div className="info-title">{title}</div>
                   <div className="info-content" title={title}>
                     {info}
@@ -259,6 +264,7 @@ const App = (props) => {
                           min: 0
                         }
                       }}
+                      animate={!hasInit}
                     >
                       <Tooltip shared={false} />
                       <Area
