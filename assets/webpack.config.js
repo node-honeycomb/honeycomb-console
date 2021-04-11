@@ -5,7 +5,7 @@ const ReplaceCSSUrl = require('webpack-plugin-replace-css-url');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const ESBuildPlugin = require('esbuild-minimizer-webpack-plugin').default;
+const {ESBuildPlugin, ESBuildMinifyPlugin} = require('esbuild-loader');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 
 const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
@@ -184,14 +184,15 @@ const config = {
         css: ['stylesheet'],
       }
     }),
+    new ESBuildPlugin(),
     // new BundleAnalyzerPlugin()
   ].filter(Boolean),
 
   optimization: {
     minimize: isProduct,
     minimizer: [
-      new ESBuildPlugin()
-    ],
+      new ESBuildMinifyPlugin()
+    ]
   }
 };
 

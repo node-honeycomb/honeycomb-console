@@ -23,6 +23,10 @@ const EditAppConfig = (props) => {
   const editorRef = useRef();
 
   const getAppConfig = async () => {
+    if (!currentClusterCode) {
+      return null;
+    }
+
     const result = await api.configApi.getAppConfig(
       appName, currentClusterCode, appType
     );
@@ -140,11 +144,11 @@ const EditAppConfig = (props) => {
   return (
     <React.Fragment>
       <div className="list-title">
-        应用配置
+        应用配置 | {appName}
         {
           isEdit && (
             <span style={{color: 'red'}}>
-            （{appName}编辑中）
+            （编辑中）
             </span>
           )
         }

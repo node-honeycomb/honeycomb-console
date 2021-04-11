@@ -134,3 +134,29 @@ export const parseUsgae = (usage) => {
     cpuUsage: groupByMinute(parseCpuUsage)
   };
 };
+
+/**
+ * 获取每一个应用的异常情况的统计
+ * @param {Array} apps
+ */
+export const getAppExpceptStatistics = (apps) => {
+  let total = 0;
+  let errorCount = 0;
+  const errorApps = [];
+
+  apps.forEach(({versions}) => {
+    versions.forEach(version => {
+      total++;
+      const status = version.cluster.map(c => c.status);
+
+      if (status.includes('exception')) {
+        errorApps.push(version.appId);
+        errorCount++;
+      }
+    });
+  });
+
+  return {
+    errorCount, total, errorApps
+  };
+};

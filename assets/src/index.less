@@ -112,3 +112,45 @@ body {
     font-weight: bolder;
   }
 }
+
+// 状态汇总：https://github.com/node-honeycomb/honeycomb-server/blob/0cbada2baceec9669883a5b584b8a31984893d7c/lib/child.js#L132
+
+.app-init {
+  background-color: @success-color;
+  color: @border-color-base;
+}
+
+.app-online {
+  background-color: @success-color;
+  color: @border-color-base;
+}
+
+.app-offline {
+  background-color: @outline-color;
+  color: white;
+}
+
+.app-exception {
+  background-color: @error-color;
+  color: white;
+}
+
+.app-retry {
+  background-color: @warning-color;
+  color: white;
+}
+
+.app-reloaded {
+  background-color: @primary-color;
+  color: white;
+}
+
+.app-starting {
+  background-color: @primary-color;
+  color: white;
+}
+
+.app-stoping {
+  background-color: @outline-color;
+  color: white;
+}

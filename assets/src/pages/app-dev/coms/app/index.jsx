@@ -3,7 +3,7 @@ import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {notification, message, Drawer} from 'antd';
+import {notification, message} from 'antd';
 import {Chart, Area, Line, Tooltip} from 'bizcharts';
 import {DeploymentUnitOutlined, LoadingOutlined} from '@ant-design/icons';
 
@@ -12,7 +12,6 @@ import PAGES from '@lib/pages';
 import {isAppLoading} from '@lib/util';
 import {PRIMARY_COLOR} from '@lib/color';
 import WhiteSpace from '@coms/white-space';
-import EditAppConfig from '@coms/edit-app-config';
 import AdminAppIconTip from '@coms/admin-app-icon-tip';
 import {ADMIN_APP_NAME, ADMIN_APP_CODE, APP_STATUS} from '@lib/consts';
 
@@ -68,13 +67,12 @@ const getStat = (versions) => {
 
 
 const App = (props) => {
-  const {app, usage, zIndex, currentClusterCode} = props;
+  const {app, usage, zIndex, currentClusterCode, onAppCfg} = props;
   const {name, versions} = app;
   const {publishAt, exception} = getStat(versions);
   const isAdminApp = ADMIN_APP_CODE === name;
   const [isActive, setActive] = useState(false);
   const {memUsage, cpuUsage} = usage || {};
-  const [cfgAppName, setCfgAppName] = useState(null);
   const [hasInit, setHasInit] = useState(false);
 
   const workingApp = getCurrentWorking(versions);
@@ -151,8 +149,7 @@ const App = (props) => {
 
         // 配置app
         case MENU_ACTIONS.CONFIG: {
-          // eslint-disable-next-line
-          setCfgAppName(name);
+          onAppCfg(name);
           break;
         }
 
@@ -310,16 +307,6 @@ const App = (props) => {
           })
         }
       </div>
-      <Drawer
-        visible={!!cfgAppName}
-        onClose={() => setCfgAppName(null)}
-        width="50%"
-        forceRender
-      >
-        <EditAppConfig
-          appName={cfgAppName}
-        />
-      </Drawer>
     </div>
   );
 };
@@ -333,7 +320,8 @@ App.propTypes = {
   }),
   usage: PropTypes.object,
   zIndex: PropTypes.number,
-  currentClusterCode: PropTypes.string
+  currentClusterCode: PropTypes.string,
+  onAppCfg: PropTypes.func
 };
 
 export default App;

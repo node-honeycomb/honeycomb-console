@@ -5,10 +5,19 @@ import {
   Tooltip, Interval, Interaction,
   Coordinate,
 } from 'bizcharts';
+import {Tooltip as AntTooltip} from 'antd';
 
 import {PRIMARY_COLOR} from '@lib/color';
 
 import './index.less';
+
+const getPercent = (part, all) => {
+  if (all === 0) {
+    return 0;
+  }
+
+  return ((part / all) * 100).toFixed(0);
+};
 
 class Ring extends React.Component {
   // FIXME: 这个逻辑没有办法用 hooks 来实现了，没有办法避免更新
@@ -28,16 +37,16 @@ class Ring extends React.Component {
   }
 
   render() {
-    const {all, part, title, allTitle, partTitle} = this.props;
+    const {all, part, title, allTitle, partTitle, partTooltip} = this.props;
 
     const data = [
       {
-        type: allTitle,
-        value: all,
-      },
-      {
         type: partTitle,
         value: part
+      },
+      {
+        type: allTitle,
+        value: all - part,
       }
     ];
 
@@ -53,7 +62,7 @@ class Ring extends React.Component {
         >
           <Annotation.Text
             position={['50%', '50%']}
-            content={`${parseInt(part, 10)}/${parseInt(all, 10)}`}
+            content={`${getPercent(part, all)}%`}
             style={{
               lineHeight: '240px',
               fontSize: '20',
@@ -79,7 +88,9 @@ class Ring extends React.Component {
         </Chart>
         <div>
           <h3 style={{color: 'white'}}>{title}</h3>
-          <div>{partTitle}：{part}</div>
+          <AntTooltip title={partTooltip}>
+            <div>{partTitle}：{part}</div>
+          </AntTooltip>
           <div>{allTitle}：{all}</div>
         </div>
       </div>
@@ -93,7 +104,8 @@ Ring.propTypes = {
   part: PropTypes.number,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   allTitle: PropTypes.string,
-  partTitle: PropTypes.string
+  partTitle: PropTypes.string,
+  partTooltip: PropTypes.any
 };
 
 export default Ring;

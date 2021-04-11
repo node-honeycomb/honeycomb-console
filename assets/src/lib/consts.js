@@ -1,10 +1,13 @@
+import React from 'react';
+import {CrownOutlined} from '@ant-design/icons';
+
 export const USER_ROLE = {
   ADMIN: 1,
   USER: 0
 };
 
 export const USER_ROLE_TITLE = {
-  [USER_ROLE.ADMIN]: '管理员',
+  [USER_ROLE.ADMIN]: <span><CrownOutlined /> 管理员</span>,
   [USER_ROLE.USER]: '用户'
 };
 
@@ -40,3 +43,17 @@ export const APP_STATUS = {
   RELOAD: 'reload',
   RELOADED: 'reloaded'
 };
+
+export const SYS_CPU_TIPS = (
+  <span>
+  由
+    <a
+      rel="noreferrer"
+      href="http://nodejs.cn/api/os.html#os_os_loadavg"
+      target="_blank"
+    >
+      os.loadavg()[0]
+    </a>
+  计算得出，每5s收集一次
+  </span>
+);

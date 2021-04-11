@@ -9,6 +9,7 @@ import {InfoCircleOutlined} from '@ant-design/icons';
 import {Spin, DatePicker, Select, Button, Switch, Tooltip} from 'antd';
 
 import Machine from '@coms/machine';
+import {SYS_CPU_TIPS} from '@lib/consts';
 import {usageApi, clusterApi} from '@api';
 import {tryUsageStrToArr} from '@lib/util';
 import BannerCard from '@coms/banner-card';
@@ -83,19 +84,7 @@ const getAppUsage = (
   }
 };
 
-const SYS_CPU_TIPS = (
-  <span>
-  由
-    <a
-      rel="noreferrer"
-      href="http://nodejs.cn/api/os.html#os_os_loadavg"
-      target="_blank"
-    >
-      os.loadavg()[0]
-    </a>
-  计算得出，每5s收集一次
-  </span>
-);
+
 const SYS_MEM_TIPS = '由free计算，为内存使用百分比';
 
 
