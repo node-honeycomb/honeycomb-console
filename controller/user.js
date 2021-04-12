@@ -1,31 +1,30 @@
-'use strict';
 const user = require('../model/user');
 const utils = require('../common/utils');
-const log = require('../common/log');
-const config = require('../config');
+const {ECODE, EMSG} = require('../common/error');
+
 /**
+ * 创建一个用户
  * @api {post} /api/user/create
  * @body
- *   name
- *   password
+ *   name {String} 用户名
+ *   password {String} 密码
  */
 exports.createUser = function (req, callback) {
   var curUser = req.user;
   var name = req.body.name;
   var pwd = req.body.password;
 
+  pwd = utils.sha256(pwd);
+
   if (!name || !pwd) {
     return callback(new Error('username and password required'));
   }
-  let check = utils.checkPwd(pwd);
-  if (check !== true) {
-    return callback(check);
-  }
   if (curUser.role !== user.RoleType.RoleAdmin) {
-    return callback(new Error('no permission'));
+    return callback({
+      code: ECODE.NO_PERMISSION,
+      message: EMSG.NO_PERMISSION
+    });
   }
-  
-  pwd = utils.genPwd(pwd, config.salt);
 
   user.getUser(name, (err, data) => {
     if (!data) {
@@ -36,30 +35,43 @@ exports.createUser = function (req, callback) {
 };
 
 /**
+ * 获取用户列表
  * @api {get} /api/user/list
  */
 exports.listUser = function (req, callback) {
   user.listUser(callback);
 };
 /**
+ * 删除一个用户
  * @api {post} /api/user/:name/delete
  */
 exports.deleteUser = function (req, callback) {
   var uname = req.params.name;
   var curUser = req.user;
+
   if (curUser.role !== user.RoleType.RoleAdmin) {
-    return callback(new Error('no permission'));
+    return callback({
+      code: ECODE.NO_PERMISSION,
+      message: EMSG.NO_PERMISSION
+    });
   }
+
   user.getUser(uname, (err, data) => {
     if (err) {
       return callback(err);
     }
+
     if (!data) {
       return callback(null);
     }
+
     if (data.role === user.RoleType.RoleAdmin) {
-      return callback(new Error('no permission'));
+      return callback({
+        code: ECODE.NO_PERMISSION,
+        message: EMSG.NO_PERMISSION
+      });
     }
+
     user.deleteUser(uname, callback);
   });
 };

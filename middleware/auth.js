@@ -1,20 +1,22 @@
-'use strict';
-const utils = require('../common/utils');
-const User = require('../model/user');
-const config = require('../config');
 const pathToRegex = require('path-to-regexp');
 const log = require('../common/log');
 const svgCaptcha = require('svg-captcha');
+
+const config = require('../config');
+const User = require('../model/user');
+const utils = require('../common/utils');
+const {ECODE, EMSG} = require('../common/error');
 
 /**
  * [exports description]
  * @return {[type]} [description]
  */
-module.exports = function(app, options) {
+module.exports = function (app, options) {
   const ignorePathRegex = options.ignore ? pathToRegex(options.ignore) : null;
-  return function(req, res, next) {
-    let path = req.path;
-    // 排除掉的路径
+
+  return function (req, res, next) {
+    const path = req.path;
+
     if (ignorePathRegex && ignorePathRegex.test(path)) {
       return next();
     }
@@ -24,34 +26,57 @@ module.exports = function(app, options) {
         req.session.user = null;
         req.session = null;
         res.redirect(req.headers.referer || config.prefix);
+
         return;
       }
+
       return next();
     }
 
-    let user = req.body.username;
+    const user = req.body.username;
     let pwd = req.body.password;
-    let captcha = req.body.captcha;
-    
+
+    const throwError = (error) => {
+      res.status(500);
+
+      return res.send(error);
+    };
+
     switch (path) {
       case '/initUser':
         if (!user || !pwd) {
-          return res.redirect(config.prefix + '?error=user_or_pwd_empty');
+          res.status(500);
         }
-        pwd = utils.genPwd(pwd, config.salt);
+
+        pwd = utils.sha256(pwd);
+
         User.countUser((err, data) => {
           if (err) {
             return next(err);
           }
+
           if (data > 0) {
-            return next(new Error('root user all ready inited'));
+            return throwError({
+              code: ECODE.USER_CREATED,
+              message: EMSG.USER_CREATED
+            });
           }
+
           User.addUser(user, pwd, 1, 1, err => {
-            let target = config.prefix;
             if (err) {
-              target += '?error=' + err.message;
+              req.log.error('create user failed');
+              req.log.error(err);
+
+
+              return throwError({
+                code: ECODE.INIT_USER_FAILED,
+                message: EMSG.INIT_USER_FAILED
+              });
             }
-            res.redirect(target);
+
+            res.send({
+              code: 'SUCCESS'
+            });
           });
         });
         break;
@@ -62,6 +87,7 @@ module.exports = function(app, options) {
         if ((captcha || '').toLowerCase() !== (req.session.captcha || '').toLowerCase()) {
           return res.redirect(config.prefix + '?error=captcha_not_match');
         }
+
         User.getUser(user, (err, user) => {
           if (err) {
             log.error('login get user failed', err.message);
@@ -69,14 +95,14 @@ module.exports = function(app, options) {
           }
           pwd = utils.genPwd(pwd, config.salt);
           if (user.password === pwd && user.status === 1) {
-            // req.session.user = {
-            //   name: user.name,
-            //   role: user.role
-            // };
             req.session.username = user.name;
-            return res.redirect(config.prefix);
+
+            return res.send({code: 'SUCCESS'});
           } else {
-            return res.redirect(config.prefix + '?error=login_failed');
+            return throwError({
+              code: ECODE.LOGIN_FAILED,
+              message: EMSG.LOGIN_FAILED
+            });
           }
         });
         break;
@@ -100,11 +126,13 @@ module.exports = function(app, options) {
       default:
         User.countUser((err, count) => {
           let errmsg;
+
           if (err) {
             errmsg = err.message;
           } else {
             errmsg = req.query.error || '';
           }
+
           res.render('login.html', {
             prefix: config.prefix !== '/' ? config.prefix : '',
             userCount: count,

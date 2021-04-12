@@ -1,0 +1,118 @@
+@import '../../../../index.less';
+
+.app {
+  display: flex;
+  padding: 12px;
+  height: 64px;
+  line-height: 20px;
+  background-color: #fff;
+  border: 1px solid #ccd3db;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+  margin: 10px 0;
+  position: relative;
+
+  .app-info-container {
+    display: flex;
+    width: 100%;
+  }
+
+  .app-info {
+    display: flex;
+    justify-content: space-between;
+    width: calc(100% - 45px);
+    .error-num {
+      display: inline-block;
+      border-radius: 5px;
+      padding: 0 10px;
+    }
+  }
+
+  .usage-echarts {
+    width: 200px;
+    margin-right: 10px;
+
+    .charts-title {
+      font-weight: bold;
+    }
+
+    .echarts-box {
+      width: 250px;
+      height: 30px;
+    }
+  }
+
+  &.active {
+    background: @text-color;
+    color: white;
+    transform: scale(1.01);
+
+    .versions {
+      display: block;
+    }
+  }
+
+  .app-icon {
+    align-items: center;
+    display: flex;
+    margin-right: 20px;
+  }
+
+  .info {
+    float: left;
+    margin-right: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 110px;
+
+    .info-title {
+      font-weight: bolder;
+      white-space: nowrap;
+    }
+  
+    .info-content {
+      font-weight: lighter;
+    }
+  }
+
+  .versions {
+    border-radius: 0 0 5px 5px;
+    position: absolute;
+    width: 100%;
+    top: 100%;
+    color: @text-color;
+    left: 0;
+    background: white;
+    padding: 10px;
+    border: @text-color 1px solid;
+    border-top: none;
+    display: none;
+    z-index: 200;
+
+    .version-app {
+      display: flex;
+      padding: 12px;
+      height: 64px;
+      line-height: 20px;
+      background-color: #fff;
+      border: 1px solid #ccd3db;
+      border-radius: 4px;
+      cursor: pointer;
+      -webkit-transition: all .3s;
+      -o-transition: all .3s;
+      transition: all .3s;
+      margin: 10px 0;
+
+      .version-app-info {
+        display: flex;
+        justify-content: space-between;
+        width: calc(100% - 30px);
+      }
+    }
+
+  }
+}

@@ -1,0 +1,156 @@
+@import '~antd/dist/antd.less';
+
+@font-size-sm: 12px;
+@font-size-base: 12px;
+@primary-color: #1B9AEE;
+@border-radius-base: 0;
+@border-radius-sm: 0;
+@text-color: #242e42;
+@text-color-secondary: fade(#242e42, 70%);
+@background-color-base: hsv(0, 0, 96%);
+@success-color: #15AD31;
+@error-color: #E62412;
+@warning-color: #FA8C15;
+@info-color: #329dce;
+@danger-color: @error-color;
+@processing-color: @primary-color;
+@border-color-base: #dedede;
+@border-color-split: #dedede;
+@outline-width: 0;
+@outline-color: #737373;
+@input-height-lg: 36px;
+@input-height-base: 32px;
+@input-height-sm: 24px;
+@input-hover-border-color: #737373;
+@form-item-margin-bottom: 16px;
+@btn-default-bg: #fafafa;
+@btn-default-border: #dedede;
+@btn-danger-color: #fff;
+@btn-danger-bg: @error-color;
+@btn-danger-border: @error-color;
+@switch-color: @success-color;
+@table-header-bg: #fafafa;
+@table-row-hover-bg: #fafafa;
+@table-padding-vertical: 15px;
+@badge-color: @error-color;
+@breadcrumb-base-color: @text-color;
+@breadcrumb-last-item-color: @text-color-secondary;
+@slider-rail-background-color: @background-color-base;
+@slider-rail-background-color-hover: #e1e1e1;
+@slider-track-background-color: @primary-color;
+@slider-track-background-color-hover: @primary-color;
+@slider-handle-border-width: 1px;
+@slider-handle-color: #dedede;
+@slider-handle-color-hover: #dedede;
+@slider-handle-color-focus: #dedede;
+@slider-handle-color-tooltip-open: #ddd;
+@slider-handle-color-focus-shadow: transparent;
+@slider-handle-shadow: 1px 1px 4px 0 rgba(0,0,0,.13);
+@alert-success-border-color: #dff4e5;
+@alert-success-bg-color: #dff4e5;
+@alert-info-border-color: #e5f3ff;
+@alert-info-bg-color: #e5f3ff;
+@alert-error-border-color: #fcebea;
+@alert-error-bg-color: #fcebea;
+@alert-warning-border-color: #fff7db;
+@alert-warning-bg-color: #fff7db;
+@radio-button-bg: transparent;
+@radio-button-checked-bg: transparent;
+@progress-radius: 0;
+@tabs-card-gutter: -1px;
+@tabs-card-tab-active-border-top: 2px solid @primary-color;
+@layout-body-background: #fafafa;
+
+.no-color-link {
+  color: @text-color;
+}
+
+.margin-b10 {
+  margin-bottom: 10px;
+}
+
+body {
+  background-color: #fafafb;
+}
+
+.page-left-side {
+  padding: 20px 0;
+  width: 232px;
+  float: left;
+}
+
+.list-title {
+  font-weight: bolder;
+}
+
+.page-right-side {
+  padding: 20px 0;
+  float: left;
+  width: calc(100% - 232px);
+  position: relative;
+
+  .log-filter {
+    .log-info {
+      display: flex;
+    }
+  }
+
+  .log-filter-box {
+    margin-top: 20px;
+
+    & > div {
+      flex: 1;
+      margin-right: 20px;
+    }
+
+    & > span {
+      margin-right: 20px;
+    }
+  }
+
+  .log-filename {
+    font-weight: bolder;
+  }
+}
+
+// 状态汇总：https://github.com/node-honeycomb/honeycomb-server/blob/0cbada2baceec9669883a5b584b8a31984893d7c/lib/child.js#L132
+
+.app-init {
+  background-color: @success-color;
+  color: @border-color-base;
+}
+
+.app-online {
+  background-color: @success-color;
+  color: @border-color-base;
+}
+
+.app-offline {
+  background-color: @outline-color;
+  color: white;
+}
+
+.app-exception {
+  background-color: @error-color;
+  color: white;
+}
+
+.app-retry {
+  background-color: @warning-color;
+  color: white;
+}
+
+.app-reloaded {
+  background-color: @primary-color;
+  color: white;
+}
+
+.app-starting {
+  background-color: @primary-color;
+  color: white;
+}
+
+.app-stoping {
+  background-color: @outline-color;
+  color: white;
+}

@@ -60,7 +60,7 @@ module.exports = {
       enable: true,
       module: '../middleware/auth.js',
       config: {
-        ignore: ['/signatureAuth/**']
+        ignore: ['/signatureAuth/**', '/assets/**'],
       }
     },
     store: {
@@ -124,5 +124,6 @@ module.exports = {
   // 是否关闭上传功能
   hideUpload: false,
   // 默认监控间隔：5 min
-  monitorCycle: 1000 * 60 * 5
+  monitorCycle: 1000 * 60 * 5,
+  docUrl: 'https://www.yuque.com/honeycomb/gz4kna'
 };

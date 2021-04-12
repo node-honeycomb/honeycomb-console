@@ -1,15 +1,17 @@
-const config = require('../config');
-const log = require('./log');
-const meta = config.meta;
+const fs = require('xfs');
 const path = require('path');
 const Sqlite = require('sqlite3');
-const utils = require('../common/utils');
-const fs = require('xfs');
 const async = require('async');
+
+const log = require('./log');
+const config = require('../config');
 
 let readyFn = null;
 let flagReady = false;
+
 let flag;
+const meta = config.meta;
+
 if (fs.existsSync(meta.dbfile)) {
   log.info('create db');
   flag = Sqlite.OPEN_READWRITE;
@@ -21,6 +23,7 @@ const db = new Sqlite.Database(meta.dbfile, flag, function (err) {
   if (err) throw new Error(err);
   if (flag === (Sqlite.OPEN_READWRITE | Sqlite.OPEN_CREATE)) {
     let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
+
     statments = statments.split(/\n\n/);
 
     async.eachSeries(statments, (st, done) => {

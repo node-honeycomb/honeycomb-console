@@ -2,26 +2,24 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>App Admin</title>
+  <title>Honeycomb-Console</title>
+  <link rel="stylesheet" href="<%= prefix %>/assets/app.css">
 </head>
 <body>
-  <div id="server-admin"></div>
+  <div id="main"></div>
   <script>
-    window.prefix = '<%=prefix%>';
-    window.secureServerVersion = '<%=secureServerVersion%>';
-    window.oldConsole = '<%=oldConsole%>';
-    window.csrfToken = '<%=csrfToken%>';
-    window.publishPages = JSON.parse('<%- JSON.stringify(publishPages) %>');
-    window.user = JSON.parse('<%- JSON.stringify(user) || "{}" %>');
-    window.appManageConfig = JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>');
-    window.newConsole = '<%=newConsole%>';
-    window.hideUpload = '<%=hideUpload%>';
-    <% if(env === 'dev'){ %>
-    document.write('<scrip' + 't src="<%=prefix%>/assets/.build/build.js"></s' + 'cript>');
-    <% } %>
-    document.write('<lin' + 'k rel="stylesheet" href="<%=prefix%>/assets/app.css">');
-    document.write('<scrip' + 't src="<%=prefix%>/assets/vendor.js"></s' + 'cript>');
-    document.write('<scrip' + 't src="<%=prefix%>/assets/app.js"></s' + 'cript>');
+    window.CONFIG = {
+      prefix: '<%=prefix%>',
+      secureServerVersion: '<%=secureServerVersion%>',
+      oldConsole:  '<%=oldConsole%>',
+      csrfToken: '<%=csrfToken%>',
+      publishPages: JSON.parse('<%- JSON.stringify(publishPages) %>'),
+      user: JSON.parse('<%- JSON.stringify(user) || "{}" %>'),
+      appManageConfig: JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>'),
+      hideUpload: '<%=hideUpload%>',
+      docUrl: '<%= docUrl %>'
+    };
   </script>
+  <script src="<%= prefix %>/assets/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,87 @@
+@import './../../index.less';
+
+.sys-monitor {
+  .main-container {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .left-machines {
+    float: left;
+    width: 30%;
+    margin-right: 10px;
+  }
+
+  .right-monitor {
+    padding-top: 28px;
+    float: left;
+    width: calc(100% - 20px - 30%);
+  }
+
+  .filter-content {
+    .filter {
+      display: inline-block;
+      margin-left: 20px;
+      margin-bottom: 5px;
+    }
+  }
+
+  .button {
+    margin-top: 10px;
+    padding-left: 20px;
+  }
+
+  .monitor-chart-title {
+    margin-top: 15px;
+    display: block;
+    padding-left: 20px;
+    font-size: 14px;
+  }
+
+  .sys-monitor-app-card {
+    margin-bottom: 15px;
+    border-top: 5px solid;
+  }
+
+  .add-chart {
+    .add-btn {
+      height: 30px;
+      border: 1px solid @border-color-base;
+      border-radius: 5px;
+      text-align: center;
+      font-size: 13px;
+      line-height: 30px;
+      margin-top: 15px;
+      cursor: pointer;
+      transition: .3s;
+
+      &:hover {
+        border-color: @primary-color;
+        color: @primary-color;
+      }
+    }
+
+    .sys-monitor-card {
+      height: 50px;
+      width: 100%;
+      line-height: 50px;
+      border: 1px solid @border-color-base;
+      padding: 0 10px;
+      margin-top: 10px;
+      border-radius: 5px;
+      border-left: 5px black solid;
+      cursor: pointer;
+      background: white;
+      display: flex;
+
+      &:hover {
+        box-shadow: 0px 0px 5px #aaa;
+      }
+
+      .icon-delete-btn {
+        margin-left: auto;
+      }
+    }
+  }
+}

@@ -5,7 +5,8 @@ var log = require('../common/log');
 module.exports = function () {
   return function (req, res, next) {
     if (req.session && req.session.user) {
-      let user = req.session.user;
+      const user = req.session.user;
+
       async.waterfall([
         function (cb) {
           UserModel.getUser(user.name, cb);

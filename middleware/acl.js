@@ -10,21 +10,33 @@ class UserClass {
     this.name = user.name;
     this.clusterAcl = user.clusterAcl;
   }
+
   isSystemAdmin() {
     return this.role === 1;
   }
+
   isClusterAdmin(clusterCode) {
-    return this.isSystemAdmin() || this.clusterAcl[clusterCode] && this.clusterAcl[clusterCode].isAdmin;
+    return this.isSystemAdmin() ||
+      this.clusterAcl[clusterCode] &&
+      this.clusterAcl[clusterCode].isAdmin;
   }
+
   containsCluster(clusterCode) {
     return this.isClusterAdmin(clusterCode) || !!this.clusterAcl[clusterCode];
   }
+
   containsApp(clusterCode, appName) {
-    return this.isSystemAdmin() || this.isClusterAdmin(clusterCode) || ['server', 'common'].indexOf(appName) === -1 && this.clusterAcl[clusterCode] && (this.clusterAcl[clusterCode].apps.indexOf('*') > -1 || this.clusterAcl[clusterCode].apps.indexOf(appName) > -1);
+    return this.isSystemAdmin() ||
+      this.isClusterAdmin(clusterCode) ||
+      ['server', 'common'].indexOf(appName) === -1 &&
+      this.clusterAcl[clusterCode] &&
+      (this.clusterAcl[clusterCode].apps.indexOf('*') > -1 ||
+      this.clusterAcl[clusterCode].apps.indexOf(appName) > -1);
   }
+
   getAdminClusterList() {
     return Object.keys(this.clusterAcl).map((clusterCode) => {
-      return this.clusterAcl[clusterCode].isAdmin ? clusterCode: '';
+      return this.clusterAcl[clusterCode].isAdmin ? clusterCode : '';
     }).filter((clusterCode) => {
       return !!clusterCode;
     });
@@ -35,6 +47,7 @@ module.exports = function (req, res, next) {
   if (req.session && req.session.username) {
     var username = req.session.username;
     var user = {};
+
     user.name = username;
     async.waterfall([
       function (cb) {
@@ -52,7 +65,8 @@ module.exports = function (req, res, next) {
         if (!data || data.length === 0) {
           user.clusterAcl = {};
         } else {
-          let clusterAcl = {};
+          const clusterAcl = {};
+
           data.forEach((rowData) => {
             clusterAcl[rowData.cluster_code] = {
               id: rowData.id,

@@ -14,6 +14,7 @@ exports.urlencode = function (str) {
     return encodeURIComponent(str);
   } catch (e) {
     log.error(e.stack);
+
     return str;
   }
 };
@@ -23,6 +24,7 @@ exports.urldecode = function (str) {
     return decodeURIComponent(str);
   } catch (e) {
     log.error(e.stack);
+
     return str;
   }
 };
@@ -31,8 +33,10 @@ exports.md5 = function (str) {
   if (typeof str !== 'string') {
     throw new Error('md5 only support string');
   }
-  let hash = crypto.createHash('md5');
+  const hash = crypto.createHash('md5');
+
   hash.update(str);
+
   return hash.digest('hex');
 };
 
@@ -40,8 +44,10 @@ exports.sha256 = function (str) {
   if (typeof str !== 'string') {
     throw new Error('sha256 only support string');
   }
-  let hash = crypto.createHash('sha256');
+  const hash = crypto.createHash('sha256');
+
   hash.update(str);
+
   return hash.digest('hex');
 };
 
@@ -77,6 +83,7 @@ exports.getUidAndGid = function (changeUser) {
     return {};
   }
   const uid = process.getuid();
+
   if (uid >= 500) {
     return {uid: process.getuid(), gid: process.getgid()};
   }
@@ -91,6 +98,7 @@ exports.getUidAndGid = function (changeUser) {
     uid: +res[1],
     gid: +res[2]
   };
+
   return user;
 };
 
@@ -115,15 +123,17 @@ exports.exec = function (command, options, cb) {
       // Mac 下打包的tgz文件和linux下不一致，但不影响解压，只是会报如下信息的错误, 所有当此错误时忽略
       if (err.stack && err.stack.indexOf('tar: Ignoring unknown extended header keyword') < 0) {
         log.error(`exec command: ${command} failed`, err);
+
         return cb(err, [stdout, stderr]);
       }
     }
+
     return cb(null, [stdout, stderr]);
   });
 };
 
 exports.parseAppId = function (appId) {
-  let tmp = appId.split('_');
+  const tmp = appId.split('_');
   let version = '0.0.0';
   let appName;
   let buildNum = 0;
@@ -173,26 +183,35 @@ exports.parseAppId = function (appId) {
 
 exports.sign = function (queryPath, options, token) {
   let contentMd5;
-  let date = new Date().toGMTString();
-  let accept = 'application/json';
-  let contentType = options.headers['content-type'] ||  options.headers['Content-Type'] || 'application/json';
-  let stringToSign;
+  const date = new Date().toGMTString();
+  const accept = 'application/json';
+  const contentType = options.headers['content-type'] ||
+  options.headers['Content-Type'] ||
+  'application/json';
+
+
   if (['POST', 'PUT', 'PATCH'].indexOf(options.method) >= 0) {
-    let tmp = options.data ? JSON.stringify(options.data) : '';
+    const tmp = options.data ? JSON.stringify(options.data) : '';
+
     contentMd5 = exports.md5base64(tmp);
   } else {
     contentMd5 = '';
     if (options.data) {
-      let tmp = url.parse(queryPath, true);
+      const tmp = url.parse(queryPath, true);
+
       _.merge(tmp.query, options.data);
       queryPath = tmp.pathname + '?' + qs.stringify(tmp.query);
     }
     options.data = undefined;
   }
-  stringToSign = `${options.method}\n${accept}\n${contentMd5}\n${contentType}\n${date}\n${queryPath}`;
+
+  // eslint-disable-next-line
+  const stringToSign = `${options.method}\n${accept}\n${contentMd5}\n${contentType}\n${date}\n${queryPath}`;
+
   options.headers['Content-Type'] = contentType;
   // log.debug('String to be signed: ', stringToSign,queryPath);
-  let signature = exports.sha1(stringToSign, token);
+  const signature = exports.sha1(stringToSign, token);
+
   options.headers.Authorization = `system admin:${signature}`;
   options.headers.Date = date;
 
@@ -210,9 +229,9 @@ exports.sign = function (queryPath, options, token) {
  */
 exports.callremote = function (queryPath, options, callback) {
   let endpoint = options.endpoint;
-  let token = options.token;
-  let ips = options.ips.join(',');
-  let defaultOptions = {
+  const token = options.token;
+  const ips = options.ips.join(',');
+  const defaultOptions = {
     method: 'GET',
     headers: {},
     timeout: 15000,
@@ -234,8 +253,9 @@ exports.callremote = function (queryPath, options, callback) {
   delete options.token;
   delete options.ips;
 
-  let signed = exports.sign(queryPath, options, token);
-  let qpath = endpoint + signed.queryPath;
+  const signed = exports.sign(queryPath, options, token);
+  const qpath = endpoint + signed.queryPath;
+
   log.debug(`${options.method} ${qpath}`);
   urllib.request(qpath, options, function (err, data) {
     if (err) {
@@ -251,28 +271,32 @@ exports.callremote = function (queryPath, options, callback) {
  */
 function genWeight(version, buildNum) {
   let tmp = version.split('.');
+
   tmp = _.reverse(tmp);
   let weight = 0;
+
   tmp.forEach(function (t, i) {
     weight += Number(t) * Math.pow(1000, i);
   });
   weight += Number(buildNum) / 1000;
+
   return weight;
 }
 // 对 server 接口 /api/apps 的返回做处理，合并apps信息
 exports.mergeAppInfo = function (ips, apps) {
-  let result = {};
+  const result = {};
+
   apps.forEach(function (app) {
-    let name = app.name;
-    let id = app.appId;
-    let ip = app.ip;
-    let version = app.version;
-    let buildNum = app.buildNum;
-    let publishAt = app.publishAt;
-    let workerNum = app.workerNum;
-    let isCurrWorking = app.isCurrWorking;
-    let expectWorkerNum = app.expectWorkerNum;
-    let vkey = app.version + '_' + app.buildNum;
+    const name = app.name;
+    const id = app.appId;
+    const ip = app.ip;
+    const version = app.version;
+    const buildNum = app.buildNum;
+    const publishAt = app.publishAt;
+    const workerNum = app.workerNum;
+    const isCurrWorking = app.isCurrWorking;
+    const expectWorkerNum = app.expectWorkerNum;
+    const vkey = app.version + '_' + app.buildNum;
 
     // create app object
     if (!result[name]) {
@@ -282,8 +306,8 @@ exports.mergeAppInfo = function (ips, apps) {
       };
     }
 
-    let appObj = result[name];
-    let versions = appObj.versions;
+    const appObj = result[name];
+    const versions = appObj.versions;
 
     if (!versions[vkey]) {
       versions[vkey] = {
@@ -297,7 +321,8 @@ exports.mergeAppInfo = function (ips, apps) {
       };
     }
 
-    let cluster = versions[vkey].cluster;
+    const cluster = versions[vkey].cluster;
+
     if (!cluster[ip]) {
       cluster[ip] = {
         ip: ip,
@@ -310,15 +335,18 @@ exports.mergeAppInfo = function (ips, apps) {
     }
   });
 
-  let data = [];
+  const data = [];
+
   Object.keys(result).forEach(function (key) {
-    let app = result[key];
-    let versions = app.versions;
-    let vlist = [];
+    const app = result[key];
+    const versions = app.versions;
+    const vlist = [];
+
     Object.keys(versions).forEach(function (v) {
-      let version = versions[v];
-      let cluster = version.cluster;
-      let vms = [];
+      const version = versions[v];
+      const cluster = version.cluster;
+      const vms = [];
+
       Object.keys(cluster).forEach(function (vm) {
         vms.push(cluster[vm]);
       });
@@ -369,14 +397,16 @@ exports.mergeAppInfo = function (ips, apps) {
 
 
 exports.getClusterApps = function (clusterIinfo, cb) {
-  let path = '/api/apps';
+  const path = '/api/apps';
+
   clusterIinfo.timeout = 5000;
   exports.callremote(path, clusterIinfo, function (err, result) {
     if (err || result.code !== 'SUCCESS') {
       return cb(err);
     } else {
-      let ips = [];
+      const ips = [];
       let apps = [];
+
       result.data.success.forEach((item) => {
         ips.push(item.ip);
         apps = apps.concat(item.apps);
