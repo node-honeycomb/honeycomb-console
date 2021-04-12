@@ -1,5 +1,3 @@
-'use strict';
-const config = require('../config');
 const log = require('../common/log');
 const utils = require('../common/utils');
 const cluster = require('../model/cluster');
@@ -7,6 +5,7 @@ const cluster = require('../model/cluster');
 const callremote = utils.callremote;
 
 /**
+ * 登录
  * @api /logout
  * @nowrap
  */
@@ -17,56 +16,47 @@ exports.logout = function (req, res) {
   res.redirect('/');
 };
 
-// /**
-//  * @api {post} /loginAuth
-//  */
-// exports.loginAuth = function (req, callback) {
-//   let opt = req.body;
-//   if (opt.username === config.username &&
-//     utils.sha256(opt.password) === config.password) {
-//     req.session.user = {
-//       id: opt.username,
-//       name: opt.username,
-//       nickname: opt.username
-//     };
-//     callback(null, {code: 'SUCCESS'});
-//   } else {
-//     log.error('用户名密码错误');
-//     callback({code: 'ERROR', message: '用户名密码错误'});
-//   }
-// };
-
 /**
+ * 获取当前集群状态
  * @api {get} /api/status
+ * @query
+ *  clusterCode {String} 集群code
  */
 exports.status = function (req, callback) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = '/api/status';
+  const path = '/api/status';
+
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error('get status info failed: ', errMsg);
-      let code = err && err.code || (results && results.code) || 'ERROR';
+      const code = err && err.code || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       log.debug('get status results:', results);
+
       return callback(null, results.data);
     }
   });
 };
 
 /**
+ * 获取当前用户
  * @api {get} /api/user
  */
 exports.getUser = function (req, callback) {
-  let user = req.user || {};
+  const user = req.user || {};
+
   callback(null, {
     name: user.name,
     role: user.role
@@ -77,23 +67,28 @@ exports.getUser = function (req, callback) {
  * @api {get} /api/coredump
  */
 exports.coredump = function (req, callback) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = '/api/coredump';
+  const path = '/api/coredump';
+
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error('get coredump info failed: ', errMsg);
-      let code = err && err.code || (results && results.code) || 'ERROR';
+      const code = err && err.code || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       log.debug('get coredump results:', results);
+
       return callback(null, results.data);
     }
   });
@@ -105,33 +100,40 @@ exports.coredump = function (req, callback) {
  * @param callback
  */
 exports.deleteCoredump = function (req, callback) {
-  let files = req.body && req.body.files;
+  const files = req.body && req.body.files;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_COREDUMP',
     opType: 'PAGE_MODEL',
+    // eslint-disable-next-line
     opLogLevel: 'RISKY', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
     opItem: 'SYSTEM',
   });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.body.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = `/api/coredump`;
+  const path = `/api/coredump`;
+
   opt.method = 'DELETE';
   opt.data = {files};
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error(`delete coredump files failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      const code = (err && err.code) || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       log.debug(`delete coredump files results:`, results);
+
       return callback(null, results.data);
     }
   });
@@ -139,64 +141,80 @@ exports.deleteCoredump = function (req, callback) {
 
 
 /**
+ * 获取位置的 process
  * @api {get} /api/unknowProcess
+ * @query
+ *  clusterCode {String} 集群code
  */
 exports.unknowProcess = function (req, callback) {
-  let clusterCode = req.query.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = '/api/unknowProcess';
+  const path = '/api/unknowProcess';
+
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error('get unknowProcess info failed: ', errMsg);
-      let code = err && err.code || (results && results.code) || 'ERROR';
+      const code = err && err.code || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       log.debug('get unknowProcess results:', results);
+
       return callback(null, results.data);
     }
   });
 };
 
 /**
+ * 删除某个未知的 process
  * @api {post} /api/unknowProcess/:pid/delete
  * @param req
  * @param callback
  */
 exports.deleteApp = function (req, callback) {
-  let pid = req.params && req.params.pid;
+  const pid = req.params && req.params.pid;
+
   req.oplog({
     clientId: req.ips.join('') || '-',
     opName: 'DELETE_UNKNOWPROCESS',
     opType: 'PAGE_MODEL',
+    // eslint-disable-next-line
     opLogLevel: 'RISKY', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
     opItem: 'SYSTEM',
     opItemId: pid
   });
-  let clusterCode = req.body.clusterCode;
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const clusterCode = req.body.clusterCode;
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = `/api/unknowProcess/${pid}`;
+  const path = `/api/unknowProcess/${pid}`;
+
   opt.method = 'DELETE';
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error(`delete unknownProcess ${pid} failed: `, errMsg);
-      let code = (err && err.code) || (results && results.code) || 'ERROR';
+      const code = (err && err.code) || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       log.debug(`delete unknownProcess ${pid} results:`, results);
+
       return callback(null, results.data);
     }
   });

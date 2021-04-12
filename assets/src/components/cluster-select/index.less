@@ -1,0 +1,39 @@
+@import '../../index.less';
+
+.cluster-select {
+  overflow: hidden;
+
+  .cluster-item {
+    height: 35px;
+    width: 200px;
+    line-height: 35px;
+    border: 1px solid #ddd;
+    border-radius: 2px;
+    padding: 0 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    float: left;
+    margin: 5px 5px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    .active-icon {
+      display: none;
+      float: right;
+    }
+
+    &:hover {
+      box-shadow: 0px 0px 5px #ddd;
+    }
+
+    &.active {
+      box-shadow: 0px 0px 5px @primary-color;
+      color: @primary-color;
+
+      .active-icon {
+        display: inline-block;
+      }
+    }
+  }
+}

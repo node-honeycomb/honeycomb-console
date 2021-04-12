@@ -1,0 +1,95 @@
+.app {
+  display: flex;
+  padding: 12px;
+  min-height: 64px;
+  line-height: 20px;
+  background-color: #fff;
+  border: 1px solid #ccd3db;
+  border-radius: 4px;
+  cursor: pointer;
+  -webkit-transition: all .3s;
+  -o-transition: all .3s;
+  transition: all .3s;
+  margin: 10px 0;
+  position: relative;
+
+  &.simple-app {
+    height: auto;
+    min-height: 10px;
+    cursor: auto;
+  }
+  
+  .app-name {
+    align-items: center;
+    display: flex;
+    width: 150px;
+    white-space: nowrap;
+  }
+
+  .simple-versions {
+    .one-version {
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      margin-bottom: 5px;
+    }
+
+    .one-version > span {
+      display: inline-block;
+    }
+
+    .version {
+      width: 100px;
+    }
+
+    .proc {
+      width: 60px;
+    }
+
+    .created-time {
+      width: 200px;
+    }
+
+    .status {
+      width: 120px;
+    }
+
+    .stop, .delete {
+      color: #f16356
+    }
+
+    .version-op {
+      width: 100px;
+    }
+
+    .mem {
+      width: 90px;
+    }
+
+    .cpu {
+      width: 90px;
+    }
+  }
+
+  .expand-icon {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+
+  .from-now {
+    color: grey;
+  }
+
+  .one-app-op {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+    margin-right: 50px;
+  }
+
+  .loading-btn {
+    color: #737373;
+    cursor: not-allowed;
+  }
+}

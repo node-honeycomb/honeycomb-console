@@ -1,9 +1,9 @@
-'use strict';
 /**
  * app的主入口文件
  */
 const App = require('hc-bee');
 const app = new App();
+
 const config = require('./config');
 const startMonitor = require('./monitor');
 

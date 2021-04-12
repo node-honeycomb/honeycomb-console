@@ -1,0 +1,37 @@
+.edit-app-config {
+  margin-top: 10px;
+  height: calc(100% - 10px);
+
+  .ant-spin-nested-loading {
+    height: 100%;
+  }
+
+  .ant-spin-container {
+    height: 100%;
+
+    & > .editor {
+      height: calc(100% - 60px);
+    }
+  }
+
+  .footer {
+    margin-top: 15px;
+
+    .ant-btn {
+      margin-right: 10px
+    }
+  }
+}
+
+.code-diff-modal {
+  top: 50px;
+  height: 70%;
+  .ant-modal-content {
+    height: 100%;
+    min-height: 300px;
+    .ant-modal-body {
+      height: calc(100% - 108px);
+      overflow: auto;
+    }
+  }
+}

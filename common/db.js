@@ -1,5 +1,6 @@
 const config = require('../config');
 const meta = config.meta;
+
 switch (meta.driver) {
   case 'mysql':
     module.exports = require('./mysql');

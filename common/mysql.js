@@ -1,12 +1,12 @@
 'use strict';
 const mysql = require('mysql');
-const log = require('./log');
-const config = require('../config');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
+const config = require('../config');
+const log = require('./log');
 
-if(!config.meta.user){
+if (!config.meta.user) {
   config.meta.user = config.meta.username;
 }
 if (!config.meta.connectionLimit) config.meta.connectionLimit = 3;
@@ -16,11 +16,12 @@ const pool = mysql.createPool(config.meta);
 // TODO: export async callback function to make sure db ready before main program boot.
 pool.getConnection(function (err, conn) {
   let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_mysql.sql')).toString();
+
   statments = statments.split(/\n\n/);
-  async.eachSeries(statments,(st, done) => {
+  async.eachSeries(statments, (st, done) => {
     conn.query(st, done);
-  },(err) => {
-    if(err) {
+  }, (err) => {
+    if (err) {
       log.error(err);
       throw err;
     }
@@ -44,6 +45,7 @@ if (config.meta.session_variables) {
 
 let readyFn;
 let flagReady = false;
+
 exports.ready = function (cb) {
   if (flagReady) {
     return cb();

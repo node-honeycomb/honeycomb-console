@@ -1,33 +1,30 @@
 const promisify = require('util').promisify;
 const formstream = require('formstream');
-// const CronJob = require('cron').CronJob;
+const _ = require('lodash');
 const cluster = require('./model/cluster');
 const appConfig = require('./model/app_config');
 const appPackage = require('./model/app_package');
-const async = require('async');
-const _ = require('lodash');
 const utils = require('./common/utils');
 const log = require('./common/log');
 
 const reflushClusterConfigSync = promisify(cluster.getClusterCfg);
 const getSnapshortSync = promisify(cluster.getSnapshort);
-const cleanSnapshortSync = promisify(cluster.cleanSnapshort);
 const fixClusterSync = promisify(cluster.fixCluster);
-const getClusterAppsSync = promisify(utils.getClusterApps);
+
 
 const getAppConfig = promisify(appConfig.getAppConfig);
-const cleanAppConfig = promisify(appConfig.cleanAppConfig);
 const getAppPackage = promisify(appPackage.getPackage);
 const callremote = promisify(utils.callremote);
 
 const live = {
   getClusterAppsSync: promisify(utils.getClusterApps),
-  getCluserConfig: async function(clusterInfo, type, appName) {
-    let path = `/api/config/${type}/${appName}`;
-    let opt = _.cloneDeep(clusterInfo);
-    let res = await callremote(path, opt).catch((e) => {
+  getCluserConfig: async function (clusterInfo, type, appName) {
+    const path = `/api/config/${type}/${appName}`;
+    const opt = _.cloneDeep(clusterInfo);
+    const res = await callremote(path, opt).catch((e) => {
       log.error('getAppConfig failed', e.message);
     });
+
     if (!res) {
       return null;
     }
@@ -53,38 +50,45 @@ tick();
 
 async function run() {
   await reflushClusterConfigSync();
-  let clusters = cluster.getClusterCodes();
+  const clusters = cluster.getClusterCodes();
+
   // 遍历snapshort中的所有集群
   for (let i = 0; i < clusters.length; i++) {
-    let clusterCode = clusters[i];
+    const clusterCode = clusters[i];
+
     await fixClusterSync(clusterCode);
   }
-} 
+}
 
 async function run2() {
   await reflushClusterConfigSync();
-  let clusters = cluster.getClusterCodes();
+  const clusters = cluster.getClusterCodes();
+
   // 遍历snapshort中的所有集群
   for (let i = 0; i < clusters.length; i++) {
-    let clusterCode = clusters[i];
-    await fixClusterSync(clusterCode);
-    let clusterInfo = cluster.getClusterCfgByCode(clusterCode);
+    const clusterCode = clusters[i];
 
-    let clusterSnp = await getSnapshortSync(clusterCode);
+    await fixClusterSync(clusterCode);
+    const clusterInfo = cluster.getClusterCfgByCode(clusterCode);
+
+    const clusterSnp = await getSnapshortSync(clusterCode);
+
     if (!clusterSnp) {
       continue;
     }
 
     // 检查 server 配置，并更新 + reload
-    let flagServerCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'server');
-    let flagCommonCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'common');
-    let flagReload = flagServerCfgChange || flagCommonCfgChange;
+    const flagServerCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'server');
+    const flagCommonCfgChange = await recoverServerConfig(clusterCode, clusterInfo, 'server', 'common');
+    const flagReload = flagServerCfgChange || flagCommonCfgChange;
+
     if (flagReload) {
       log.warn('global config(server/common) changed, cluster should reload');
     }
     // 获取到当前集群的app信息
-    let appsLiveCluster = await live.getClusterAppsSync(clusterInfo);
-    let md5New = utils.md5(JSON.stringify(appsLiveCluster));
+    const appsLiveCluster = await live.getClusterAppsSync(clusterInfo);
+    const md5New = utils.md5(JSON.stringify(appsLiveCluster));
+
     if (md5New === clusterSnp.md5) {
       // 如果集群配置有变更，需要reload
       if (flagReload) {
@@ -98,29 +102,33 @@ async function run2() {
     }
     // log.info('live app info', JSON.stringify(appsLiveCluster, null, 2));
     // 建立集群现场的appId map
-    let appsLiveClusterMap = {};
+    const appsLiveClusterMap = {};
+
     appsLiveCluster.forEach((app) => {
       app.versions.forEach((v) => {
         appsLiveClusterMap[v.appId] = v;
       });
     });
-    let appsSnapshort = clusterSnp.info;
+    const appsSnapshort = clusterSnp.info;
+
     // 遍历snapshort中的app, 将配置和app发布到新机器
-    for (let n = 0; n < appsSnapshort.length ; n++) {
-      let app = appsSnapshort[n];
-      let appName = app.name;
-      let versions = app.versions;
+    for (let n = 0; n < appsSnapshort.length; n++) {
+      const app = appsSnapshort[n];
+      const appName = app.name;
+      const versions = app.versions;
+
       for (let m = 0; m < versions.length; m++) {
-        let v = versions[m];
-        let vNow = appsLiveClusterMap[v.appId];
+        const v = versions[m];
+        const vNow = appsLiveClusterMap[v.appId];
         let flagRunInSnapshort = false;
+
         for (let k = 0; k < v.cluster.length; k++) {
           if (v.cluster[k].status === 'online') {
             flagRunInSnapshort = true;
           }
         }
 
-        if (!vNow) { 
+        if (!vNow) {
           // 线上并无snapshort中的app版本，则新增app版本上去
           log.info(`app: ${v.appId}  missing in whole cluster: ${clusterCode}, recover app`);
           // app版本缺失，两种情况：1. 完全没有，2.单边机器有
@@ -129,6 +137,7 @@ async function run2() {
           // 线上有snapshort中的app版本
           // 则判断集群中该版本的app是否都有
           let flagInLive = true;
+
           for (let k = 0; k < vNow.cluster.length; k++) {
             if (vNow.cluster[k].status === 'none') {
               flagInLive = false;
@@ -142,13 +151,14 @@ async function run2() {
           reloadApp(clusterInfo, v.appId);
         }
       }
-    };
+    }
   }
 }
 
 async function recoverApp(clusterCode, clusterInfo, appName, v, appExist, appStoped) {
-  let appConfig = await getAppConfig(clusterCode, 'app', appName);
-  let appPkg = await getAppPackage(clusterCode, v.appId);
+  const appConfig = await getAppConfig(clusterCode, 'app', appName);
+  const appPkg = await getAppPackage(clusterCode, v.appId);
+
   if (appConfig) {
     await recoverAppConfig(clusterCode, clusterInfo, 'app', appName, appConfig.config);
   }
@@ -169,19 +179,23 @@ async function recoverApp(clusterCode, clusterInfo, appName, v, appExist, appSto
     await startApp(clusterInfo, v.appId);
     await reloadApp(clusterInfo, v.appId);
   }
-};
+}
 
 async function recoverServerConfig(clusterCode, clusterInfo, type, name) {
-  let clusterServerCfg = await live.getCluserConfig(clusterInfo, type, name);
-  let clusterSnapShortCfg = await getAppConfig(clusterCode, type, name);
+  const clusterServerCfg = await live.getCluserConfig(clusterInfo, type, name);
+  const clusterSnapShortCfg = await getAppConfig(clusterCode, type, name);
+
   if (!clusterSnapShortCfg) {
     log.warn(`cluster config, ${type}/${name} not found, skip`);
+
     return;
   }
-  let presistCfg = JSON.stringify(clusterSnapShortCfg.config);
+  const presistCfg = JSON.stringify(clusterSnapShortCfg.config);
   let flagDiff = false;
+
   clusterServerCfg.forEach((server) => {
-    let tmpConfig = JSON.stringify(server.data);
+    const tmpConfig = JSON.stringify(server.data);
+
     if (tmpConfig !== presistCfg) {
       flagDiff = true;
     }
@@ -190,15 +204,17 @@ async function recoverServerConfig(clusterCode, clusterInfo, type, name) {
   if (flagDiff) {
     await recoverAppConfig(clusterCode, clusterInfo, type, name, clusterSnapShortCfg.config);
   }
+
   return flagDiff;
 }
 
 /**
  * 发布App配置过去
  */
-async function recoverAppConfig(clusterCode, clusterInfo,  type, appName, config) {
-  let path = `/api/config/${type}/${appName}`;
-  let opt = _.cloneDeep(clusterInfo);
+async function recoverAppConfig(clusterCode, clusterInfo, type, appName, config) {
+  const path = `/api/config/${type}/${appName}`;
+  const opt = _.cloneDeep(clusterInfo);
+
   opt.method = 'POST';
   opt.data = config;
   await callremote(path, opt).catch(function (err) {
@@ -211,17 +227,20 @@ async function recoverAppConfig(clusterCode, clusterInfo,  type, appName, config
  */
 async function recoverAppPackage(clusterCode, clusterInfo, file) {
   log.info('>> recover app package', file);
-  let form = formstream();
+  const form = formstream();
+
   form.file('pkg', file.package, file.appId + '.tgz');
-  let opt = _.cloneDeep(clusterInfo);
-  let path = '/api/publish';
+  const opt = _.cloneDeep(clusterInfo);
+  const path = '/api/publish';
+
   opt.method = 'POST';
   opt.headers = form.headers();
   opt.stream = form;
   opt.timeout = 1000000;
-  let res = await callremote(path, opt).catch((err) => {
+  const res = await callremote(path, opt).catch((err) => {
     log.error('recover app package failed', err.message);
   });
+
   log.info('>> recover app package success', res);
 }
 
@@ -229,11 +248,13 @@ async function recoverAppPackage(clusterCode, clusterInfo, file) {
  * reload 整个集群的app
  */
 async function reloadCluster(clusterInfo, appsLiveCluster) {
-  for(let i = 0; i < appsLiveCluster.length; i++) {
-    let app = appsLiveCluster[i];
-    let name = app.name;
+  for (let i = 0; i < appsLiveCluster.length; i++) {
+    const app = appsLiveCluster[i];
+    const name = app.name;
+
     for (let n = 0; n < app.versions.length; n++) {
-      let version = app.versions[n];
+      const version = app.versions[n];
+
       if (version.cluster[0].status === 'online') {
         await reloadApp(clusterInfo, version.appId);
         console.log(`reload app ${version.appId} done`);
@@ -245,9 +266,10 @@ async function reloadCluster(clusterInfo, appsLiveCluster) {
 /**
  * 重启App，主要确保配置的修改生效
  */
-async function reloadApp(clusterInfo,  appId) {
-  let path = `/api/reload/${appId}`;
-  let opt = _.cloneDeep(clusterInfo);
+async function reloadApp(clusterInfo, appId) {
+  const path = `/api/reload/${appId}`;
+  const opt = _.cloneDeep(clusterInfo);
+
   opt.method = 'POST';
   opt.timeout = 60000;
   await callremote(path, opt).catch((err) => {
@@ -256,8 +278,9 @@ async function reloadApp(clusterInfo,  appId) {
 }
 
 async function startApp(clusterInfo, appId) {
-  let path = `/api/start/${appId}`;
-  let opt = _.cloneDeep(clusterInfo);
+  const path = `/api/start/${appId}`;
+  const opt = _.cloneDeep(clusterInfo);
+
   opt.method = 'POST';
   await callremote(path, opt).catch((err) => {
     log.error('reload app failed', err.message);
@@ -265,8 +288,9 @@ async function startApp(clusterInfo, appId) {
 }
 
 async function stopApp(clusterInfo, appId) {
-  let path = `/api/stop/${appId}`;
-  let opt = _.cloneDeep(clusterInfo);
+  const path = `/api/stop/${appId}`;
+  const opt = _.cloneDeep(clusterInfo);
+
   opt.method = 'POST';
   opt.timeout = 30000;
   await callremote(path, opt).catch((err) => {

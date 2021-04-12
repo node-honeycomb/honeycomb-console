@@ -6,30 +6,36 @@ const callremote = utils.callremote;
 /**
  * @api {get} /signatureAuth/systemCall/appList
  */
-exports.appList = async function(req, callback) {
-  let clusterCode = req.query.clusterCode;
+exports.appList = async function (req, callback) {
+  const clusterCode = req.query.clusterCode;
+
   await new Promise(r => {
     cluster.getClusterCfg(() => {
       r();
     });
   });
-  let opt = cluster.getClusterCfgByCode(clusterCode);
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = '/api/apps';
-  callremote(path, opt, function(err, result) {
+  const path = '/api/apps';
+
+  callremote(path, opt, function (err, result) {
     if (err || result.code !== 'SUCCESS') {
-      let errMsg = (err && err.message) || result.message;
+      const errMsg = (err && err.message) || result.message;
+
       log.error('get apps from servers failed: ', errMsg);
-      let code = (err && err.code) || (result && result.code) || 'ERROR';
+      const code = (err && err.code) || (result && result.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
-      let ips = [];
+      const ips = [];
       let apps = [];
+
       result.data.success.forEach(item => {
         ips.push(item.ip);
         apps = apps.concat(item.apps);

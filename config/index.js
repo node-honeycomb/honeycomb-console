@@ -4,12 +4,14 @@ const _ = require('lodash');
 const defaultCfg = require('./config_default');
 
 let userCfg = {};
+
 try {
   userCfg = require('./config');
 } catch (e) {
   console.log('[WARN]', e.message);
 }
 
-let config = _.merge(defaultCfg, userCfg);
+const config = _.merge(defaultCfg, userCfg);
+
 // 兼容老应用
 module.exports = config;

@@ -19,14 +19,17 @@ class User {
 const INSERT_SYSTEM_USER = `INSERT INTO
     hc_console_system_user (name, password, status, role, gmt_create, gmt_modified)
   VALUES(?, ?, ?, ?, ?, ?)`;
+
 User.addUser = function (name, pwd, status, role, callback) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     INSERT_SYSTEM_USER,
     [name, pwd, status, role, d, d],
     function (err) {
       if (err) {
         log.error('Insert new user failed:', err);
+
         return callback(err);
       } else {
         log.info('Add user success');
@@ -44,13 +47,15 @@ const UPDATE_SYSTEM_USER = `
 `;
 
 User.updateUser = function (name, pwd, status, role, callback) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     UPDATE_SYSTEM_USER,
     [status, pwd, role, d, name],
     function (err) {
       if (err) {
         log.error('update user new user failed:', err);
+
         return callback(err);
       } else {
         log.info('Add user success');
@@ -65,13 +70,15 @@ const LIST_USER = `
   SELECT
     name,
     role,
-    status
+    status,
+    gmt_create AS gmtCreate
   FROM
     hc_console_system_user
   WHERE
     status = 1
   limit 10000
 `;
+
 User.listUser = function (cb) {
   db.query(LIST_USER, cb);
 };
@@ -98,13 +105,15 @@ const QUERY_SYSTEM_USER = `
     hc_console_system_user
   WHERE
     name = ?`;
+
 User.getUser = function (name, callback) {
   db.query(
     QUERY_SYSTEM_USER,
     [name],
     function (err, data) {
       if (err) {
-        log.error('Qeury user failed:',  name, err);
+        log.error('Qeury user failed:', name, err);
+
         return callback(err);
       }
       if (!data.length) {
@@ -125,7 +134,8 @@ const DELETE_SYSTEM_USER = `
   WHERE name = ?`;
 
 User.deleteUser = function (name, callback) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     DELETE_SYSTEM_USER,
     [d, name],
@@ -165,28 +175,28 @@ User.updateUserRole = function (name, role, callback) {
 User.RoleType = RoleType;
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
-function userInit (callback) {
+function userInit(callback) {
   callback = callback || function () {};
   if (config.defaultUser && config.defaultPassword) {
-      User.countUser((err, data) => {
-        if (err) {
-          return callback(err);
-        }
-        if (data > 0) {
-          return callback();
-        }
-        User.addUser(config.defaultUser, config.defaultPassword, 1, 1, (err) => {
-          callback(err);
-        });
+    User.countUser((err, data) => {
+      if (err) {
+        return callback(err);
+      }
+      if (data > 0) {
+        return callback();
+      }
+      User.addUser(config.defaultUser, config.defaultPassword, 1, 1, (err) => {
+        callback(err);
+      });
     });
   }
-};
+}
 
 userInit((err) => {
   if (err) {
     if (err.code === 'ER_NO_SUCH_TABLE') {
       // TODO: sql顺序需要可控
-      return setTimeout(userInit, 1000)
+      return setTimeout(userInit, 1000);
     }
     if (err.code === 'ER_DUP_ENTRY') {
       return;

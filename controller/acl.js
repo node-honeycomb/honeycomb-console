@@ -1,7 +1,8 @@
 'use strict';
-const userAcl = require('../model/user_acl');
 const async = require('async');
+const userAcl = require('../model/user_acl');
 const log = require('../common/log');
+
 /**
  * @api {post} /api/acl/create
  */
@@ -36,6 +37,7 @@ exports.createAcl = function (req, callback) {
  */
 exports.getAcl = function (req, callback) {
   var user = req.user;
+
   userAcl.getClusterAcl(user, callback);
 };
 
@@ -46,6 +48,7 @@ exports.getAcl = function (req, callback) {
  */
 exports.updateAcl = function (req, callback) {
   var acl = req.body.acl;
+
   userAcl.updateClusterAcl(acl, callback);
 };
 
@@ -56,6 +59,7 @@ exports.updateAcl = function (req, callback) {
  */
 exports.deleteAcl = function (req, callback) {
   var acl = req.body.acl;
+
   userAcl.deleteClusterAcl(acl, callback);
 };
 
