@@ -176,7 +176,7 @@ class AppLayout extends React.Component {
           onClose={this.onCloseCluster}
         />
         <Sider currentClusterCode={currentClusterCode} />
-        <div className="main-content">
+        <div className="main-content" id="main-content">
           {
             this.props.children
           }

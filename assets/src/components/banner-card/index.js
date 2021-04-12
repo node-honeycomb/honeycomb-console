@@ -7,7 +7,7 @@ const BannerCard = (props) => {
   return (
     <div
       {...props}
-      className={`banner-card ${props.className}`}
+      className={`banner-card ${props.className || ''}`}
     >
       {
         props.children

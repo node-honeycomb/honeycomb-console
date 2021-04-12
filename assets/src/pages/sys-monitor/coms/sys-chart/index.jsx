@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import {Chart, LineAdvance} from 'bizcharts';
 
 const SysChart = (props) => {
-  const {data, loading} = props;
+  const {data, loading, group = ['ip']} = props;
 
   return (
     <Spin spinning={loading}>
@@ -14,13 +14,20 @@ const SysChart = (props) => {
         height={300}
         data={data}
       >
-        <LineAdvance
-          shape="smooth"
-          point
-          area
-          position="time*value"
-          color="ip"
-        />
+        {
+          group.map(key => {
+            return (
+              <LineAdvance
+                key={key}
+                shape="smooth"
+                point
+                area
+                position="time*value"
+                color={key}
+              />
+            );
+          })
+        }
       </Chart>
     </Spin>
   );
@@ -28,7 +35,8 @@ const SysChart = (props) => {
 
 SysChart.propTypes = {
   data: PropTypes.array,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  group: PropTypes.arrayOf(PropTypes.string)  // 分组，默认按照IP分组
 };
 
 export default SysChart;
