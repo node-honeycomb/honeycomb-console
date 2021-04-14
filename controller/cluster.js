@@ -82,10 +82,10 @@ exports.addCluster = function (req, callback) {
     opEnv: req.body.env,
   });
 
-  let clusterName = req.body.name;
-  let clusterEnv = req.body.env;
+  const clusterName = req.body.name;
+  const clusterEnv = req.body.env;
   let token = req.body.token;
-  let monitor = req.body.monitor || null;
+  const monitor = req.body.monitor || null;
 
   if (token === '***********') {
     const opt = cluster.getClusterCfgByCode(clusterCode);

@@ -23,7 +23,7 @@ const q = queue({
  * 2. 异常应用 exception
  */
 const detectCluster = (cluster) => {
-  let path = '/api/apps';
+  const path = '/api/apps';
   const clusterCode = cluster.code;
   const clusterName = cluster.name;
   const monitor = cluster.monitor;
@@ -35,7 +35,8 @@ const detectCluster = (cluster) => {
   return new Promise((res) => {
     callremote(path, cluster, function (err, result) {
       if (err || result.code !== 'SUCCESS') {
-        let errMsg = err && err.message || result.message;
+        const errMsg = err && err.message || result.message;
+
         log.error('get apps from servers failed: ', errMsg);
 
         emitClusterError({
@@ -48,7 +49,7 @@ const detectCluster = (cluster) => {
         return res();
       }
 
-      let ips = [];
+      const ips = [];
       let apps = [];
 
       result.data.success.forEach((item) => {
@@ -74,6 +75,7 @@ const detectCluster = (cluster) => {
        *  [key]: any;
        * }
        */
+      // eslint-disable-next-line
       for (const app of apps) {
         if (app.status === 'exception') {
           exceptionAppIds.push(app.appId);
@@ -87,6 +89,7 @@ const detectCluster = (cluster) => {
       }
 
       res();
+
       return emitAppError({
         clusterCode,
         clusterName,
@@ -103,6 +106,7 @@ async function detect() {
   Object.keys(clusters).forEach(clusterCode => {
     q.push(async () => {
       const cluster = clusters[clusterCode];
+
       cluster.code = clusterCode;
 
       await detectCluster(cluster);

@@ -53,9 +53,11 @@ exports.sha256 = function (str) {
 
 exports.genPwd = function (pwd, salt) {
   let hash = exports.sha256(pwd);
+
   if (salt) {
     hash = exports.sha256(salt + hash);
   }
+
   return hash;
 };
 
@@ -67,6 +69,7 @@ exports.checkPwd = function (pwd) {
     // console.log('>>>>',!/A-Z/.test(pwd), !/a-z/.test(pwd), !/\d/.test(pwd), /^[a-zA-Z0-9]+$/.test(pwd));
     return new Error('password too simple, should contain all this kinds of characters: A-Z, a-z, 0-9, and special character');
   }
+
   return true;
 };
 
@@ -89,8 +92,9 @@ exports.getUidAndGid = function (changeUser) {
   }
   const gidFile = '/etc/passwd';
   const str = fs.readFileSync(gidFile, 'utf-8');
-  const reg  = /[^app]admin:x:+(\d+):(\d+)/;
-  const res  = str.match(reg);
+  const reg = /[^app]admin:x:+(\d+):(\d+)/;
+  const res = str.match(reg);
+
   if (!res) {
     return {};
   }
@@ -353,9 +357,10 @@ exports.mergeAppInfo = function (ips, apps) {
 
       // 补齐cluster， 如果某个ip没有app，设置status为none
       ips.forEach(function (ip) {
-        let idx = _.findIndex(vms, function (vm) {
+        const idx = _.findIndex(vms, function (vm) {
           return ip === vm.ip;
         });
+
         if (idx < 0) {
           vms.push({
             ip: ip,
@@ -413,7 +418,8 @@ exports.getClusterApps = function (clusterIinfo, cb) {
       });
 
       apps = exports.mergeAppInfo(ips, apps);
-      let res = [];
+      const res = [];
+
       apps.forEach((app) => {
         if (/^__\w+__$/.test(app.name)) {
           return;

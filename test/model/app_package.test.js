@@ -1,8 +1,8 @@
+const path = require('path');
 const testMod = require('../../model/app_package.js');
 
-const path = require('path');
 
-let data = {
+const data = {
   clusterCode: 'test',
   appId: 'simple-app_1.1.0_1',
   appName: 'simple-app',

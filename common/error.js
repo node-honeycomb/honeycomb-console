@@ -2,7 +2,8 @@ const ECODE = {
   NO_PERMISSION: 'NO_PERMISSION',
   LOGIN_FAILED: 'LOGIN_FAILED',
   USER_CREATED: 'USER_CREATED',
-  INIT_USER_FAILED: 'INIT_USER_FAILED'
+  INIT_USER_FAILED: 'INIT_USER_FAILED',
+  CAPTCHA_ERROR: 'CAPTCHA_ERROR'
 };
 
 const EMSG = {
@@ -12,7 +13,8 @@ const EMSG = {
   LOGIN_TICKET_EMPTY: '用户名或密码不能为空！',
   USER_NOT_FOUND: '该用户不存在，请联系管理员添加用户！',
   USER_CREATED: '初始用户已经创建，无法再次创建！',
-  INIT_USER_FAILED: '初始化用户失败'
+  INIT_USER_FAILED: '初始化用户失败',
+  CAPTCHA_ERROR: '验证码输入错误'
 };
 
 const SYSTEM_CODE = 'HC';

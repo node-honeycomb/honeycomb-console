@@ -1,12 +1,12 @@
 'use strict';
 
+const async = require('async');
+const _ = require('lodash');
+const net = require('net');
 const log = require('../common/log');
 const db = require('../common/db');
 const userAcl = require('./user_acl');
-const async = require('async');
 const config = require('../config');
-const _ = require('lodash');
-const net = require('net');
 const utils = require('../common/utils');
 const callremote = utils.callremote;
 
@@ -21,7 +21,8 @@ exports.addCluster = function (
   env, monitor,
   callback
 ) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     INSERT_SYSTEM_CLUSTER,
     [name, code, token, endpoint, env, monitor, d, d],
@@ -42,18 +43,21 @@ const UPDATE_SYSTEM_CLUSTER = `
   SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, monitor = ?, gmt_modified = ?
   WHERE code = ?;
 `;
+
 exports.updateCluster = function (
   name, code, token, endpoint,
   env, monitor,
   callback
 ) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     UPDATE_SYSTEM_CLUSTER,
     [name, token, endpoint, env, monitor, d, code],
     function (err) {
       if (err) {
         log.error('Update cluster failed:', err);
+
         return callback(err);
       } else {
         log.info('update cluster success');
@@ -71,10 +75,12 @@ const UPDATE_SYSTEM_CLUSTER_ENDPOINT = `
 
 exports.updateClusterEndpoint = function (code, endpoint, callback) {
   callback = callback || function () {};
-  let d = new Date();
+  const d = new Date();
+
   db.query(UPDATE_SYSTEM_CLUSTER_ENDPOINT, [endpoint, d, code], function (err) {
     if (err) {
       log.error('Update cluster failed:', err);
+
       return callback(err);
     } else {
       log.info('update cluster success');
@@ -87,10 +93,12 @@ const DELETE_SYSTEM_CLUSTER = `
   DELETE FROM
     hc_console_system_cluster
   WHERE code = ?;`;
+
 exports.deleteCluster = function (code, callback) {
   db.query(DELETE_SYSTEM_CLUSTER, [code], function (err) {
     if (err) {
       log.error('Delete cluster failed:', err);
+
       return callback(err);
     } else {
       log.info('Delete cluster success');
@@ -106,12 +114,14 @@ const INSERT_SYSTEM_WORKER = `
     (?, ?, ?, ?);`;
 
 exports.addWorker = function (ipAddress, clusterCode, callback) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(INSERT_SYSTEM_WORKER, [ipAddress, clusterCode, d, d], function (
     err
   ) {
     if (err && err.code !== 'ER_DUP_ENTRY') {
       log.error('Insert new worker failed:', err);
+
       return callback(err);
     } else {
       log.info('Add worker success');
@@ -130,7 +140,8 @@ const CHECK_SYSTEM_WORKER_TMP = `
 `;
 
 exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
-  let d = new Date();
+  const d = new Date();
+
   db.query(CHECK_SYSTEM_WORKER_TMP, [ipAddress, clusterCode], (err, data) => {
     if (err) {
       return callback(err);
@@ -143,6 +154,7 @@ exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
     ) {
       if (err) {
         log.error('Insert new worker failed:', err);
+
         return callback(err);
       } else {
         log.info('Add worker success');
@@ -189,6 +201,7 @@ const DELETE_SYSTEM_WORKER_BY_CLUSTER = `
   WHERE
     cluster_code = ?;
 `;
+
 exports.deleteWorkersByClusterCode = function (clusterCode, callback) {
   callback = callback || function () {};
   db.query(DELETE_SYSTEM_WORKER_BY_CLUSTER, [clusterCode], callback);
@@ -245,7 +258,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
 
 function adpater2cluster(data) {
   data = data || [];
-  let clusterCfg = {};
+  const clusterCfg = {};
 
   data.forEach(function (c) {
     if (!clusterCfg[c.code]) {
@@ -283,12 +296,15 @@ function adpater2cluster(data) {
 exports.getClusterCfg = function (cb) {
   db.query(SELECT_SYSTEM_CLUSTER_WOKER, function (err, data) {
     if (err || !data) {
-      let e = new Error('SELECT_SYSTEM_CLUSTER failed: ' + err.message);
+      const e = new Error('SELECT_SYSTEM_CLUSTER failed: ' + err.message);
+
       log.error(err.message);
+
       return cb(e);
     }
 
     const clusterCfg = adpater2cluster(data);
+
     exports.gClusterConfig = clusterCfg;
     cb(null, clusterCfg);
   });
@@ -320,12 +336,15 @@ const SELECT_MONITED_CLUSTER_WORKER = `
 exports.getMonitedClusterCfg = function (cb) {
   db.query(SELECT_MONITED_CLUSTER_WORKER, function (err, data) {
     if (err || !data) {
-      let e = new Error('SELECT_MONITED_CLUSTER_WORKER failed: ' + err.message);
+      const e = new Error('SELECT_MONITED_CLUSTER_WORKER failed: ' + err.message);
+
       log.error(err.stack);
+
       return cb(e);
     }
 
     const clusterCfg = adpater2cluster(data);
+
     cb(null, clusterCfg);
   });
 };
@@ -339,7 +358,8 @@ exports.getClusterCodes = () => {
  * 更新集群配置在内存中的缓存
  */
 exports.fixClusterConfigCache = (clusterCode, ips, errips) => {
-  let cluster = exports.gClusterConfig[clusterCode];
+  const cluster = exports.gClusterConfig[clusterCode];
+
   if (cluster) {
     cluster.ips = ips;
     cluster.ipsOffline = errips;
@@ -347,10 +367,13 @@ exports.fixClusterConfigCache = (clusterCode, ips, errips) => {
 };
 
 exports.getClusterCfgByCode = function (clusterCode) {
-  let opt = exports.gClusterConfig[clusterCode] || {};
+  const opt = exports.gClusterConfig[clusterCode] || {};
+
   if (!opt.endpoint || !opt.token || !opt.ips) {
-    let e = new Error('cluster config missing');
+    const e = new Error('cluster config missing');
+
     log.error(e.message, 'clusterCfg: ', opt, 'clusterCode: ', clusterCode);
+
     return {
       code: 'ERROR',
       message: e.message,
@@ -403,6 +426,7 @@ const SQL_QUERY_CLUSTER_SNAPSHORT = `
   order by id desc
   limit 1
 `;
+
 exports.getSnapshort = (clusterCode, cb) => {
   db.query(SQL_QUERY_CLUSTER_SNAPSHORT, [clusterCode], (err, data) => {
     if (err) {
@@ -425,6 +449,7 @@ const SQL_CLEAN_CLUSTER_SNAPSHORTS = `
     ) topids
   )
 `;
+
 exports.cleanSnapshort = (clusterCode, cb) => {
   db.query(SQL_CLEAN_CLUSTER_SNAPSHORTS, [clusterCode], (err, data) => {
     if (err) {
@@ -438,16 +463,18 @@ const SQL_INSERT_CLUSTER_SNAPSHORT = `insert into hc_console_system_cluster_snap
 (cluster_code, info, md5, user, gmt_create) 
 values 
 (?, ?, ?, ?, ?)`;
+
 exports.saveSnapshort = (obj, cb) => {
-  let info = JSON.stringify(obj.info);
-  let md5 = utils.md5(info);
-  let param = [
+  const info = JSON.stringify(obj.info);
+  const md5 = utils.md5(info);
+  const param = [
     obj.clusterCode,
     info,
     md5,
     obj.user || '',
     new Date()
   ];
+
   db.query(SQL_INSERT_CLUSTER_SNAPSHORT, param, (err) => {
     cb(err);
     exports.cleanSnapshort(obj.clusterCode);
@@ -458,32 +485,38 @@ exports.saveSnapshort = (obj, cb) => {
  * 修复集群worker, 通过检测联通性，淘汰漂移的节点
  */
 exports.fixCluster = function (clusterCode, callback) {
-  let clusterInfo = exports.getClusterCfgByCode(clusterCode);
-  let opt = _.cloneDeep(clusterInfo);
+  const clusterInfo = exports.getClusterCfgByCode(clusterCode);
+  const opt = _.cloneDeep(clusterInfo);
+
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  let path = '/api/status';
+  const path = '/api/status';
+
   opt.ips = opt.ips.concat(opt.ipsOffline || []);
 
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+      const errMsg = err && err.message || results.message;
+
       log.error('get status info failed: ', errMsg);
-      let code = err && err.code || (results && results.code) || 'ERROR';
+      const code = err && err.code || (results && results.code) || 'ERROR';
+
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       // log.debug('get status results:', results);
-      let errList = results.data.error;
-      let okList = results.data.success;
-      let okips = [];
+      const errList = results.data.error;
+      const okList = results.data.success;
+      const okips = [];
+
       okList.forEach((node) => {
         okips.push(node.ip);
       });
-      let errips = [];
+      const errips = [];
+
       errList.forEach((node) => {
         errips.push(node.ip);
       });
@@ -508,6 +541,7 @@ function clusterInit(callback) {
   callback = callback || function () {};
   const clusterToken = config.clusterToken || '***honeycomb-default-token***';
   const clusterCfg = config.cluster;
+
   if (!clusterCfg) {
     return callback();
   }
@@ -527,6 +561,7 @@ function clusterInit(callback) {
       return; // do nothing
     }
     const endpoint = `http://${ips[0]}:9999`;
+
     exports.addCluster(
       clusterCode,
       clusterCode,
@@ -575,7 +610,8 @@ function initWorkers(clusterCode, ips, callback) {
       exports.getClusterCfg(function (err) {
         if (err)
           callback(new Error('getClusterCfg fail before add cluster acl'));
-        let newCluster = exports.gClusterConfig[clusterCode];
+        const newCluster = exports.gClusterConfig[clusterCode];
+
         if (!newCluster)
           callback(new Error('get new cluster fail after getClusterCfg'));
         userAcl.addUserAcl(

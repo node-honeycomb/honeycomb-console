@@ -30,11 +30,14 @@ const ClusterAuth = (props) => {
   const [aclList, setAclList] = useState([]);
   const [appList, setAppList] = useState([]);
   const [clusterCode, setClusterCode] = useState(currentClusterCode);
+
   const selectedCluster = {
-    code: _.get(clusters, `${clusterCode}.code`),
+    code: clusterCode,
     id: _.get(clusters, `${clusterCode}.id`),
     name: _.get(clusters, `${clusterCode}.name`),
   };
+
+  console.log(clusters, clusterCode);
 
   const getAclList = async () => {
     try {

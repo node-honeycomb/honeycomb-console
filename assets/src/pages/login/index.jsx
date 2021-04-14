@@ -16,18 +16,20 @@ const LOGO_IMG = `${prefix}/assets/static/logo.png`;
 
 const Login = () => {
   const [loading, setLoading] = useState(false);
+  // 点击验证码的次数
+  const [click, setClick] = useState(0);
 
   const onCreate = useCallback(async (value) => {
     if (!value) {
       return;
     }
 
-    const {username, password} = value;
+    const {username, password, captcha} = value;
 
     setLoading(true);
 
     try {
-      await userApi.login({username, password});
+      await userApi.login({username, password, captcha});
 
       message.success('登录成功！');
       setTimeout(() => {
@@ -106,14 +108,38 @@ const Login = () => {
               {
                 required: true, message: '密码不能为空'
               }
-            ]
-            }
+            ]}
           >
             <Input.Password
               prefix={<LockOutlined className="site-form-item-icon" />}
               placeholder="密码"
             />
           </Form.Item>
+          {
+            !isInit && (
+              <div className="captcha-input-wrapper">
+                <Form.Item
+                  name="captcha"
+                  rules={[
+                    {
+                      required: true, message: '验证码不能为空'
+                    }
+                  ]}
+                  className="captcha-input"
+                >
+                  <Input
+                    placeholder="请输入验证码"
+                  />
+                </Form.Item>
+                <img
+                  className="login-captcha"
+                  title="点击切换验证码"
+                  onClick={() => setClick(click + 1)}
+                  src={`${prefix}/loginCaptcha?click=${click}`}
+                />
+              </div>
+            )
+          }
 
           <Form.Item>
             <Button

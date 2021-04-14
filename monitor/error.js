@@ -34,11 +34,13 @@ exports.emitClusterError = async ({
   monitor
 }) => {
   let msg = '';
+
   msg += '# HC集群无响应\n';
   msg += `集群：${clusterName}(${clusterCode})\n\n`;
   msg += `错误原因：${message}`;
 
   const body = getMsg(msg);
+
   logger.info(`send err_msg to cluster: ${clusterCode}`);
 
   try {
@@ -74,6 +76,7 @@ exports.emitAppError = async ({
   monitor
 }) => {
   let message = '';
+
   message += '# HC应用出现异常\n';
   message += `集群：${clusterName}(${clusterCode})\n\n`;
   message += `异常应用：${appIds.join('，')}`;

@@ -1,8 +1,8 @@
 import request from '../request';
 
 // 用户登录
-export const login = ({username, password}) => {
-  return request.post('/loginAuth', {username, password});
+export const login = ({username, password, captcha}) => {
+  return request.post('/loginAuth', {username, password, captcha});
 };
 
 // 初始化用户
@@ -29,3 +29,4 @@ export const deleteUser = ({name}) => {
 export const updateUser = ({username, password}) => {
   return request.put(`/api/user/${username}/update`, {username, password});
 };
+

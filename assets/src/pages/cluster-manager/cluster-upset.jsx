@@ -54,6 +54,7 @@ const ClusterUpset = (props) => {
           ips: iplist,
           env: _.get(value, 'env'),
           isUpdate: !isAdd,
+          monitor: _.get(value, 'monitor').trim(),
         };
 
         await clusterApi.create(values);
@@ -66,13 +67,13 @@ const ClusterUpset = (props) => {
         });
       } finally {
         setComfirmLoading(false);
+        _.isFunction(props.getCluster) && props.getCluster();
         onClose();
       }
     });
   };
   const onClose = useCallback(() => {
     setVisible(false);
-    _.isFunction(props.getCluster) && props.getCluster();
     props.close();
   });
 
@@ -128,6 +129,8 @@ const ClusterUpset = (props) => {
           name="token"
           initialValue={_.get(props, 'row.token')}
           rules={[{required: true, message: 'token不能为空！'}]}
+          help="默认token为：***honeycomb-default-token***"
+          style={{marginBottom: 10}}
         >
           {isAdd ? (
             <Input placeholder="请填写token，来自server.config.admin.token" />
@@ -180,6 +183,21 @@ const ClusterUpset = (props) => {
             <Select.Option value="pre">预发(pre)</Select.Option>
             <Select.Option value="prod">生产(prod)</Select.Option>
           </Select>
+        </Form.Item>
+        <Form.Item
+          label="集群监控"
+          name="monitor"
+          initialValue={_.get(props, 'row.monitor')}
+          help={(
+            <span>
+              仅支持钉钉机器人，请参考
+              <a target="_blank" href="https://www.yuque.com/honeycomb/honeycomb/ops-cluster#8yYlB" rel="noreferrer">
+              文档
+              </a>
+            </span>
+          )}
+        >
+          <Input />
         </Form.Item>
       </Form>
     </Modal>

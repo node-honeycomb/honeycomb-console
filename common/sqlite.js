@@ -50,11 +50,11 @@ exports.query = function (sql, param, callback) {
 };
 
 exports.ready = function (cb) {
- if (flagReady) {
-      return cb();
+  if (flagReady) {
+    return cb();
   }
   readyFn = cb;
-}
+};
 
 exports.type = 'sqlite';
 

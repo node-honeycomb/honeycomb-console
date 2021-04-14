@@ -1,7 +1,7 @@
-const pathToRegex = require('path-to-regexp');
-const log = require('../common/log');
 const svgCaptcha = require('svg-captcha');
+const pathToRegex = require('path-to-regexp');
 
+const log = require('../common/log');
 const config = require('../config');
 const User = require('../model/user');
 const utils = require('../common/utils');
@@ -33,7 +33,8 @@ module.exports = function (app, options) {
       return next();
     }
 
-    const user = req.body.username;
+    const {username: user, captcha} = req.body;
+
     let pwd = req.body.password;
 
     const throwError = (error) => {
@@ -82,39 +83,53 @@ module.exports = function (app, options) {
         break;
       case '/loginAuth':
         if (!user || !pwd || !captcha) {
-          return res.redirect(config.prefix + '?error=user_or_pwd_or_captcha_empty');
+          return throwError({
+            code: ECODE.LOGIN_FAILED,
+            message: EMSG.LOGIN_FAILED
+          });
         }
+
         if ((captcha || '').toLowerCase() !== (req.session.captcha || '').toLowerCase()) {
-          return res.redirect(config.prefix + '?error=captcha_not_match');
+          return throwError({
+            code: ECODE.CAPTCHA_ERROR,
+            message: EMSG.CAPTCHA_ERROR
+          });
         }
 
         User.getUser(user, (err, user) => {
           if (err) {
             log.error('login get user failed', err.message);
-            return res.redirect(config.prefix + '?error=login_failed');
+
+            return throwError({
+              code: ECODE.CAPTCHA_ERROR,
+              message: EMSG.CAPTCHA_ERROR
+            });
           }
+
           pwd = utils.genPwd(pwd, config.salt);
           if (user.password === pwd && user.status === 1) {
             req.session.username = user.name;
 
             return res.send({code: 'SUCCESS'});
-          } else {
-            return throwError({
-              code: ECODE.LOGIN_FAILED,
-              message: EMSG.LOGIN_FAILED
-            });
           }
+
+          return throwError({
+            code: ECODE.LOGIN_FAILED,
+            message: EMSG.LOGIN_FAILED
+          });
         });
         break;
-      case '/loginCaptcha':
-        let capt = svgCaptcha.create({
-          size: 6, 
-          noise: 3, 
+      case '/loginCaptcha': {
+        const capt = svgCaptcha.create({
+          size: 4,
+          noise: 3,
           background: '#fff',
           ignoreChars: '0o1il'
         });
+
         req.session.captcha = capt.text;
         res.type('svg').status(200).send(capt.data);
+      }
         break;
       case '/api/worker/register':
       case '/api/worker/unregister':

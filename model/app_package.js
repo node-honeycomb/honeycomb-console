@@ -1,9 +1,9 @@
-const log = require('../common/log');
-const db = require('../common/db');
-const config = require('../config');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const log = require('../common/log');
+const db = require('../common/db');
+const config = require('../config');
 
 
 let storage;
@@ -23,8 +23,10 @@ if (config.storage) {
 const INSERT_APP_PKG = `REPLACE INTO
     hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, user, gmt_create)
   VALUES(?, ?, ?, ?, ?, ?, ?)`;
+
 exports.savePackage = (data, callback) => {
-  let d = new Date();
+  const d = new Date();
+
   if (db.type === 'sqlite' && !config.debug) {
     return callback(null);
   }
@@ -33,6 +35,7 @@ exports.savePackage = (data, callback) => {
       if (err) {
         err.message = `storage save failed, app: ${data.appId}, path: ${data.pkg}` + err.message;
         log.error(err.message);
+
         return callback(err);
       }
       save('key', fkey, callback);
@@ -50,6 +53,7 @@ exports.savePackage = (data, callback) => {
       function (err) {
         if (err) {
           log.error('Insert pkg failed:', err);
+
           return callback(err);
         } else {
           log.info('insert pkg success', file);
@@ -64,6 +68,7 @@ exports.savePackage = (data, callback) => {
  * 删除包
  */
 const DELETE_APP_PKG = `delete from hc_console_system_cluster_app_pkgs where cluster_code = ? and app_id = ?`;
+
 exports.deletePackage = (clusterCode, appId, callback) => {
   db.query(
     GET_APP_PKG,
@@ -71,6 +76,7 @@ exports.deletePackage = (clusterCode, appId, callback) => {
     function (err, data) {
       if (err) {
         log.error('delete app pkg: query pkg info failed:', err);
+
         return callback(err);
       } else {
         log.info('delete app pkg: query pkg info successfully', JSON.stringify(data[0]));
@@ -104,23 +110,28 @@ const GET_APP_PKG = `
   FROM hc_console_system_cluster_app_pkgs
   WHERE cluster_code = ? and app_id = ?
 `;
+
 exports.getPackage = (clusterCode, appId, callback) => {
-  let d = new Date();
+  const d = new Date();
+
   db.query(
     GET_APP_PKG,
     [clusterCode, appId],
     function (err, data) {
       if (err) {
         log.error('get app pkg:  failed when query pkg info:', err);
+
         return callback(err);
       } else {
         log.info('get app pkg: query pkg info success', JSON.stringify(data[0]));
         if (data[0] && data[0].package) {
-          let tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
+          const tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
+
           if (storage) {
             storage.get(data[0].package.toString(), tmpFile, (err) => {
               if (err) {
                 log.error(`get app package failed, cluster: ${clusterCode} appId: ${appId}`, err);
+
                 return callback(err);
               }
               data[0].package = tmpFile;
