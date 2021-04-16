@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `endpoint` text NOT NULL,
   `token` varchar(256) NOT NULL DEFAULT '',
   `description` text,
+  `monitor` varchar(256) DEFAULT NULL, -- COMMENT '当前集群监控机器人地址，集群异常时会推送到该地址'
   `status` tinyint(4) NOT NULL DEFAULT '1',
   `gmt_create` datetime NOT NULL,
   `gmt_modified` datetime NOT NULL
