@@ -96,7 +96,11 @@ const SysMonitor = (props) => {
   }
 
   if (clusterLoading) {
-    return <Spin style={{width: '100%', textAlign: 'center'}} spinning />;
+    return (
+      <Spin style={{width: '100%', textAlign: 'center'}} spinning>
+        <div className="sys-monitor" />
+      </Spin>
+    );
   }
 
   const cards = storage.list();

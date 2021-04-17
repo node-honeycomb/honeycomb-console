@@ -52,10 +52,10 @@ const SimpleTitle = () => {
           return (
             <Tooltip
               title={item.info}
-              key={item.title}
+              key={item.name}
             >
               <span
-                key={item.title}
+                key={item.name}
                 style={{
                   width: item.width
                 }}

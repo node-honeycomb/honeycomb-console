@@ -57,7 +57,8 @@ export const detroy = (key) => {
 };
 
 export const list = () => {
-  const cnt = localStorage.getItem(KEY);
+  const clusterCode = window.CONFIG.clusterCode;
+  const cnt = localStorage.getItem(`${clusterCode}_${KEY}`);
 
   try {
     return JSON.parse(cnt) || [];
@@ -67,7 +68,9 @@ export const list = () => {
 };
 
 export const save = (cfg) => {
-  localStorage[KEY] = JSON.stringify(cfg);
+  const clusterCode = window.CONFIG.clusterCode;
+
+  localStorage[`${clusterCode}_${KEY}`] = JSON.stringify(cfg);
   callAllCb();
 };
 

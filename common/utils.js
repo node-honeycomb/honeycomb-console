@@ -1,4 +1,4 @@
-'use strict';
+/* eslint-disable max-len */
 const fs = require('fs');
 const crypto = require('crypto');
 const childProcess = require('child_process');

@@ -69,6 +69,10 @@ const AppList = (props) => {
 
   const {result: appList, loading} = useRequest({
     request: async () => {
+      if (!currentClusterCode) {
+        return [];
+      }
+
       const result = await api.appApi.appList(currentClusterCode);
 
       return result.success;

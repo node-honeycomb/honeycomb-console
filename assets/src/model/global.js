@@ -8,7 +8,9 @@ import {LS_LAST_SELECT_CLUSTER_CODE} from '@lib/consts';
 
 
 const key = 'cluster-usage-count';
+const clusterStatusKey = 'cluster-status-value';
 
+// 集群使用次数 +1
 const addClusterCount = (clusterCode) => {
   if (!localStorage.getItem(key)) {
     localStorage.setItem(key, JSON.stringify({}));
@@ -29,6 +31,7 @@ const addClusterCount = (clusterCode) => {
   localStorage.setItem(key, JSON.stringify(v));
 };
 
+// 获取使用次数最多的几个集群
 const getFreqClusterCodes = () => {
   const v = tryParse(localStorage.getItem(key), {});
 
@@ -41,15 +44,34 @@ const getFreqClusterCodes = () => {
   return codes.map(v => v[0]);
 };
 
+/**
+ * 从localStorage中读取上一次机器的状态
+ */
+const getCheckedClustersFromLS = () => {
+  try {
+    return JSON.parse(localStorage.getItem(clusterStatusKey)) || [];
+  } catch (e) {
+    return [];
+  }
+};
+
+/**
+ * 保存机器状态到 localStraoge 中
+ * @param {Array} cfg
+ */
+const saveCheckedClustersToLS = (cfg) => {
+  localStorage.setItem(clusterStatusKey, JSON.stringify(cfg));
+};
+
 export default {
   namespace: 'global',
   state: {
-    clusters: {},              // 集群列表
-    currentClusterCode: null,  // 当前集群code
-    currentCluster: {},        // 当前集群的信息
-    freqClusters: [],          // 经常使用的集群
-    checkingClusterCode: null, // 正在检查的云计算资源code
-    checkedClusters: [],       // 集群状态
+    clusters: {},                                   // 集群列表
+    currentClusterCode: null,                       // 当前集群code
+    currentCluster: {},                             // 当前集群的信息
+    freqClusters: [],                               // 经常使用的集群
+    checkingClusterCode: null,                      // 正在检查的云计算资源code
+    checkedClusters: getCheckedClustersFromLS(),    // 集群状态
   },
   effects: {
     // 获取当前用户的可用的集群
@@ -95,6 +117,8 @@ export default {
         } catch (err) {
           checkedClusters.push([clusterCode, false, err.message]);
         }
+
+        saveCheckedClustersToLS(checkedClusters);
 
         yield put({
           type: 'setCheckingClusterCode',
@@ -171,6 +195,9 @@ export default {
       state.currentCluster = clusters[clusterCode];
       state.currentCluster.code = clusterCode;
       state.currentClusterCode = clusterCode;
+
+      // 注册到全局变量，慎重使用
+      window.CONFIG.clusterCode = clusterCode;
 
       // 浅拷贝
       return {...state};

@@ -1,5 +1,4 @@
-'use strict';
-
+/* eslint-disable max-lines */
 const async = require('async');
 const _ = require('lodash');
 const net = require('net');
@@ -451,7 +450,7 @@ const SQL_CLEAN_CLUSTER_SNAPSHORTS = `
 `;
 
 exports.cleanSnapshort = (clusterCode, cb) => {
-  db.query(SQL_CLEAN_CLUSTER_SNAPSHORTS, [clusterCode], (err, data) => {
+  db.query(SQL_CLEAN_CLUSTER_SNAPSHORTS, [clusterCode], (err) => {
     if (err) {
       log.error('clean snapshort failed', err.message);
     }
@@ -573,7 +572,7 @@ function clusterInit(callback) {
           if (err.code === 'ER_DUP_ENTRY') {
             // 如果worker改变，需要更新
             exports.queryWorker(clusterCode, (err, workers) => {
-              if (err) return cb(err);
+              if (err) return callback(err);
               workers = workers.map(w => w.ip);
               if (!_.isEqual(workers.sort(), ips.sort())) {
                 // 先删除该cluster原来的所有worker，然后重新初始化

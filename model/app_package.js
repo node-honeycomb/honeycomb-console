@@ -1,3 +1,4 @@
+/* eslint-disable  max-len */
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
@@ -112,8 +113,6 @@ const GET_APP_PKG = `
 `;
 
 exports.getPackage = (clusterCode, appId, callback) => {
-  const d = new Date();
-
   db.query(
     GET_APP_PKG,
     [clusterCode, appId],

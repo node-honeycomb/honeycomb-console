@@ -26,7 +26,12 @@ import './index.less';
 // 用于获取当前正在运行的app
 const APP_SYMBOL = Symbol('__app__');
 
-const getOffline = (versions) => {
+/**
+ * 判断是否含有offline之外的状态
+ * @param {Array} versions
+ * @returns {Boolean}
+ */
+const isOfflineMixed = (versions) => {
   // eslint-disable-next-line
   for (const v of versions) {
     const uniqStatus = _.uniq(v.cluster.map(c => c.status));
@@ -112,6 +117,8 @@ const SimpleApp = (props) => {
     }
   };
 
+  const isMixed = isOfflineMixed(versions);
+
   /**
    * 过滤逻辑
    * 1. 所有的 online 的 app 都必须显示
@@ -130,7 +137,6 @@ const SimpleApp = (props) => {
     return !isOffline;
   };
 
-  const hasOffline = getOffline(versions);
   const expandProps = {
     className: 'expand-icon',
     onClick: () => setAllVisible(!allVisible)
@@ -144,7 +150,7 @@ const SimpleApp = (props) => {
       <div className="app-name">
         <span>{name}</span>
         {
-          hasOffline &&
+          isMixed &&
           (
             allVisible ?
               <MinusSquareOutlined {...expandProps} /> :
