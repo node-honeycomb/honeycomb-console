@@ -17,8 +17,8 @@ export const getClusterUsages = (status) => {
 
   return status.map(stt => {
     const {memoryUsage, memory} = stt.data;
-    const disk = _.get(stt, 'data.diskInfo.serverRoot.size');
-    const ava = _.get(stt, 'data.diskInfo.serverRoot.available');
+    const disk = _.get(stt, 'data.diskInfo.serverRoot.size', 0);
+    const ava = _.get(stt, 'data.diskInfo.serverRoot.available', 0);
 
     return {
       ip: stt.ip,

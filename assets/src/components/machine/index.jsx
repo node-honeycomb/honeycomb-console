@@ -53,6 +53,10 @@ const Machine = (props) => {
       <div>
         {
           Object.keys(TITLE_MAP).map(key => {
+            if (!data[key]) {
+              return null;
+            }
+
             return (
               <div className="machine-keys" key={key}>
                 <span className="title">{TITLE_MAP[key]}</span>

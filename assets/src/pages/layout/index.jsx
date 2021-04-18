@@ -32,7 +32,14 @@ class AppLayout extends React.Component {
   }
 
   state = {
-    clusterVisible: false
+    clusterVisible: false,
+    errorMsg: null
+  }
+
+  componentDidCatch(error, info) {
+    this.setState({errorMsg: error && error.message});
+
+    console.log(error, info);
   }
 
   /**
@@ -161,8 +168,14 @@ class AppLayout extends React.Component {
     });
   }
 
+  renderError = () => {
+    return (
+      <div className="error-msg">😵 Something Went Wrong... <br /> Error: {this.state.errorMsg}</div>
+    );
+  }
+
   render() {
-    const {clusterVisible} = this.state;
+    const {clusterVisible, errorMsg} = this.state;
     const {currentCluster, currentClusterCode} = this.props;
 
     return (
@@ -178,7 +191,7 @@ class AppLayout extends React.Component {
         <Sider currentClusterCode={currentClusterCode} />
         <div className="main-content" id="main-content">
           {
-            this.props.children
+            errorMsg ? this.renderError() : this.props.children
           }
         </div>
       </div>
