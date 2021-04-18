@@ -42,6 +42,7 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    position: relative;
 
     &.active {
       background-color: #36435c;
@@ -55,6 +56,16 @@
 
     .anticon {
       margin-right: 10px;
+    }
+    
+    .pin {
+      position: absolute;
+      right: 0;
+      top: 0;
+
+      &.pinned {
+        color: @success-color !important;
+      }
     }
   }
 

@@ -22,7 +22,12 @@ const menu = (
   <Menu>
     <Menu.Item>
       <div className="user-dp-menu-item">
-        <a href={`${prefix}/logout`}>
+        <a
+          onClick={() => {
+            localStorage.clear();
+            window.location = `${prefix}/logout`;
+          }}
+        >
           <LogoutOutlined /><WhiteSpace />登出
         </a>
       </div>

@@ -7,10 +7,16 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {withRouter, routerRedux} from 'dva/router';
 import useOnclickOutside from 'react-cool-onclickoutside';
-import {DesktopOutlined, ReloadOutlined, SearchOutlined, LoadingOutlined} from '@ant-design/icons';
+import {
+  DesktopOutlined, ReloadOutlined,
+  SearchOutlined, LoadingOutlined,
+  PushpinOutlined
+} from '@ant-design/icons';
 
 import s2q from '@lib/search-to-query';
 import WhiteSpace from '@coms/white-space';
+
+import * as storage from './storage';
 
 import './index.less';
 
@@ -25,6 +31,7 @@ const ClusterDrawer = (props) => {
     checkingClusterCode, checkedClusters
   } = props;
 
+  // ============================= 选择集群 =============================
   const onSetCluster = useCallback((clusterCode) => {
     return () => {
       setGlobalClusterCode(clusterCode);
@@ -38,6 +45,12 @@ const ClusterDrawer = (props) => {
     };
   }, []);
 
+  // ============================= pin或者取消pin集群 =============================
+  const onPinCluster = (clusterCode) => {
+    storage.toggle(clusterCode);
+    setPins(storage.list());
+  };
+
   const ref = useOnclickOutside(() => {
     onClose();
   },
@@ -46,9 +59,15 @@ const ClusterDrawer = (props) => {
   });
 
   const [keyword, setKeyword] = useState('');
+  const [pins, setPins] = useState(storage.list());
 
   const renderClusterItem = (clusterCode, isFilter = true) => {
     const cluster = clusters[clusterCode];
+
+    if (!cluster) {
+      return null;
+    }
+
     const {name} = cluster;
     const isActive = currentClusterCode === clusterCode;
 
@@ -99,6 +118,22 @@ const ClusterDrawer = (props) => {
         >
           {icon()}
           {name}（{clusterCode}）
+          <div
+            className={
+              classnames(
+                'pin',
+                {
+                  pinned: pins.includes(clusterCode)
+                }
+              )
+            }
+            onClick={(e) => {
+              e.stopPropagation();
+              onPinCluster(clusterCode);
+            }}
+          >
+            <PushpinOutlined />
+          </div>
         </div>
       </Tooltip>
     );
@@ -109,6 +144,16 @@ const ClusterDrawer = (props) => {
       className={classnames('cluster-drawer', {visible: visible})}
       ref={ref}
     >
+      <Spin spinning={loading}>
+        <div className="cluster-title">
+          Pin
+        </div>
+        {
+          pins.map(clusterCode => {
+            return renderClusterItem(clusterCode, false);
+          })
+        }
+      </Spin>
       <Spin spinning={loading}>
         <div className="cluster-title">
           常用集群
