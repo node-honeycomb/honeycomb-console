@@ -6,6 +6,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const {ESBuildPlugin, ESBuildMinifyPlugin} = require('esbuild-loader');
+const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 
 const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
@@ -42,7 +43,7 @@ const getOutput = () => {
 const config = {
   context: __dirname,
   mode: isProduct ? 'production' : 'development',
-  devtool: 'cheap-module-source-map',
+  devtool: isProduct ? 'none' : 'cheap-module-source-map',
 
   entry: {
     app: [
@@ -185,6 +186,9 @@ const config = {
       }
     }),
     new ESBuildPlugin(),
+    new WebpackDynamicPublicPathPlugin({
+      externalPublicPath: 'window.CONFIG.prefix + "/assets/"'
+    })
     // new BundleAnalyzerPlugin()
   ].filter(Boolean),
 
