@@ -54,7 +54,7 @@ const ClusterUpset = (props) => {
           ips: iplist,
           env: _.get(value, 'env'),
           isUpdate: !isAdd,
-          monitor: _.get(value, 'monitor').trim(),
+          monitor: (_.get(value, 'monitor') || '').trim(),
         };
 
         await clusterApi.create(values);
