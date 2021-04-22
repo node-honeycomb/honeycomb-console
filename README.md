@@ -1,16 +1,24 @@
 <h2 align="center"> 🐝honeycomb-console </h2>
 
-<p align="center">honeycomb-server控制台，基于honeycomb app机制开发。提供优秀的集群、应用运维，监控能力。</p>
+<p align="center">honeycomb-console控制台，优秀的集群、应用运维，监控能力！</p>
 
+![应用截图](https://img.alicdn.com/imgextra/i1/O1CN01D51de328X1pbLu7le_!!6000000007941-2-tps-1196-702.png)
 
 ## 🐝Demo
-
+暂无线上demo，请参考安装【安装】章节
 
 ## ⚒️安装
 
-
-## 📤部署
-
+`docker`安装
+```bash
+$ docker run -d -p 80:80 \
+-p 9999:9999 \
+-v $PWD/honeycomb/logs:/home/admin/honeycomb/logs \
+-v $PWD/honeycomb/run:/home/admin/honeycomb/run \
+-v $PWD/honeycomb/conf:/home/admin/honeycomb/conf \
+--name honeycomb-server-console \
+node2honeycomb/honeycomb-server-console:latest
+```
 
 ## ⛑开发
 
