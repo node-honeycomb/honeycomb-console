@@ -18,9 +18,14 @@ pool.getConnection(function (err, conn) {
   let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_mysql.sql')).toString();
   statments = statments.split(/\n\n/);
   async.eachSeries(statments,(st, done) => {
-    conn.query(st, done);
+    conn.query(st, (err) => {
+      if (err && /^alter table/ig.test(st)) {
+        err.ignore = true;
+      }
+      done(err);
+    });
   },(err) => {
-    if(err) {
+    if(err && ! err.ignore) {
       log.error(err);
       throw err;
     }

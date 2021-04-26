@@ -14,12 +14,26 @@ SQLJS().then((SQL) => {
   db = new SQL.Database(buf);
   let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
   statments = statments.split(/\n\n/);
+  let flag = false;
   async.eachSeries(statments, (st, done) => {
-    let res = db.exec(st);
+    try {
+        db.exec(st);
+    } catch (e) {
+        if (e && /^alter/ig.test(st)) {
+            // do nothing
+        } else {
+            throw e;
+        }
+    }
+    flag = flag || /^(insert|delete|update|create|alter)/i.test(st.trim());
     done();
   }, (err) => {
     if (err) {
       return log.error(err);
+    }
+    if (flag) {
+        console.log('save db init');
+        fs.sync().save(dbfile, new Buffer(db.export()));
     }
     flagReady = true;
     if (readyFn) {
@@ -59,7 +73,7 @@ exports.query = function (sql, param, cb) {
         cb = param;
         param = [];
     }
-    let flag = /^(insert|delete|update|create)/i.test(sql.trim());
+    let flag = /^(insert|delete|update|create|alter)/i.test(sql.trim());
     // console.log('>>> query:', sql, param);
     sql = prepareSql(sql, param);
     // console.log('>>> sql:', sql);
