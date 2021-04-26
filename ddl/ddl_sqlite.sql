@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster` (
   `gmt_modified` datetime NOT NULL
 );
 
+ALTER TABLE hc_console_system_cluster ADD COLUMN  `monitor` varchar(256) DEFAULT NULL;
+
 CREATE TABLE IF NOT EXISTS `hc_console_system_worker` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
   `ip` varchar(128) NOT NULL DEFAULT '', -- COMMENT 'worker ip地址',
