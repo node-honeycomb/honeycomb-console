@@ -201,7 +201,6 @@ exports.sign = function (queryPath, options, token) {
     queryPath: queryPath
   };
 };
-
 /**
  * call cluster endpoint
  * @param  {String}   queryPath  路径

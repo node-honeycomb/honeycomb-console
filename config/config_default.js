@@ -21,6 +21,10 @@ module.exports = {
   },
   salt: null,
   /**
+   * 监控
+   */
+  monitor: false,
+  /**
    * 集群自动检测，默认关闭
    */
   autoCheck: false,

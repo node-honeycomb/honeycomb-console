@@ -454,6 +454,44 @@ exports.saveSnapshort = (obj, cb) => {
   });
 };
 
+
+function callremoteWithRetry (queryPath, options, callback, retry) {
+  let count = 0;
+  let okips = [];
+  retry = retry || 3;
+
+  function check(queryPath, options) {
+    callremote(queryPath, options, (err, results) => {
+      if (err) {
+        return callback(err);
+      }
+      // log.debug('get status results:', results);
+      let errList = results.data.error;
+      let okList = results.data.success;
+      okList.forEach((node) => {
+        okips.push(node.ip);
+      });
+      let errips = [];
+      errList.forEach((node) => {
+        errips.push(node.ip);
+      });
+      if (errips.length) {
+        count += 1;
+        if (count >= retry) {
+          callback(null, {okips, errips});
+          return;
+        } 
+        setTimeout(() => {
+          options.ips = errips;
+          check(queryPath, options);
+        }, 1000 * count);
+      } else {
+        callback(null, {okips, errips});
+      }
+    });
+  }
+  check(queryPath, options);
+};
 /**
  * 修复集群worker, 通过检测联通性，淘汰漂移的节点
  */
@@ -466,27 +504,19 @@ exports.fixCluster = function (clusterCode, callback) {
   let path = '/api/status';
   opt.ips = opt.ips.concat(opt.ipsOffline || []);
 
-  callremote(path, opt, function (err, results) {
-    if (err || results.code !== 'SUCCESS') {
-      let errMsg = err && err.message || results.message;
+  callremoteWithRetry(path, opt, function (err, results) {
+    if (err) {
+      let errMsg = err && err.message;
       log.error('get status info failed: ', errMsg);
-      let code = err && err.code || (results && results.code) || 'ERROR';
+      let code = err && err.code || 'ERROR';
       return callback({
         code: code,
         message: errMsg
       });
     } else {
       // log.debug('get status results:', results);
-      let errList = results.data.error;
-      let okList = results.data.success;
-      let okips = [];
-      okList.forEach((node) => {
-        okips.push(node.ip);
-      });
-      let errips = [];
-      errList.forEach((node) => {
-        errips.push(node.ip);
-      });
+      let okips = results.okips;
+      let errips = results.errips;
       exports.fixClusterConfigCache(clusterCode, okips, errips);
       if (errips.length) {
         exports.updateWorker('offline', errips, clusterCode);
@@ -497,7 +527,7 @@ exports.fixCluster = function (clusterCode, callback) {
       log.info(`fix cluster ${clusterCode}, okip: ${okips}, errip: ${errips}`);
       callback(null);
     }
-  });
+  }, 3);
 };
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
