@@ -7,8 +7,10 @@ const Cluster = require('../model/cluster');
 const {callremote} = require('../common/utils');
 const {emitClusterError, emitAppError} = require('./error');
 
+// 最大容忍错误次数
+const maxAllowErrorCount = cfg.monitor.maxAllowErrorCount || 3;
 // 默认每 5 分钟扫描一次
-const cycle = cfg.monitorCycle || 1000 * 60 * 5;
+const cycle = cfg.monitor.monitorCycle || 1000 * 60 * 5;
 const getMonitedClusterCfg = util.promisify(Cluster.getMonitedClusterCfg);
 
 const q = queue({
@@ -22,7 +24,7 @@ const q = queue({
  * 1. 异常机器
  * 2. 异常应用 exception
  */
-const detectCluster = (cluster) => {
+const detectCluster = async (cluster) => {
   let path = '/api/apps';
   const clusterCode = cluster.code;
   const clusterName = cluster.name;
@@ -32,20 +34,19 @@ const detectCluster = (cluster) => {
     return;
   }
 
-  return new Promise((res) => {
+  // 请求远端server
+  const detectRemote = () => new Promise((res, rej) => {
     callremote(path, cluster, function (err, result) {
       if (err || result.code !== 'SUCCESS') {
         let errMsg = err && err.message || result.message;
         log.error('get apps from servers failed: ', errMsg);
 
-        emitClusterError({
+        return rej({
           clusterCode,
           clusterName,
           message: err.message,
           monitor: cluster.monitor,
         });
-
-        return res();
       }
 
       let ips = [];
@@ -86,8 +87,7 @@ const detectCluster = (cluster) => {
         return;
       }
 
-      res();
-      return emitAppError({
+      return rej({
         clusterCode,
         clusterName,
         appIds: exceptionAppIds,
@@ -95,6 +95,27 @@ const detectCluster = (cluster) => {
       });
     });
   });
+
+  for (let i = 0; i < maxAllowErrorCount + 1; i++) {
+    try {
+      await detectRemote();
+      break;
+    } catch (e) {
+      log.warn(`detect cluster ${clusterCode} failed, try count: ${i}`);
+
+      if (i !== maxAllowErrorCount) {
+        continue;
+      }
+
+      if (e.appIds) {
+        return emitAppError(e);
+      }
+
+      return emitClusterError(e);
+    }
+  }
+
+  log.info(`detect cluster ${clusterCode} successfully!`);
 };
 
 async function detect() {

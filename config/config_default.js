@@ -21,10 +21,6 @@ module.exports = {
   },
   salt: null,
   /**
-   * 监控
-   */
-  monitor: false,
-  /**
    * 集群自动检测，默认关闭
    */
   autoCheck: false,
@@ -127,6 +123,14 @@ module.exports = {
   },
   // 是否关闭上传功能
   hideUpload: false,
-  // 默认监控间隔：5 min
-  monitorCycle: 1000 * 60 * 5
+  /**
+   * 监控
+   */
+  monitor: {
+    enable: false,
+    // 默认监控间隔：5 min
+    monitorCycle: 1000 * 60 * 5,
+    // 容忍最大错误发生次数
+    maxAllowErrorCount: 3
+  }
 };
