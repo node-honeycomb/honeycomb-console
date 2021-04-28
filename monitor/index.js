@@ -19,6 +19,12 @@ const q = queue({
   timeout: 1000 * 60   // 每一个检测最多1分钟
 });
 
+const delay = (time) => {
+  return new Promise((res) => {
+    setTimeout(res, time);
+  });
+};
+
 /**
  * 检查当前cluster是否存在异常
  * 1. 异常机器
@@ -104,6 +110,7 @@ const detectCluster = async (cluster) => {
       log.warn(`detect cluster ${clusterCode} failed, try count: ${i}`);
 
       if (i !== maxAllowErrorCount) {
+        await delay(3000);
         continue;
       }
 
