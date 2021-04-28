@@ -129,8 +129,8 @@ module.exports = {
   monitor: {
     enable: false,
     // 默认监控间隔：5 min
-    monitorCycle: 1000 * 60 * 5,
+    monitorInterval: 1000 * 60 * 5,
     // 容忍最大错误发生次数
-    maxAllowErrorCount: 3
+    maxRetry: 3
   }
 };

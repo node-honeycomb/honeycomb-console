@@ -8,9 +8,9 @@ const {callremote} = require('../common/utils');
 const {emitClusterError, emitAppError} = require('./error');
 
 // 最大容忍错误次数
-const maxAllowErrorCount = cfg.monitor.maxAllowErrorCount || 3;
+const maxRetry = cfg.monitor.maxRetry || 3;
 // 默认每 5 分钟扫描一次
-const cycle = cfg.monitor.monitorCycle || 1000 * 60 * 5;
+const monitorInterval = cfg.monitor.monitorInterval || 1000 * 60 * 5;
 const getMonitedClusterCfg = util.promisify(Cluster.getMonitedClusterCfg);
 
 const q = queue({
@@ -102,14 +102,14 @@ const detectCluster = async (cluster) => {
     });
   });
 
-  for (let i = 0; i < maxAllowErrorCount + 1; i++) {
+  for (let i = 0; i < maxRetry + 1; i++) {
     try {
       await detectRemote();
       break;
     } catch (e) {
       log.warn(`detect cluster ${clusterCode} failed, try count: ${i}`);
 
-      if (i !== maxAllowErrorCount) {
+      if (i !== maxRetry) {
         await delay(3000);
         continue;
       }
@@ -143,7 +143,7 @@ async function startMonitor() {
 
   setInterval(() => {
     detect();
-  }, cycle);
+  }, monitorInterval);
 }
 
 module.exports = startMonitor;
