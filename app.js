@@ -37,7 +37,7 @@ if (db.ready) {
   });
 }
 
-if (config.monitor) {
+if (config.monitor && config.monitor.enable) {
   startMonitor();
 }
 
