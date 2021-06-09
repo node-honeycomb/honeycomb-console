@@ -20,6 +20,7 @@ import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
 import EditAppConfig from '@coms/edit-app-config';
 
+import OnlineListModal from './coms/online-list-modal';
 import App from './coms/app';
 import SimpleApp from './coms/simple-app';
 import Usages, {MODE} from './coms/usages';
@@ -244,6 +245,9 @@ const AppDev = (props) => {
           </Spin>
         </BannerCard>
       </div>
+      <OnlineListModal
+        currentClusterCode={currentClusterCode}
+      />
       <Drawer
         visible={!!cfgAppName}
         onClose={() => setCfgAppName(null)}
