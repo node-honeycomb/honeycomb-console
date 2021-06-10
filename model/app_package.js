@@ -6,7 +6,7 @@ const path = require('path');
 const os = require('os');
 
 
-let storage;
+let storage = false;
 
 if (config.storage) {
   try {
