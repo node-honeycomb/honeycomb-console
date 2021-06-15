@@ -14,13 +14,17 @@ const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
     (name, code, token, endpoint, env, monitor, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?) ;`;
+    (?, ?, ?, ?, ?, ?, ?, ?)`;
 
 exports.addCluster = function (
   name, code, token, endpoint,
   env, monitor,
   callback
 ) {
+  if (typeof monitor === 'function') {
+    callback = monitor;
+    monitor = ''
+  }
   let d = new Date();
   db.query(
     INSERT_SYSTEM_CLUSTER,
@@ -47,6 +51,10 @@ exports.updateCluster = function (
   env, monitor,
   callback
 ) {
+  if (typeof monitor === 'function') {
+    callback = monitor;
+    monitor = ''
+  }
   let d = new Date();
   db.query(
     UPDATE_SYSTEM_CLUSTER,
