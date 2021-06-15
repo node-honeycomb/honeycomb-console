@@ -20,7 +20,8 @@ pool.getConnection(function (err, conn) {
   async.eachSeries(statments,(st, done) => {
     conn.query(st, (err) => {
       if (err && /^alter table/ig.test(st)) {
-        err.ignore = true;
+        console.log('ddl init warn, sql:', st, 'error:', err.message);
+        return done();
       }
       done(err);
     });
