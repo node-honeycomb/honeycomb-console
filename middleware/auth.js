@@ -38,6 +38,9 @@ module.exports = function(app, options) {
         if (!user || !pwd) {
           return res.redirect(config.prefix + '?error=user_or_pwd_empty');
         }
+        if (config.middleware.appAuth && !config.middleware.appAuth.enable) {
+          return res.status(403).end('Forbidden');
+        }
         pwd = utils.genPwd(pwd, config.salt);
         User.countUser((err, data) => {
           if (err) {
