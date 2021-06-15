@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import {Modal, Button, Table, Tag, Spin} from 'antd';
 import _ from 'lodash';
 import api from '@api/index';
+import moment from 'moment';
 
 import './index.less';
 
@@ -79,9 +80,8 @@ const genClearList = (value) => {
 };
 
 const OnlineListModal = (props) => {
-  const {currentClusterCode} = props;
+  const {currentClusterCode, visible, onClose} = props;
   const [appList, setAppList] = useState([]);
-  const [visible, setVisible] = useState(false);
   const [isOfflineSuccess, setIsOfflineSuccess] = useState({});
   const [isOfflineFailed, setIsOfflineFailed] = useState({});
   const [spinning, setSpinning] = useState({});
@@ -117,12 +117,15 @@ const OnlineListModal = (props) => {
     width: 200,
     key: 'appId'
   }, {
-    title: 'publish at',
+    title: '发布时间',
     dataIndex: 'publishAt',
     width: 160,
-    key: 'publishAt'
+    key: 'publishAt',
+    render: (_text) => {
+      return moment(_text).format('YYYY-MM-DD HH:mm:ss');
+    }
   }, {
-    title: 'status',
+    title: '状态',
     key: 'status',
     render: (_text, record) => {
       if (isOfflineSuccess[record.appId]) {
@@ -160,15 +163,14 @@ const OnlineListModal = (props) => {
 
     if (Object.keys(setClearPolicy(genClearList(success))).length) {
       setAppList(success);
-      setVisible(true);
     }
   };
 
   useEffect(() => {
-    if (currentClusterCode) {
+    if (visible) {
       getAppList();
     }
-  }, [currentClusterCode]);
+  }, [visible]);
 
   const delelteApps = async () => {
     const {success} = await api.appApi.appList(currentClusterCode);
@@ -260,7 +262,7 @@ const OnlineListModal = (props) => {
 
   const handleCancel = () => {
     setIsClearing(false);
-    setVisible(false);
+    onClose();
   };
 
   return (
@@ -274,7 +276,7 @@ const OnlineListModal = (props) => {
         </div>
       }
       onCancel={() => handleCancel()}
-      width={780}
+      width={680}
     >
       <div className="delete-all-list online-list">
         <div className="delete-all-subtitle">
@@ -297,6 +299,8 @@ const OnlineListModal = (props) => {
 
 OnlineListModal.propTypes = {
   currentClusterCode: PropTypes.string,
+  visible: PropTypes.bool,
+  onClose: PropTypes.func,
 };
 
 export default OnlineListModal;
