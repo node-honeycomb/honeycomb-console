@@ -158,8 +158,7 @@ const OnlineListModal = (props) => {
   const getAppList = async () => {
     const {success} = await api.appApi.appList(currentClusterCode);
 
-
-    if (genClearList(success).length) {
+    if (Object.keys(setClearPolicy(genClearList(success))).length) {
       setAppList(success);
       setVisible(true);
     }
@@ -185,8 +184,6 @@ const OnlineListModal = (props) => {
       // 需要保留在机器上的版本数量
       deleteList = _.concat(deleteList, offlineList.slice(0, offlineList.length - keepOfflineNum < 0 ? 0 : offlineList.length - keepOfflineNum));
     });
-
-    if (!deleteList.length) return;
 
     for (let i = 0; i < deleteList.length; i++) {
       deleteSpinning[_.get(deleteList, [i, 'appId'])] = true;
@@ -256,6 +253,7 @@ const OnlineListModal = (props) => {
         setSpinning(spinning);
       }
     }
+
 
     delelteApps();
   };
