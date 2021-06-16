@@ -122,8 +122,7 @@ exports.addWorker = function (ipAddress, clusterCode, callback) {
       log.error('Insert new worker failed:', err);
       return callback(err);
     } else {
-      log.info('Add worker success');
-      callback(null);
+      exports.updateWorker('online', ipAddress, clusterCode, callback);
     }
   });
 };
