@@ -51,6 +51,13 @@ module.exports = {
   // port: 9000,
   prefix: '/honeycomb-console',
   middleware: {
+    relocate: {
+      enable: true,
+      module: '../middleware/relocate.js',
+      config: {
+        host: ''
+      }
+    },
     cookieSession: {
       config: {
         secret: '** change this config when publish **'
