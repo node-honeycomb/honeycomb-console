@@ -52,7 +52,6 @@ module.exports = {
   prefix: '/honeycomb-console',
   middleware: {
     relocate: {
-      enable: true,
       module: '../middleware/relocate.js',
       config: {
         host: ''
