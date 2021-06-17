@@ -73,7 +73,8 @@ const Usages = (props) => {
   return (
     <Ring
       all={Number(isMem ? usage.totalMem : usage.totalDisk)}
-      part={Number(isMem ? usage.avaMem : usage.avaDisk)}
+      part={Number(isMem ? (usage.totalMem - usage.avaMem).toFixed(2) :
+        (usage.totalDisk - usage.avaDisk).toFixed(2))}
       title={title}
       allTitle={isMem ? '总内存(G)' : '总磁盘容量(G)'}
       partTitle={isMem ? '可用内存(G)' : '可用磁盘容量(G)'}
