@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
   debug: true,
   /**
@@ -6,8 +8,8 @@ module.exports = {
    *
    */
   meta: {
-    // driver: 'sql.js', // mysql or sql.js, default sql.js
-    // dbfile: path.join(__dirname, '../run/meta.db')
+    driver: 'sql.js', // mysql or sql.js, default sql.js
+    dbfile: path.join(__dirname, '../run/meta.db')
     /**
     driver   : mysql
     host     : 'localhost',

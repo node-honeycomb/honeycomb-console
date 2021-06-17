@@ -20,6 +20,7 @@ import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
 import EditAppConfig from '@coms/edit-app-config';
 
+import OnlineListModal from './coms/online-list-modal';
 import App from './coms/app';
 import SimpleApp from './coms/simple-app';
 import Usages, {MODE} from './coms/usages';
@@ -50,6 +51,8 @@ const AppDev = (props) => {
   const [appUsgae, setAppUsgae] = useState({});
   const [isSimple, setIsSimple] = useState(localStorage.getItem('isSimple') || true);
   const [cfgAppName, setCfgAppName] = useState(null);
+  const [clearListVisible, setClearListVisible] = useState(false);
+
 
   const isActive = location.pathname === PAGES.APP_DEV;
 
@@ -140,6 +143,10 @@ const AppDev = (props) => {
 
       await getUsage(apps);
     })();
+
+    if (currentClusterCode) {
+      setClearListVisible(true);
+    }
   }, [currentClusterCode]);
 
   const usages = getClusterUsages(result.success);
@@ -212,7 +219,7 @@ const AppDev = (props) => {
         </Dropdown>
         <WhiteSpace />
         <Tooltip title="应用清理">
-          <FormatPainterOutlined />
+          <FormatPainterOutlined onClick={() => setClearListVisible(true)} />
         </Tooltip>
       </div>
       <div className="app-list">
@@ -244,6 +251,11 @@ const AppDev = (props) => {
           </Spin>
         </BannerCard>
       </div>
+      <OnlineListModal
+        visible={clearListVisible}
+        onClose={() => setClearListVisible(false)}
+        currentClusterCode={currentClusterCode}
+      />
       <Drawer
         visible={!!cfgAppName}
         onClose={() => setCfgAppName(null)}
