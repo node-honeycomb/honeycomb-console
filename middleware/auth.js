@@ -85,8 +85,8 @@ module.exports = function(app, options) {
         break;
       case '/loginCaptcha':
         let capt = svgCaptcha.create({
-          size: 6, 
-          noise: 3, 
+          size: 4, 
+          noise: 2, 
           background: '#fff',
           ignoreChars: '0o1il'
         });
