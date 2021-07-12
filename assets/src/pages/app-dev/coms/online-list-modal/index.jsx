@@ -274,7 +274,11 @@ const OnlineListModal = (props) => {
       visible={visible}
       footer={
         <div>
-          <Button disabled={isClearing} type="primary" onClick={() => handleOk()}>清理</Button>
+          {
+            appList.length > 0 ?
+              <Button disabled={isClearing} type="primary" onClick={() => handleOk()}>清理</Button> :
+              null
+          }
           <Button onClick={() => handleCancel()}>关闭窗口{countDownNum && `(${countDownNum})`}</Button>
         </div>
       }
