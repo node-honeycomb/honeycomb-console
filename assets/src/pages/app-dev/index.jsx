@@ -25,7 +25,14 @@ import App from './coms/app';
 import SimpleApp from './coms/simple-app';
 import Usages, {MODE} from './coms/usages';
 import SimpleTitle from './coms/simple-title';
-import {getClusterUsages, getCurrentWorking, parseUsgae, getAppExpceptStatistics} from './util';
+import {
+  getClusterUsages,
+  getCurrentWorking,
+  parseUsgae,
+  getAppExpceptStatistics,
+  setClearPolicy,
+  genClearList
+} from './util';
 
 import './index.less';
 
@@ -141,12 +148,14 @@ const AppDev = (props) => {
       setLoading(true);
       const apps = await getApiList();
 
+      if (currentClusterCode) {
+        if (Object.keys(setClearPolicy(genClearList(apps))).length) {
+          setClearListVisible(true);
+        }
+      }
+
       await getUsage(apps);
     })();
-
-    if (currentClusterCode) {
-      setClearListVisible(true);
-    }
   }, [currentClusterCode]);
 
   const usages = getClusterUsages(result.success);

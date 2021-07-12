@@ -6,6 +6,7 @@ import {Modal, Button, Table, Tag, Spin} from 'antd';
 import _ from 'lodash';
 import api from '@api/index';
 import moment from 'moment';
+import {CheckCircleOutlined} from '@ant-design/icons';
 
 import './index.less';
 
@@ -163,6 +164,8 @@ const OnlineListModal = (props) => {
 
     if (Object.keys(setClearPolicy(genClearList(success))).length) {
       setAppList(success);
+    } else {
+      setAppList([]);
     }
   };
 
@@ -271,7 +274,11 @@ const OnlineListModal = (props) => {
       visible={visible}
       footer={
         <div>
-          <Button disabled={isClearing} type="primary" onClick={() => handleOk()}>清理</Button>
+          {
+            appList.length > 0 ?
+              <Button disabled={isClearing} type="primary" onClick={() => handleOk()}>清理</Button> :
+              null
+          }
           <Button onClick={() => handleCancel()}>关闭窗口{countDownNum && `(${countDownNum})`}</Button>
         </div>
       }
@@ -279,18 +286,27 @@ const OnlineListModal = (props) => {
       width={680}
     >
       <div className="delete-all-list online-list">
-        <div className="delete-all-subtitle">
-          <span>以下应用需要清理版本，点击“清理”会先下线再删除多余版本。</span>
-        </div>
         {
-          _.map(setClearPolicy(genClearList(appList)), (value, key) => {
+          !appList.length &&
+          <div className="delete-empty">
+            <CheckCircleOutlined className="delete-empty-icon" />
+            <p className="delete-empty-p">当前集群很健康，没有需要清理的应用</p>
+          </div>
+        }
+        {
+          appList.length > 0 ? <div className="delete-all-subtitle">
+            <span>以下应用需要清理版本，点击“清理”会先下线再删除多余版本。</span>
+          </div> : null
+        }
+        {
+          appList.length > 0 ? _.map(setClearPolicy(genClearList(appList)), (value, key) => {
             return <Table
               key={key}
               size={'small'}
               pagination={false}
               columns={columns}
               dataSource={value} />;
-          })
+          }) : null
         }
       </div>
     </Modal>
