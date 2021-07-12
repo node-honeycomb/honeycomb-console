@@ -1,0 +1,50 @@
+@import '../../index.less';
+
+.tree-ul {
+  margin: 0;
+  list-style: none;
+  padding: 0;
+  width: 232px;
+  overflow: auto;
+  white-space: nowrap;
+  height: calc(100vh - 130px);
+
+  li {
+    margin-top: 4px;
+  }
+
+  .master {
+    height: 36px;
+    line-height: 36px;
+    font-weight: bold;
+    cursor: pointer;
+
+    .title {
+      margin-left: 16px;
+      -webkit-touch-callout: none;
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+  }
+
+  .active {
+    color: @primary-color;
+  }
+
+  .slave {
+    height: 20px;
+    margin-bottom: 8px;
+    padding-left: 28px;
+    line-height: 20px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgb(233, 242, 250);
+      font-weight: bold;
+    }
+  }
+}

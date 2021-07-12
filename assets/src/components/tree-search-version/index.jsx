@@ -44,33 +44,14 @@ const getMasterStatus = (tree, statusMap, nodeKey) => {
 //    |- Node-1
 //    |- Node-2
 // |- Folder
-const Tree = (props) => {
+const TreeSearchVersion = (props) => {
   const {
     tree = [], loading, activeKey, onSelect,
-    defaultActiveKey, treeStatusChange
+    defaultActiveKey, keywords
   } = props;
 
-  // 文件夹的开关状态，默认所有都是关
+  // 文件夹的开关状态，默认所有都是开，为了自动展开
   const [folderStatus, setFolderStatus] = useState({});
-
-  useEffect(() => {
-    // 在搜索栏选中某个元素时，进行定位
-    // 如果该文件父级的文件夹未打开，则打开它
-    if (!activeKey) {
-      return;
-    }
-    const masterKey = getMaster(tree, activeKey);
-    console.log(masterKey);
-    if (!masterKey) {
-      folderStatus[activeKey.key] = true;
-      setFolderStatus({...folderStatus});
-
-      return;
-    }
-
-    folderStatus[masterKey.key] = true;
-    setFolderStatus({...folderStatus});
-  }, [treeStatusChange]);
 
   useEffect(() => {
     const one = tree.find(item => item.key === defaultActiveKey);
@@ -117,21 +98,24 @@ const Tree = (props) => {
             if (isSlave) {
               const isOpen = getMasterStatus(tree, folderStatus, item.key);
 
-              if (!isOpen) {
+              if (isOpen) {
                 return true;
               }
+            }
+
+            let itemText = item.title;
+
+            if (itemText.indexOf(keywords) >= 0) {
+              itemText = itemText.replace(
+                keywords, "<span style='background-color:rgb(233, 242, 250);" +
+                  "color: red; padding:0px 2px;'>" + keywords + '</span>'
+              );
             }
 
             return (
               <li
                 key={item.key}
                 onClick={() => {
-                  if (isMaster) {
-                    folderStatus[item.key] = !folderStatus[item.key];
-                    setFolderStatus({...folderStatus});
-
-                    return;
-                  }
                   item.key && onSelect(item.key);
                 }}
                 className={
@@ -144,19 +128,16 @@ const Tree = (props) => {
                 }
               >
                 {
-                  (isMaster && folderStatus[item.key]) && (
+                  (isMaster && !folderStatus[item.key]) && (
                     <FolderOpenOutlined />
                   )
                 }
                 {
-                  (isMaster && !folderStatus[item.key]) && (
+                  (isMaster && folderStatus[item.key]) && (
                     <FolderOutlined />
                   )
                 }
-                <span className="title">
-                  {
-                    item.title
-                  }
+                <span className="title" dangerouslySetInnerHTML={{__html: itemText}}>
                 </span>
               </li>
             );
@@ -167,7 +148,7 @@ const Tree = (props) => {
   );
 };
 
-Tree.propTypes = {
+TreeSearchVersion.propTypes = {
   loading: PropTypes.bool,
   tree: PropTypes.arrayOf(PropTypes.shape({
     title: PropTypes.string,
@@ -178,7 +159,7 @@ Tree.propTypes = {
   activeKey: PropTypes.string,
   defaultActiveKey: PropTypes.string,
   onSelect: PropTypes.func,
-  treeStatusChange: PropTypes.number
+  keywords: PropTypes.string
 };
 
-export default Tree;
+export default TreeSearchVersion;
