@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
 import PropTypes from 'prop-types';
-import {Menu, Dropdown, Tooltip} from 'antd';
+import {Menu, Dropdown, Tooltip, Tag} from 'antd';
 import {
   UserOutlined, CopyOutlined, PauseCircleOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
@@ -16,7 +16,7 @@ import clusterTip from '../cluster-tip';
 import './index.less';
 
 const userName = _.get(window, 'CONFIG.user.name');
-const {docUrl, prefix, oldConsole} = window.CONFIG;
+const {docUrl, prefix, oldConsole, envName} = window.CONFIG;
 
 const menu = (
   <Menu>
@@ -53,6 +53,9 @@ const Header = (props) => {
       <div className="left">
         <div className="menu-title">
           HC-Console
+          {
+            envName && <Tag style={{marginLeft: 10}} color="blue">{envName}</Tag>
+          }
         </div>
         <span
           onClick={props.onToggleCluster}

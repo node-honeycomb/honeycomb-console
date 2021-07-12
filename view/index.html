@@ -17,7 +17,8 @@
       user: JSON.parse('<%- JSON.stringify(user) || "{}" %>'),
       appManageConfig: JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>'),
       hideUpload: '<%=hideUpload%>',
-      docUrl: '<%= docUrl %>'
+      docUrl: '<%= docUrl %>',
+      envName: '<%= envName %>'
     };
   </script>
   <script src="<%= prefix %>/assets/app.js"></script>

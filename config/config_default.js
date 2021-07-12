@@ -124,5 +124,7 @@ module.exports = {
   hideUpload: false,
   // 默认监控间隔：5 min
   monitorCycle: 1000 * 60 * 5,
-  docUrl: 'https://www.yuque.com/honeycomb/gz4kna'
+  docUrl: 'https://www.yuque.com/honeycomb/gz4kna',
+  // 当前环境的名称，将会显示到 title 上
+  envName: ''
 };

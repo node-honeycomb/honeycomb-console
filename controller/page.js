@@ -50,7 +50,8 @@ exports.pages = function (req, callback) {
         env: config.env,
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
         hideUpload: config.hideUpload,
-        docUrl: config.docUrl
+        docUrl: config.docUrl,
+        envName: config.envName
       }
     }, 'html');
   });
