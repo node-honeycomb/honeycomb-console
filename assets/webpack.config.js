@@ -9,8 +9,6 @@ const {ESBuildPlugin, ESBuildMinifyPlugin} = require('esbuild-loader');
 const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
 
-const MONACO_DIR = path.resolve(__dirname, './node_modules/monaco-editor');
-
 // const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const appConfig = require('../config');
 
@@ -140,6 +138,9 @@ const config = {
             loader: MiniCssExtractPlugin.loader
           },
           {
+            loading: 'style-loader',
+          },
+          {
             loader: 'css-loader'
           }
         ]
@@ -160,11 +161,6 @@ const config = {
             }
           }
         ]
-      },
-      {
-        test: /\.css$/,
-        include: MONACO_DIR,
-        use: ['style-loader', 'css-loader'],
       }
     ]
   },

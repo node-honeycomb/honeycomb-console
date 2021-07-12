@@ -60,6 +60,7 @@ const Tree = (props) => {
       return;
     }
     const masterKey = getMaster(tree, activeKey);
+
     console.log(masterKey);
     if (!masterKey) {
       folderStatus[activeKey.key] = true;
