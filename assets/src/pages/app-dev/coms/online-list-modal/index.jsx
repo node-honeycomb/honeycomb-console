@@ -7,6 +7,10 @@ import _ from 'lodash';
 import api from '@api/index';
 import moment from 'moment';
 import {CheckCircleOutlined} from '@ant-design/icons';
+import {
+  setClearPolicy,
+  genClearList
+} from '../../util';
 
 import './index.less';
 
@@ -21,65 +25,6 @@ function colorChoose(value) {
 const keepOnlineNum = _.get(window, ['appManageConfig', 'keepOnlineNum']) || 3; // 保留的在线版本数量
 const keepOfflineNum = _.get(window, ['appManageConfig', 'keepOfflineNum']) || 5; // 保留的离线版本数量
 
-
-const setClearPolicy = (data) => {
-  _.map(data, (value) => {
-    // eslint-disable-next-line array-callback-return
-    const onlineList = value.filter((item) => {
-      if (_.get(item, 'cluster[0].status') === 'online') {
-        return item;
-      }
-    });
-    // eslint-disable-next-line array-callback-return
-    const offlineList = value.filter((item) => {
-      if (_.get(item, 'cluster[0].status') === 'offline') return item;
-    });
-
-    let keepOnlineIdx = onlineList.length - keepOnlineNum;
-    let keepOfflineIdx = offlineList.length - keepOfflineNum;
-
-    // 在线版本数未达到上限则全部保留
-    if (keepOnlineIdx < 0) {
-      keepOnlineIdx = 0;
-    }
-    onlineList.slice(keepOnlineIdx).map(d => {
-      d.isKeepOnline = true;
-
-      return d;
-    });
-    if (keepOfflineIdx < 0) {
-      keepOfflineIdx = 0;
-    }
-    offlineList.slice(keepOfflineIdx).map(d => {
-      d.isKeepOffline = true;
-
-      return d;
-    });
-  });
-
-  return data;
-};
-
-const genClearList = (value) => {
-  const clearList = {};
-
-  value.forEach(data => {
-    // eslint-disable-next-line array-callback-return
-    const _onlineList = data.versions.filter((item) => {
-      if (_.get(item, 'cluster[0].status') === 'online') return item;
-    });
-    const _offlineList = data.versions.filter((item) => {
-      if (_.get(item, 'cluster[0].status') === 'offline') return item;
-    });
-
-    if (_onlineList.length > keepOnlineNum || _offlineList.length > keepOfflineNum) {
-      clearList[data.name] = data.versions;
-    }
-  });
-
-  return clearList;
-};
-
 const OnlineListModal = (props) => {
   const {currentClusterCode, visible, onClose} = props;
   const [appList, setAppList] = useState([]);
@@ -91,6 +36,7 @@ const OnlineListModal = (props) => {
   const [deleteSpinning, setDeleteSpinning] = useState({});
   const [isClearing, setIsClearing] = useState(false);
   const [countDownNum, setCountDownNum] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const genDomIsOffline = (record) => {
     if (record.isKeepOnline) return <span>保留在线</span>;
@@ -160,12 +106,15 @@ const OnlineListModal = (props) => {
   }];
 
   const getAppList = async () => {
+    setLoading(true);
     const {success} = await api.appApi.appList(currentClusterCode);
 
     if (Object.keys(setClearPolicy(genClearList(success))).length) {
       setAppList(success);
+      setLoading(false);
     } else {
       setAppList([]);
+      setLoading(false);
     }
   };
 
@@ -285,30 +234,32 @@ const OnlineListModal = (props) => {
       onCancel={() => handleCancel()}
       width={680}
     >
-      <div className="delete-all-list online-list">
-        {
-          !appList.length &&
+      <Spin spinning={loading} tip="Loading...">
+        <div className="delete-all-list online-list">
+          {
+            !loading && !appList.length &&
           <div className="delete-empty">
             <CheckCircleOutlined className="delete-empty-icon" />
             <p className="delete-empty-p">当前集群很健康，没有需要清理的应用</p>
           </div>
-        }
-        {
-          appList.length > 0 ? <div className="delete-all-subtitle">
-            <span>以下应用需要清理版本，点击“清理”会先下线再删除多余版本。</span>
-          </div> : null
-        }
-        {
-          appList.length > 0 ? _.map(setClearPolicy(genClearList(appList)), (value, key) => {
-            return <Table
-              key={key}
-              size={'small'}
-              pagination={false}
-              columns={columns}
-              dataSource={value} />;
-          }) : null
-        }
-      </div>
+          }
+          {
+            appList.length > 0 ? <div className="delete-all-subtitle">
+              <span>以下应用需要清理版本，点击“清理”会先下线再删除多余版本。</span>
+            </div> : null
+          }
+          {
+            appList.length > 0 ? _.map(setClearPolicy(genClearList(appList)), (value, key) => {
+              return <Table
+                key={key}
+                size={'small'}
+                pagination={false}
+                columns={columns}
+                dataSource={value} />;
+            }) : null
+          }
+        </div>
+      </Spin>
     </Modal>
   );
 };
