@@ -66,7 +66,7 @@ const AppConfig = (props) => {
 
   return (
     <div className="app-config">
-      <div className="app-config-list page-left-side">
+      <div className="page-left-side">
         <div className="list-title">应用列表</div>
         <AppList
           onSelect={onSelectApp}

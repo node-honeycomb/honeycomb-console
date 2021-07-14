@@ -47,7 +47,7 @@ const getMasterStatus = (tree, statusMap, nodeKey) => {
 const Tree = (props) => {
   const {
     tree = [], loading, activeKey, onSelect,
-    defaultActiveKey, treeStatusChange
+    defaultActiveKey, keywords, searchStatus
   } = props;
 
   // 文件夹的开关状态，默认所有都是关
@@ -61,17 +61,22 @@ const Tree = (props) => {
     }
     const masterKey = getMaster(tree, activeKey);
 
-    console.log(masterKey);
     if (!masterKey) {
+      Object.keys(folderStatus).forEach(element => {
+        folderStatus[element] = false;
+      });
       folderStatus[activeKey.key] = true;
       setFolderStatus({...folderStatus});
 
       return;
     }
 
+    Object.keys(folderStatus).forEach(element => {
+      folderStatus[element] = false;
+    });
     folderStatus[masterKey.key] = true;
     setFolderStatus({...folderStatus});
-  }, [treeStatusChange]);
+  }, [searchStatus]);
 
   useEffect(() => {
     const one = tree.find(item => item.key === defaultActiveKey);
@@ -90,7 +95,7 @@ const Tree = (props) => {
       item = getMaster(tree, one.key);
     }
 
-    folderStatus[item.key] = !folderStatus[item.key];
+    folderStatus[item.key] = true;
     setFolderStatus({...folderStatus});
 
     setTimeout(() => {
@@ -118,8 +123,23 @@ const Tree = (props) => {
             if (isSlave) {
               const isOpen = getMasterStatus(tree, folderStatus, item.key);
 
-              if (!isOpen) {
+              if (!isOpen && !searchStatus) {
                 return true;
+              }
+            }
+
+            let itemText = item.title;
+
+            if (searchStatus) {
+              const _itemKeyIndex = itemText.toLowerCase().indexOf(keywords.toLowerCase());
+
+              if (_itemKeyIndex >= 0) {
+                const _key = itemText.substr(_itemKeyIndex, keywords.length);
+
+                itemText = itemText.replace(
+                  _key, "<span style='background-color:rgb(233, 242, 250);" +
+                    "color: red; padding:0px 2px;'>" + _key + '</span>'
+                );
               }
             }
 
@@ -127,7 +147,7 @@ const Tree = (props) => {
               <li
                 key={item.key}
                 onClick={() => {
-                  if (isMaster) {
+                  if (isMaster && !searchStatus) {
                     folderStatus[item.key] = !folderStatus[item.key];
                     setFolderStatus({...folderStatus});
 
@@ -154,11 +174,7 @@ const Tree = (props) => {
                     <FolderOutlined />
                   )
                 }
-                <span className="title">
-                  {
-                    item.title
-                  }
-                </span>
+                <span className="title" dangerouslySetInnerHTML={{__html: itemText}}></span>
               </li>
             );
           })
@@ -179,7 +195,8 @@ Tree.propTypes = {
   activeKey: PropTypes.string,
   defaultActiveKey: PropTypes.string,
   onSelect: PropTypes.func,
-  treeStatusChange: PropTypes.number
+  keywords: PropTypes.string,
+  searchStatus: PropTypes.bool
 };
 
 export default Tree;

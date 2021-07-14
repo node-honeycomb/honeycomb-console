@@ -6,7 +6,6 @@ import Tree from '@coms/tree';
 import api from '@api/index';
 import {ADMIN_APP_CODE} from '@lib/consts';
 import {connect} from 'dva';
-import SearchTree from './search-tree';
 
 
 import './search-module.less';
@@ -69,14 +68,17 @@ const getAppTree = (appNames = []) => {
 
 const AppList = (props) => {
   const {currentClusterCode, onSelect, activeAppName} = props;
+  // 本来想让系统配置也是可选可被搜索，但发现原先的配置方案似乎不想让系统配置作为
+  // activeAppName传进来，所以这里先不进行修改
+  // const [activeAppName, setActiveAppName] = useState(USER_APP);
   /**
    * 搜索框的各个状态，分别是列表树的元素、上一次搜索的字符串、
-   * 用户输入的字符串和选中次数（用来通知外层的树改变形态）
+   * 用户输入的字符串和是否在搜索
    */
   const [fileSearchItem, setFileSearchItem] = useState([]);
   const [lastSearchString, setLastSearchString] = useState('');
   const [searchInputString, setSearchInputString] = useState('');
-  const [searchTimes, setSearchTimes] = useState(0);
+  const [isSearching, setSearching] = useState(false);
 
   const {result: appList, loading} = useRequest({
     request: async () => {
@@ -99,35 +101,18 @@ const AppList = (props) => {
 
   const onSelectSearchTreeItem = (filepath) => {
     onSelect(filepath);
-    setSearchTimes(searchTimes + 1);
+    setSearching(false);
     setFileSearchResultList('');
-  };
-
-  // 文件搜索框的下拉列表
-  const FileSearchResultList = () => {
-    return (
-      <div className="file-search-result-list">
-        {
-          fileSearchItem.length !== 0 ?
-            <SearchTree
-              tree={fileSearchItem}
-              loading={loading}
-              onSelect={onSelectSearchTreeItem}
-              keywords={lastSearchString}
-            /> :
-            lastSearchString === '' ?
-              null : <div className="file-search-result-item">没有数据</div>
-        }
-      </div>
-    );
   };
 
   // 用户输入改变时，改变搜索到的数据
   const setFileSearchResultList = (v) => {
+    setSearching(true);
     if (v === '') {
       setFileSearchItem([]);
       setLastSearchString('');
       setSearchInputString('');
+      setSearching(false);
 
       return null;
     }
@@ -135,6 +120,7 @@ const AppList = (props) => {
       setFileSearchItem([]);
       setLastSearchString(v.target.value);
       setSearchInputString('');
+      setSearching(false);
 
       return null;
     }
@@ -144,11 +130,11 @@ const AppList = (props) => {
 
     if (v.target.value.includes(lastSearchString) && lastSearchString !== '') {
       tmpSearchItemList = fileSearchItem.filter((item) => {
-        return item.title.includes(v.target.value);
+        return item.title.toLowerCase().includes(v.target.value.toLowerCase());
       });
     } else {
       tmpSearchItemList = getAppTree(appList.map(app => app.name)).filter((item) => {
-        return item.title.includes(v.target.value);
+        return item.title.toLowerCase().includes(v.target.value.toLowerCase());
       });
     }
 
@@ -184,17 +170,17 @@ const AppList = (props) => {
       <input
         value={searchInputString}
         className="file-search-bar"
-        placeholder="文件搜索"
+        placeholder="请键入关键词以搜索"
         onChange={(e) => setFileSearchResultList(e)}
       />
-      <FileSearchResultList></FileSearchResultList>
       <Tree
         loading={loading}
-        onSelect={onSelect}
-        tree={getAppTree(appList.map(app => app.name))}
+        onSelect={onSelectSearchTreeItem}
+        tree={isSearching ? fileSearchItem : getAppTree(appList.map(app => app.name))}
         activeKey={activeAppName}
         defaultActiveKey={USER_APP}
-        treeStatusChange={searchTimes}
+        keywords={lastSearchString}
+        searchStatus={isSearching}
       />
     </div>
   );

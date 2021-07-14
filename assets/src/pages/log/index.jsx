@@ -10,7 +10,6 @@ import s2q from '@lib/search-to-query';
 import msgParser from '@lib/msg-parser';
 import filepaths2tree from '@lib/filepath-to-tree';
 
-import SearchTree from './coms/search-tree';
 import FileTree from './coms/file-tree';
 import LogPanel from '../../components/log-panel';
 
@@ -32,7 +31,7 @@ const Log = (props) => {
   const [fileSearchItem, setFileSearchItem] = useState([]);
   const [lastSearchString, setLastSearchString] = useState('');
   const [searchInputString, setSearchInputString] = useState('');
-  const [searchTimes, setSearchTimes] = useState(0);
+  const [isSearching, setSearching] = useState(false);
 
   // 获取日志列表
   const getLogFiles = async (currentClusterCode) => {
@@ -92,54 +91,34 @@ const Log = (props) => {
       setIniting(true);
       const tree = await getLogFiles(currentClusterCode);
 
+      setFileSearchItem(tree);
       readHistoryLogFilepath(tree);
       setIniting(false);
     })();
   }, [currentClusterCode]);
 
   const onSelectFile = (filepath) => {
+    setSearching(false);
     setQuery(props.location, props.dispatch, {logFilepath: filepath});
     setActiveLog(filepath);
   };
 
-  const onSelectSearchTreeItem = (filepath) => {
-    onSelectFile(filepath);
-    setSearchTimes(searchTimes + 1);
-    setFileSearchResultList('');
-  };
-
-  // 文件搜索框的下拉列表
-  const FileSearchResultList = () => {
-    return (
-      <div className="file-search-result-list">
-        {
-          fileSearchItem.length !== 0 ?
-            <SearchTree
-              tree={fileSearchItem}
-              loading={filesLoading}
-              onSelect={onSelectSearchTreeItem}
-              keywords={lastSearchString}
-            /> :
-            lastSearchString === '' ?
-              null : <div className="file-search-result-item">没有数据</div>
-        }
-      </div>
-    );
-  };
-
   // 用户输入改变时，改变搜索到的数据
   const setFileSearchResultList = (v) => {
+    setSearching(true);
     if (v === '') {
-      setFileSearchItem([]);
+      setFileSearchItem(tree);
       setLastSearchString('');
       setSearchInputString('');
+      setSearching(false);
 
       return null;
     }
     if (v.target.value === '') {
-      setFileSearchItem([]);
+      setFileSearchItem(tree);
       setLastSearchString(v.target.value);
       setSearchInputString('');
+      setSearching(false);
 
       return null;
     }
@@ -149,11 +128,11 @@ const Log = (props) => {
 
     if (v.target.value.includes(lastSearchString) && lastSearchString !== '') {
       tmpSearchItemList = fileSearchItem.filter((item) => {
-        return item.title.includes(v.target.value);
+        return item.title.toLowerCase().includes(v.target.value.toLowerCase());
       });
     } else {
       tmpSearchItemList = tree.filter((item) => {
-        return item.title.includes(v.target.value);
+        return item.title.toLowerCase().includes(v.target.value.toLowerCase());
       });
     }
 
@@ -211,21 +190,21 @@ const Log = (props) => {
               <input
                 value={searchInputString}
                 className="file-search-bar"
-                placeholder="文件搜索"
+                placeholder="请键入关键词以搜索"
                 onChange={(e) => setFileSearchResultList(e)}
               />
-              <FileSearchResultList></FileSearchResultList>
             </div>
         }
         {
           !initing && (
             <FileTree
-              tree={tree}
+              tree={isSearching ? fileSearchItem : tree}
               loading={filesLoading}
               onSelect={onSelectFile}
               activeKey={activeLog}
               defaultActiveKey={activeLog}
-              treeStatusChange={searchTimes}
+              keywords={lastSearchString}
+              searchStatus={isSearching}
             />
           )
         }
