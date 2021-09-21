@@ -97,6 +97,9 @@ module.exports = {
     deleteCoredump: {
       async: true
     },
+    deleteClusterSnapshot: {
+      async: true
+    },
     deleteUnknowProcess: {
       async: true
     }

@@ -82,8 +82,10 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_app_pkgs` (
   UNIQUE KEY `cluster_app` (`cluster_code`,`app_id`)
 );
 
+RENAME TABLE hc_console_system_cluster_snapshort TO hc_console_system_cluster_snapshot;
+
 -- 储存集群的快照，所有在线app及版本
-CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
+CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshot` (
   `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
   `cluster_code` varchar(50) NOT NULL,
   `info` text, -- COMMENT '集群的app及版本信息',

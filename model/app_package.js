@@ -35,6 +35,10 @@ exports.savePackage = (data, callback) => {
         log.error(err.message);
         return callback(err);
       }
+      if (!fkey) {
+        let err = new Error('storage save failed, return empty fileKey');
+        return callback(err);
+      }
       save('key', fkey, callback);
     });
   } else if (storage === false) {

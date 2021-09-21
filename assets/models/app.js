@@ -48,5 +48,12 @@ module.exports = {
     headers: {
       'x-csrf-token': window.csrfToken
     }
+  },
+  deleteClusterSnapshot: {
+    url: '/api/cluster/deleteSnapshot',
+    method: 'DELETE',
+    headers: {
+      'x-csrf-token': window.csrfToken
+    }
   }
 };

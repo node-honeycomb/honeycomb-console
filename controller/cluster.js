@@ -234,7 +234,7 @@ const tar = require('tar');
 const appConfig = require('../model/app_config');
 const appPackage = require('../model/app_package');
 const promisify = require('util').promisify;
-const getSnapshortSync = promisify(cluster.getSnapshort);
+const getSnapshotSync = promisify(cluster.getSnapshot);
 const getAppConfig = promisify(appConfig.getAppConfig);
 const getAppPackage = promisify(appPackage.getPackage);
 const mv = promisify(fs.mv);
@@ -246,7 +246,7 @@ const yaml = require('yaml');
  */
 exports.downloadClusterPatch = async function (req, res, next) {
   let clusterCode = req.query.clusterCode;
-  let clusterSnp = await getSnapshortSync(clusterCode);
+  let clusterSnp = await getSnapshotSync(clusterCode);
 
   let tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
 
@@ -317,3 +317,15 @@ exports.downloadClusterPatch = async function (req, res, next) {
     ['cluster_patch']
   ).pipe(res);
 };
+
+/**
+ * @api {delete} /api/cluster/deleteSnapshot
+ */
+exports.deleteSnapshot = function (req, cb) {
+  let clusterCode = req.body.clusterCode;
+  if (!clusterCode) {
+    return new Error('missing query: clusterCode');
+  }
+  cluster.deleteSnapshot(clusterCode, cb);
+};
+

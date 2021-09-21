@@ -130,7 +130,7 @@ class Header extends React.Component {
             unknowProcess: d.success
           });
         }
-      })
+      });
     }
   }
   componentDidMount = () => {
@@ -194,6 +194,10 @@ class Header extends React.Component {
     this.setState({
       isShowAllMachineData
     });
+  }
+  deleteClusterSnapshot = () => {
+    let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
+    this.props.deleteClusterSnapshot({clusterCode});
   }
   onShowMemoryWarn = () => {
     this.setState({
@@ -350,7 +354,8 @@ class Header extends React.Component {
           )
         })
       }
-    </div>);
+    </div>
+    );
 
     let clusterInfoStatus = this.getClusterInfoStatus();
     return (
@@ -423,6 +428,7 @@ class Header extends React.Component {
           ]}
         >
           {content}
+          <div><a onClick={this.deleteClusterSnapshot.bind(this)}>清理集群快照(每次点击删除最新一个)</a></div>
         </Modal>
       </header>
     );
@@ -448,5 +454,6 @@ module.exports = connect(mapStateToProps,{
   getUnknowProcess: actions.app.getUnknowProcess,
   getStatus : actions.app.getStatus,
   deleteCoredump: actions.app.deleteCoredump,
+  deleteClusterSnapshot: actions.app.deleteClusterSnapshot,
   deleteUnknowProcess: actions.app.deleteUnknowProcess
 })(Header);

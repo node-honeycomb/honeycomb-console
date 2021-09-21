@@ -400,18 +400,18 @@ exports.deleteWorkerByIp = function (ip, callback) {
   );
 };
 
-const SQL_QUERY_CLUSTER_SNAPSHORT = `
+const SQL_QUERY_CLUSTER_SNAPSHOT = `
   select 
     cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
   from 
-    hc_console_system_cluster_snapshort 
+    hc_console_system_cluster_snapshot 
   where 
     cluster_code = ?
   order by id desc
   limit 1
 `;
-exports.getSnapshort = (clusterCode, cb) => {
-  db.query(SQL_QUERY_CLUSTER_SNAPSHORT, [clusterCode], (err, data) => {
+exports.getSnapshot = (clusterCode, cb) => {
+  db.query(SQL_QUERY_CLUSTER_SNAPSHOT, [clusterCode], (err, data) => {
     if (err) {
       return cb(err);
     }
@@ -423,29 +423,47 @@ exports.getSnapshort = (clusterCode, cb) => {
   });
 };
 
-const SQL_CLEAN_CLUSTER_SNAPSHORTS = `
-  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id < (
+
+const SQL_DELETE_CLUSTER_SNAPSHOTS = `
+  delete from hc_console_system_cluster_snapshot where cluster_code = ? and id in (
+    select id from hc_console_system_cluster_snapshot where cluster_code = ?
+    order by id desc limit 1
+  )
+`;
+
+exports.deleteSnapshot = (clusterCode, cb) => {
+  db.query(SQL_DELETE_CLUSTER_SNAPSHOTS, [clusterCode, clusterCode], (err, data) => {
+    if (err) {
+      log.error('delete snapshot failed', err.message);
+    }
+    cb && cb(err, data);
+  });
+};
+
+
+const SQL_CLEAN_CLUSTER_SNAPSHOTS = `
+  delete from hc_console_system_cluster_snapshot where cluster_code = ? and id < (
     select min(id) from (
-      select id from hc_console_system_cluster_snapshort
+      select id from hc_console_system_cluster_snapshot where cluster_code = ?
       order by id desc
       limit 3
     ) topids
   )
 `;
-exports.cleanSnapshort = (clusterCode, cb) => {
-  db.query(SQL_CLEAN_CLUSTER_SNAPSHORTS, [clusterCode], (err, data) => {
+exports.cleanSnapshot = (clusterCode, cb) => {
+  db.query(SQL_CLEAN_CLUSTER_SNAPSHOTS, [clusterCode, clusterCode], (err, data) => {
     if (err) {
-      log.error('clean snapshort failed', err.message);
+      log.error('clean snapshot failed', err.message);
     }
-    cb && cb(err);
+    cb && cb(err, data);
   });
 };
 
-const SQL_INSERT_CLUSTER_SNAPSHORT = `insert into hc_console_system_cluster_snapshort 
+const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshot 
 (cluster_code, info, md5, user, gmt_create) 
 values 
 (?, ?, ?, ?, ?)`;
-exports.saveSnapshort = (obj, cb) => {
+exports.saveSnapshot = (obj, cb) => {
   let info = JSON.stringify(obj.info);
   let md5 = utils.md5(info);
   let param = [
@@ -455,9 +473,9 @@ exports.saveSnapshort = (obj, cb) => {
     obj.user || '',
     new Date()
   ];
-  db.query(SQL_INSERT_CLUSTER_SNAPSHORT, param, (err) => {
+  db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, (err) => {
     cb(err);
-    exports.cleanSnapshort(obj.clusterCode);
+    exports.cleanSnapshot(obj.clusterCode);
   });
 };
 

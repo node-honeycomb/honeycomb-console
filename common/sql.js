@@ -19,7 +19,7 @@ SQLJS().then((SQL) => {
     try {
         db.exec(st);
     } catch (e) {
-        if (e && /^alter/ig.test(st)) {
+        if (e && /^(alter|rename)/ig.test(st)) {
             // do nothing
         } else {
             throw e;

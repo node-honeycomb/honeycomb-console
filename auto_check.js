@@ -10,8 +10,8 @@ const utils = require('./common/utils');
 const log = require('./common/log');
 
 const reflushClusterConfigSync = promisify(cluster.getClusterCfg);
-const getSnapshortSync = promisify(cluster.getSnapshort);
-const cleanSnapshortSync = promisify(cluster.cleanSnapshort);
+const getSnapshotSync = promisify(cluster.getSnapshot);
+const cleanSnapshotSync = promisify(cluster.cleanSnapshot);
 const fixClusterSync = promisify(cluster.fixCluster);
 const getClusterAppsSync = promisify(utils.getClusterApps);
 
@@ -54,7 +54,7 @@ tick();
 async function run() {
   await reflushClusterConfigSync();
   let clusters = cluster.getClusterCodes();
-  // 遍历snapshort中的所有集群
+  // 遍历snapshot中的所有集群
   for (let i = 0; i < clusters.length; i++) {
     let clusterCode = clusters[i];
     await fixClusterSync(clusterCode);
@@ -64,13 +64,13 @@ async function run() {
 async function run2() {
   await reflushClusterConfigSync();
   let clusters = cluster.getClusterCodes();
-  // 遍历snapshort中的所有集群
+  // 遍历snapshot中的所有集群
   for (let i = 0; i < clusters.length; i++) {
     let clusterCode = clusters[i];
     await fixClusterSync(clusterCode);
     let clusterInfo = cluster.getClusterCfgByCode(clusterCode);
 
-    let clusterSnp = await getSnapshortSync(clusterCode);
+    let clusterSnp = await getSnapshotSync(clusterCode);
     if (!clusterSnp) {
       continue;
     }
@@ -104,29 +104,29 @@ async function run2() {
         appsLiveClusterMap[v.appId] = v;
       });
     });
-    let appsSnapshort = clusterSnp.info;
-    // 遍历snapshort中的app, 将配置和app发布到新机器
-    for (let n = 0; n < appsSnapshort.length ; n++) {
-      let app = appsSnapshort[n];
+    let appsSnapshot = clusterSnp.info;
+    // 遍历snapshot中的app, 将配置和app发布到新机器
+    for (let n = 0; n < appsSnapshot.length ; n++) {
+      let app = appsSnapshot[n];
       let appName = app.name;
       let versions = app.versions;
       for (let m = 0; m < versions.length; m++) {
         let v = versions[m];
         let vNow = appsLiveClusterMap[v.appId];
-        let flagRunInSnapshort = false;
+        let flagRunInSnapshot = false;
         for (let k = 0; k < v.cluster.length; k++) {
           if (v.cluster[k].status === 'online') {
-            flagRunInSnapshort = true;
+            flagRunInSnapshot = true;
           }
         }
 
         if (!vNow) { 
-          // 线上并无snapshort中的app版本，则新增app版本上去
+          // 线上并无snapshot中的app版本，则新增app版本上去
           log.info(`app: ${v.appId}  missing in whole cluster: ${clusterCode}, recover app`);
           // app版本缺失，两种情况：1. 完全没有，2.单边机器有
           await recoverApp(clusterCode, clusterInfo, appName, v);
         } else {
-          // 线上有snapshort中的app版本
+          // 线上有snapshot中的app版本
           // 则判断集群中该版本的app是否都有
           let flagInLive = true;
           for (let k = 0; k < vNow.cluster.length; k++) {
@@ -135,7 +135,7 @@ async function run2() {
               log.info(`app ${v.appId} missing in worker: ${vNow.cluster[k].ip} cluster: ${clusterCode}`);
             }
           }
-          recoverApp(clusterCode, clusterInfo, appName, v, flagInLive, !flagRunInSnapshort);
+          recoverApp(clusterCode, clusterInfo, appName, v, flagInLive, !flagRunInSnapshot);
         }
 
         if (flagReload) {
@@ -173,12 +173,12 @@ async function recoverApp(clusterCode, clusterInfo, appName, v, appExist, appSto
 
 async function recoverServerConfig(clusterCode, clusterInfo, type, name) {
   let clusterServerCfg = await live.getCluserConfig(clusterInfo, type, name);
-  let clusterSnapShortCfg = await getAppConfig(clusterCode, type, name);
-  if (!clusterSnapShortCfg) {
+  let clusterSnapShotCfg = await getAppConfig(clusterCode, type, name);
+  if (!clusterSnapShotCfg) {
     log.warn(`cluster config, ${type}/${name} not found, skip`);
     return;
   }
-  let presistCfg = JSON.stringify(clusterSnapShortCfg.config);
+  let presistCfg = JSON.stringify(clusterSnapShotCfg.config);
   let flagDiff = false;
   clusterServerCfg.forEach((server) => {
     let tmpConfig = JSON.stringify(server.data);
@@ -188,7 +188,7 @@ async function recoverServerConfig(clusterCode, clusterInfo, type, name) {
   });
 
   if (flagDiff) {
-    await recoverAppConfig(clusterCode, clusterInfo, type, name, clusterSnapShortCfg.config);
+    await recoverAppConfig(clusterCode, clusterInfo, type, name, clusterSnapShotCfg.config);
   }
   return flagDiff;
 }
