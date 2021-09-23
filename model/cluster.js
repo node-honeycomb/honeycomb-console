@@ -404,7 +404,7 @@ const SQL_QUERY_CLUSTER_SNAPSHOT = `
   select 
     cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
   from 
-    hc_console_system_cluster_snapshot 
+    hc_console_system_cluster_snapshort 
   where 
     cluster_code = ?
   order by id desc
@@ -425,8 +425,8 @@ exports.getSnapshot = (clusterCode, cb) => {
 
 
 const SQL_DELETE_CLUSTER_SNAPSHOTS = `
-  delete from hc_console_system_cluster_snapshot where cluster_code = ? and id in (
-    select id from hc_console_system_cluster_snapshot where cluster_code = ?
+  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id in (
+    select id from hc_console_system_cluster_snapshort where cluster_code = ?
     order by id desc limit 1
   )
 `;
@@ -442,9 +442,9 @@ exports.deleteSnapshot = (clusterCode, cb) => {
 
 
 const SQL_CLEAN_CLUSTER_SNAPSHOTS = `
-  delete from hc_console_system_cluster_snapshot where cluster_code = ? and id < (
+  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id < (
     select min(id) from (
-      select id from hc_console_system_cluster_snapshot where cluster_code = ?
+      select id from hc_console_system_cluster_snapshort where cluster_code = ?
       order by id desc
       limit 3
     ) topids
@@ -459,7 +459,7 @@ exports.cleanSnapshot = (clusterCode, cb) => {
   });
 };
 
-const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshot 
+const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshort 
 (cluster_code, info, md5, user, gmt_create) 
 values 
 (?, ?, ?, ?, ?)`;
