@@ -25,7 +25,7 @@ release: clean
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
 	@cd out/release/assets && NODE_ENV=production npm install --registry=${REGISTRY}
 	@cd out/release && NODE_ENV=production npm install --registry=${REGISTRY}
-	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
+	@cd out/release/assets && NODE_ENV=production ./node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
 	@cd out/release && cp -r .package/* ./assets/
@@ -54,6 +54,7 @@ clean:
 
 tag:
 	@cat package.json | awk -F '"' '/version" *: *"/{print "v"$$4}' | xargs -I {} git tag {}
+
 release-linux:
 	docker run -it --rm -v $(shell pwd):/workspace centos/nodejs-8-centos7 /bin/bash -c \
 	"cd /workspace  && registry=https://registry.npm.taobao.org make package"
