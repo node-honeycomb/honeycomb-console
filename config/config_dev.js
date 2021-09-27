@@ -27,7 +27,7 @@ module.exports = {
     },
     webpack: {
       enable: true,
-      module: 'honeypack',
+      module: require.resolve('../assets/node_modules/honeypack'),
       router: '/assets'
     }
   },
