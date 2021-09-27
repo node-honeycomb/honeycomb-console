@@ -40,6 +40,7 @@ const ClusterDrawer = (props) => {
       query.clusterCode = clusterCode;
 
       location.search = '?' + qs.stringify(query);
+      location.pathname = window.location.pathname;
 
       dispatch(routerRedux.push(location));
     };

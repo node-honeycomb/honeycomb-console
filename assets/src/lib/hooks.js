@@ -57,6 +57,23 @@ export const useSearch = ({
       let matched = false;
 
       keys.forEach(key => {
+        if (matched) {
+          return;
+        }
+
+        if (Array.isArray(item[key])) {
+          item[key].forEach(item => {
+            if (matched) {
+              return;
+            }
+            if (item.includes(keyword)) {
+              matched = true;
+
+              return;
+            }
+          });
+        }
+
         if (item[key].includes(keyword)) {
           matched = true;
         }

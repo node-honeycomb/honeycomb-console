@@ -23,7 +23,7 @@ const EditAppConfig = (props) => {
   const editorRef = useRef();
 
   const getAppConfig = async () => {
-    if (!currentClusterCode) {
+    if (!currentClusterCode || !appName) {
       return null;
     }
 
