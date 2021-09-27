@@ -181,7 +181,7 @@ const Log = (props) => {
   };
 
   return (
-    <div>
+    <div style={{height: '100%', overflow: 'hidden'}}>
       <div className="page-left-side">
         <div className="list-title">日志列表</div>
         {
@@ -195,19 +195,23 @@ const Log = (props) => {
               />
             </div>
         }
-        {
-          !initing && (
-            <FileTree
-              tree={isSearching ? fileSearchItem : tree}
-              loading={filesLoading}
-              onSelect={onSelectFile}
-              activeKey={activeLog}
-              defaultActiveKey={activeLog}
-              keywords={lastSearchString}
-              searchStatus={isSearching}
-            />
-          )
-        }
+        <div
+          style={{height: 'calc(100% - 52px)', overflow: 'auto'}}
+        >
+          {
+            !initing && (
+              <FileTree
+                tree={isSearching ? fileSearchItem : tree}
+                loading={filesLoading}
+                onSelect={onSelectFile}
+                activeKey={activeLog}
+                defaultActiveKey={activeLog}
+                keywords={lastSearchString}
+                searchStatus={isSearching}
+              />
+            )
+          }
+        </div>
       </div>
       <div className="page-right-side">
         <LogPanel
