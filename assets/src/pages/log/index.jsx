@@ -190,7 +190,7 @@ const Log = (props) => {
               <input
                 value={searchInputString}
                 className="file-search-bar"
-                placeholder="请键入关键词以搜索"
+                placeholder="日志文件搜索"
                 onChange={(e) => setFileSearchResultList(e)}
               />
             </div>
