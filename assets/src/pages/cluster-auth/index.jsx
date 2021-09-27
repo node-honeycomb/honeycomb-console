@@ -34,8 +34,8 @@ const ClusterAuth = (props) => {
 
   const selectedCluster = {
     code: clusterCode,
-    id: _.get(clusters, `${clusterCode}.id`),
-    name: _.get(clusters, `${clusterCode}.name`),
+    id: _.get(clusters, [clusterCode, 'id']),
+    name: _.get(clusters, [clusterCode, 'name']),
   };
 
   console.log(clusters, clusterCode);
