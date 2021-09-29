@@ -101,7 +101,7 @@ const Machine = (props) => {
           </div>
           <div>
             <span className="s-title">剩余容量</span>：
-            {_.get(data, 'diskInfo.serverRoot.capacity') * 100}%
+            {(_.get(data, 'diskInfo.serverRoot.capacity') || 0) * 100}%
             &nbsp;
             <span className="s-title">文件系统</span>：
             {_.get(data, 'diskInfo.serverRoot.filesystem')}
@@ -118,7 +118,7 @@ const Machine = (props) => {
           </div>
           <div>
             <span className="s-title">剩余容量</span>：
-            {_.get(data, 'diskInfo.logsRoot.capacity') * 100}%
+            {(_.get(data, 'diskInfo.logsRoot.capacity') || 0) * 100}%
             &nbsp;
             <span className="s-title">文件系统</span>：
             {_.get(data, 'diskInfo.logsRoot.filesystem')}
