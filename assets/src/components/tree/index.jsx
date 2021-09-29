@@ -108,7 +108,7 @@ const Tree = (props) => {
 
       const dom = elements[0];
 
-      scrollIntoView(dom, {align: {lockX: true}});
+      scrollIntoView(dom);
     }, 100);
   }, []);
 
@@ -147,30 +147,12 @@ const Tree = (props) => {
               <li
                 key={item.key}
                 onClick={() => {
-                  // 选择到目录时
                   if (isMaster && !searchStatus) {
                     folderStatus[item.key] = !folderStatus[item.key];
                     setFolderStatus({...folderStatus});
 
                     return;
                   }
-
-                  // 搜索状态时
-                  if (searchStatus) {
-                    setTimeout(() => {
-                      const key = `tree-node-${item.key}`;
-                      const elements = document.getElementsByClassName(key);
-
-                      if (!elements || elements.length === 0) {
-                        return;
-                      }
-
-                      const dom = elements[0];
-
-                      scrollIntoView(dom, {align: {lockX: true}});
-                    }, 100);
-                  }
-
                   item.key && onSelect(item.key);
                 }}
                 className={

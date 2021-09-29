@@ -11,6 +11,8 @@ import s2q from '@lib/search-to-query';
 import callClusterSelect from '@coms/cluster-select';
 import {LS_LAST_SELECT_CLUSTER_CODE} from '@lib/consts';
 
+import {clusterApi} from '@api';
+
 import Sider from './coms/sider';
 import HcHeader from './coms/header';
 import ClusterDrawer from './coms/cluster';
@@ -33,7 +35,11 @@ class AppLayout extends React.Component {
 
   state = {
     clusterVisible: false,
-    errorMsg: null
+    errorMsg: null,
+    clusters: [],
+    clusterStatus: [],
+    coreDumps: [],
+    unknowProcesses: []
   }
 
   componentDidCatch(error, info) {
@@ -78,10 +84,26 @@ class AppLayout extends React.Component {
         return;
       }
     }
-
     const stop = this.readQueryCluster();
 
     !stop && await this.renderHistoryCluster(clusters);
+    const clusterCode = this.props.currentClusterCode;
+    const clusterStatus = await clusterApi.status(clusterCode);
+    const coreDump = await clusterApi.getCoredump(clusterCode);
+    const unknowPro = await clusterApi.getUnknowProcess(clusterCode);
+    const statusObjPro = _.get(clusterStatus, ['success']) || [];
+    const statusObjs = statusObjPro.map(pro => {
+      return _.get(pro, 'data') || {};
+    }) || [];
+    const coreDumpArr = _.get(coreDump, ['success']) || [];
+    const unkProArr = _.get(unknowPro, ['success']) || [];
+
+    this.setState({
+      clusters: clusters,
+      clusterStatus: statusObjs,
+      coreDumps: coreDumpArr,
+      unknowProcesses: unkProArr
+    });
   }
 
   renderHistoryCluster = async (clusters) => {
@@ -174,15 +196,34 @@ class AppLayout extends React.Component {
     );
   }
 
+  onDeleteUnknowProcess = async (data) => {
+    const code = this.props.currentClusterCode;
+
+    await clusterApi.deleteUnknowProcess(data, {clusterCode: code});
+    message.success('清除成功');
+    const newUnknows = await clusterApi.getUnknowProcess({clusterCode: code});
+
+    this.setState({
+      unknowProcesses: newUnknows.success
+    });
+  }
+
   render() {
-    const {clusterVisible, errorMsg} = this.state;
+    const {
+      clusterVisible, errorMsg, clusters, clusterStatus, coreDumps, unknowProcesses
+    } = this.state;
     const {currentCluster, currentClusterCode} = this.props;
 
     return (
       <div>
         <HcHeader
           onToggleCluster={this.onToggleCluster}
+          clusters={clusters}
           currentCluster={currentCluster}
+          clusterStatus={clusterStatus}
+          coreDumps={coreDumps}
+          unknowProcesses={unknowProcesses}
+          onDeleteUnknowProcess={this.onDeleteUnknowProcess}
         />
         <ClusterDrawer
           visible={clusterVisible}

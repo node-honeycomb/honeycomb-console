@@ -106,7 +106,6 @@ export default {
       }
 
       const clusterCodes = Object.keys(clusters);
-
       // eslint-disable-next-line
       for (const clusterCode of clusterCodes) {
         try {

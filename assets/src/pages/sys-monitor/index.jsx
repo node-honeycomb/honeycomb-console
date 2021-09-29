@@ -58,7 +58,6 @@ const SysMonitor = (props) => {
             error: []
           };
         }
-
         const r = await clusterApi.status(currentClusterCode);
 
         filter.machine = r.success.map(i => i.ip);

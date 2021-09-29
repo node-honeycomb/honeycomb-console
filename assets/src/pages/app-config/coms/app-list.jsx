@@ -166,24 +166,22 @@ const AppList = (props) => {
   };
 
   return (
-    <div style={{height: '100%'}}>
+    <div>
       <input
         value={searchInputString}
         className="file-search-bar"
-        placeholder="应用搜索"
+        placeholder="请键入关键词以搜索"
         onChange={(e) => setFileSearchResultList(e)}
       />
-      <div style={{height: 'calc(100% - 52px)', overflow: 'auto'}}>
-        <Tree
-          loading={loading}
-          onSelect={onSelectSearchTreeItem}
-          tree={isSearching ? fileSearchItem : getAppTree(appList.map(app => app.name))}
-          activeKey={activeAppName}
-          defaultActiveKey={USER_APP}
-          keywords={lastSearchString}
-          searchStatus={isSearching}
-        />
-      </div>
+      <Tree
+        loading={loading}
+        onSelect={onSelectSearchTreeItem}
+        tree={isSearching ? fileSearchItem : getAppTree(appList.map(app => app.name))}
+        activeKey={activeAppName}
+        defaultActiveKey={USER_APP}
+        keywords={lastSearchString}
+        searchStatus={isSearching}
+      />
     </div>
   );
 };
