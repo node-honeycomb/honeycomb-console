@@ -111,7 +111,17 @@ const ClusterStatus = (props) => {
           <div className="warning-wrap">
             {
               !props.serverSecure &&
-                <p>Server版本过低，请升级至{window.CONFIG.secureServerVersion}以上</p>
+                <p>
+                  Server版本过低，请升级至{window.CONFIG.secureServerVersion}以上，
+                  点击查看
+                  <a
+                    rel="noreferrer"
+                    target="_blank"
+                    href="https://www.yuque.com/honeycomb/honeycomb/upgrade"
+                  >
+                    升级文档
+                  </a>
+                </p>
             }
             {
               tokenWarnInfo &&

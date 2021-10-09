@@ -47,7 +47,7 @@ export const setClearPolicy = (data) => {
 export const genClearList = (value) => {
   const clearList = {};
 
-  value.forEach(data => {
+  (value || []).forEach(data => {
     // eslint-disable-next-line array-callback-return
     const _onlineList = data.versions.filter((item) => {
       if (_.get(item, 'cluster[0].status') === 'online') return item;

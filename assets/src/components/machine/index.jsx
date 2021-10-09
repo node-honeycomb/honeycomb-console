@@ -50,7 +50,7 @@ const Machine = (props) => {
         </Tooltip>
       </div>
       {
-        (unknowPros.data || []).map(d => {
+        unknowPros && (unknowPros.data || []).map(d => {
           const unknowProces = d.info;
           const isLongTag = unknowProces.length > 25;
           const tagElem = (

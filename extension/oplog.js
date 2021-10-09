@@ -1,3 +1,4 @@
+const moment = require('moment');
 const oplog = require('../model/oplog');
 
 module.exports = function (app) {
@@ -7,7 +8,7 @@ module.exports = function (app) {
      '_system_manage';
 
     oplog.add({
-      time: Date.now(),
+      gmtCreate: moment().format('YYYY-MM-DD HH:mm:ss'),
       username: user.name,
       socket: {
         address: this.client.remoteAddress,

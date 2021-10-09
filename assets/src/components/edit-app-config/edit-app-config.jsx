@@ -173,7 +173,8 @@ const EditAppConfig = (props) => {
                   value={editorCode}
                   options={{
                     theme: 'vs',
-                    readOnly: !isEdit
+                    readOnly: !isEdit,
+                    automaticLayout: true
                   }}
                   onChange={setEditorCode}
                   editorDidMount={(editor) => editorRef.current = editor}

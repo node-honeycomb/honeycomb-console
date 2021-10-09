@@ -1,15 +1,14 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {connect} from 'dva';
+import moment from 'moment';
 import api from '@api/index';
-import CommonTitle from '@coms/common-title';
-import {Table, Tag, Drawer, DatePicker} from 'antd';
 import PropTypes from 'prop-types';
 import {withRouter} from 'dva/router';
+import CommonTitle from '@coms/common-title';
+import {Table, Tag, Modal, DatePicker} from 'antd';
 import {default as MonacoEditor, MonacoDiffEditor} from 'react-monaco-editor';
-import moment from 'moment';
 
 import ClusterSelector from './coms/cluster-selector';
-
 
 import './index.less';
 
@@ -20,6 +19,21 @@ const colorMap = {
   RISKY: 'yellow',
   LIMIT: 'blue',
   NORMAL: 'green',
+};
+
+const LEVEL_MAP = {
+  HIGH_RISK: '高风险',
+  RISKY: '中风险',
+  LIMIT: '低风险',
+  NORMAL: '无风险',
+};
+
+const opItemMap = {
+  APP: '应用',
+  APP_CONFIG: '应用配置',
+  SYSTEM: '系统',
+  CLUSTER: '集群',
+  WOKER: '机器'
 };
 
 const opNameMap = {
@@ -43,6 +57,7 @@ const opNameMap = {
   LIST_WORKER: '查看worker',
   DEL_WORKER: '删除worker',
 };
+
 
 // 日志模块
 const OperationLog = (props) => {
@@ -102,9 +117,9 @@ const OperationLog = (props) => {
       <Table loading={loading} columns={[
         {
           title: '时间',
-          dataIndex: 'time',
-          sorter: (a, b) => a.time - b.time,
-          render: text => <span>{moment(text).format('lll')}</span>
+          dataIndex: 'gmtCreate',
+          sorter: (a, b) => moment(a.gmtCreate).subtract(moment(b.gmtCreate), 'seconds'),
+          render: text => <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>
         },
         {
           title: '操作名',
@@ -114,25 +129,26 @@ const OperationLog = (props) => {
           render: text => <span>{opNameMap[text]}</span>
         },
         {
-          title: '用户名',
+          title: '操作人',
           dataIndex: 'username'
         },
         {
-          title: '用户地址',
+          title: '操作IP',
           dataIndex: 'socket',
           render: socket => <span>{socket && `${socket.address} ${socket.port}` || '未记录'}</span>
         },
         {
-          title: '操作等级',
+          title: '操作风险',
           dataIndex: 'opLogLevel',
-          render: text => <Tag color={colorMap[text]}>{text}</Tag>
+          render: text => <Tag color={colorMap[text]}>{LEVEL_MAP[text]}</Tag>
         },
         {
           title: '操作对象',
-          dataIndex: 'opItem'
+          dataIndex: 'opItem',
+          render: text => opItemMap[text]
         },
         {
-          title: '操作对象Id',
+          title: '操作对象ID',
           dataIndex: 'opItemId',
           filterMultiple: false,
           filterSearch: true,
@@ -143,43 +159,65 @@ const OperationLog = (props) => {
         {
           title: '详细',
           dataIndex: 'detail',
-          render: (_, record) => <a onClick={() => {
-            if (record.opName === 'SET_APP_CONFIG') {
-              setOldConfig(record.extends.oldConfig);
-              setSelectedItem(record.extends.newConfig);
-              setDrawerVisible(true);
+          render: (_, record) => (
+            <a onClick={() => {
+              if (record.opName === 'SET_APP_CONFIG') {
+                setOldConfig(record.extends.oldConfig);
+                setSelectedItem(record.extends.newConfig);
+                setDrawerVisible(true);
 
-              return;
-            }
-            setOldConfig(null);
-            setSelectedItem(record);
-            setDrawerVisible(true);
-          }}>查看</a>
+                return;
+              }
+              setOldConfig(null);
+              setSelectedItem(record);
+              setDrawerVisible(true);
+            }}>
+            查看
+            </a>
+          )
         },
       ]} dataSource={dataSource}></Table>
-      <Drawer height={'50vh'} placement="bottom" visible={drawerVisible} onClose={onClose}>
+      <Modal
+        title="详情"
+        visible={drawerVisible}
+        forceRender
+        onClose={onClose}
+        onCancel={onClose}
+        onOk={onClose}
+        cancelButtonProps={{style: {display: 'none'}}}
+        okText="知道了"
+        width="60vw"
+        bodyStyle={{
+          height: '60vh',
+          width: '60vw'
+        }}
+      >
         {drawerVisible ? (oldConfig !== null ?
           <MonacoDiffEditor
             width="100%"
             height="100%"
             language="json"
-            original={JSON.stringify(oldConfig, null, '  ')}
-            value={JSON.stringify(selectedItem, null, '  ')}
+            original={JSON.stringify(oldConfig, null, 2)}
+            value={JSON.stringify(selectedItem, null, 2)}
             readOnly={true}
+            options={{
+              automaticLayout: true
+            }}
           /> :
           <MonacoEditor
             width="100%"
             height="100%"
             language="json"
             theme="vs"
-            value={JSON.stringify(selectedItem, null, '  ')}
+            value={JSON.stringify(selectedItem, null, 2)}
             options={{
               theme: 'vs',
-              readOnly: true
+              readOnly: true,
+              automaticLayout: true
             }}
           />
         ) : ''}
-      </Drawer>
+      </Modal>
     </div>
   );
 };
