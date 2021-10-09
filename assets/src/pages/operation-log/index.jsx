@@ -108,7 +108,7 @@ const OperationLog = (props) => {
           title: '操作名',
           dataIndex: 'opName',
           filters: Object.entries(opNameMap).map(([k, v]) => ({text: v, value: k})),
-          onFilter: (value, record) => record.opName.indexOf(value) === 0,
+          onFilter: (value, record) => record.opName === value,
           render: text => <span>{opNameMap[text]}</span>
         },
         {
@@ -131,7 +131,12 @@ const OperationLog = (props) => {
         },
         {
           title: '操作对象Id',
-          dataIndex: 'opItemId'
+          dataIndex: 'opItemId',
+          filterMultiple: false,
+          filterSearch: true,
+          filters: Array.from(new Set(dataSource.map(data => data.opItemId)))
+            .map(name => ({text: name, value: name})),
+          onFilter: (value, record) => record.opItemId === value,
         },
         {
           title: '详细',

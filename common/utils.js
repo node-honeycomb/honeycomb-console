@@ -445,7 +445,7 @@ function getSecretFields(config, root = '') {
     return [];
 
   return Object.keys(config)
-    .map(key => secretFieldNameList.some(patten => patten.test(key)) ?
+    .map(key => secretFieldNameList.some(pattern => pattern.test(key)) ?
       root + key :
       getSecretFields(config[key], root + key + '.')
     )
