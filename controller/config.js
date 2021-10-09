@@ -139,8 +139,10 @@ exports.setAppConfig = function (req, res) {
       opLogLevel: 'NORMAL',
       opItem: 'APP_CONFIG',
       opItemId: appName,
-      oldConfig,
-      newConfig
+      extends: {
+        oldConfig,
+        newConfig
+      }
     }, false);
   });
 

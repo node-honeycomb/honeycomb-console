@@ -143,8 +143,8 @@ const OperationLog = (props) => {
           dataIndex: 'detail',
           render: (_, record) => <a onClick={() => {
             if (record.opName === 'SET_APP_CONFIG') {
-              setOldConfig(record.oldConfig);
-              setSelectedItem(record.newConfig);
+              setOldConfig(record.extends.oldConfig);
+              setSelectedItem(record.extends.newConfig);
               setDrawerVisible(true);
 
               return;
