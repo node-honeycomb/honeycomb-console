@@ -8,7 +8,8 @@ const PAGES = {
   SYS_MONITOR: `${prefix}/pages/sys-monitor`,         // 系统监控
   CLUSTER_MANAGER: `${prefix}/pages/cluster-manager`, // 集群管理
   CLUSTER_AUTH: `${prefix}/pages/cluster-auth`,       // 集群授权
-  USER_MANAGER: `${prefix}/pages/user-manager`,       // 系统监控
+  USER_MANAGER: `${prefix}/pages/user-manager`,       // 用户管理
+  OPERATION_LOG: `${prefix}/pages/operation-log`,     // 操作日志
 };
 
 export default PAGES;

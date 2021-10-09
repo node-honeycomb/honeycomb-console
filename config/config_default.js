@@ -18,6 +18,13 @@ module.exports = {
     database : 'my_db'
     */
   },
+  logs: {
+    oplog: {
+      level: 'INFO',
+      file: '${serverRoot}/logs/honeycomb-console/oplog.%year%-%month%-%day%.log',
+      fmt: obj => obj.msg
+    }
+  },
   salt: null,
   /**
    * 集群自动检测，默认关闭

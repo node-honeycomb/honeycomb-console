@@ -2,7 +2,7 @@ import React from 'react';
 import {
   FileSearchOutlined, TeamOutlined, AppstoreOutlined,
   CloudUploadOutlined, ControlOutlined, ClusterOutlined,
-  DeploymentUnitOutlined, SettingOutlined
+  DeploymentUnitOutlined, SettingOutlined, DashboardOutlined
 } from '@ant-design/icons';
 
 import PAGES from '../../../../lib/pages';
@@ -59,6 +59,11 @@ const menu = [
     title: '用户管理',
     icon: <TeamOutlined />,
     link: PAGES.USER_MANAGER
+  },
+  {
+    title: '操作日志',
+    icon: <DashboardOutlined />,
+    link: PAGES.OPERATION_LOG
   }
 ];
 
