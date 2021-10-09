@@ -86,7 +86,7 @@ exports.registerWorker = function (req, callback) {
     opLogLevel: 'NORMAL',
     opItem: 'WORKER',
     opItemId: ip,
-    env: 'production'
+    extends: {env: 'production'}
   });
   log.info('register worker: ', ip, code);
 

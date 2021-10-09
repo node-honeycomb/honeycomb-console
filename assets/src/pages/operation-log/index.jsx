@@ -8,7 +8,7 @@ import {withRouter} from 'dva/router';
 import {default as MonacoEditor, MonacoDiffEditor} from 'react-monaco-editor';
 import moment from 'moment';
 
-import ClusterSelector from '../cluster-auth/cluster-selector';
+import ClusterSelector from './coms/cluster-selector';
 
 
 import './index.less';
@@ -54,6 +54,8 @@ const OperationLog = (props) => {
   const [selectedItem, setSelectedItem] = useState('');
   const [dateRange, setDateRange] = useState([moment().subtract(1, 'days'), moment()]);
   const [oldConfig, setOldConfig] = useState({});
+
+  clusters['_system_manage'] = {name: '系统管理'};
 
   const onClose = useCallback(() => {
     setDrawerVisible(false);
