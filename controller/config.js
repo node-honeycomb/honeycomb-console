@@ -111,15 +111,6 @@ exports.getAppConfigHistory = function (req, res) {
 exports.setAppConfig = function (req, res) {
   const appName = req.params.appName;
   const type = req.body.type;
-
-  req.oplog({
-    clientId: req.ips.join('') || '-',
-    opName: 'SET_APP_CONFIG',
-    opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
-    opItem: 'APP_CONFIG',
-    opItemId: appName
-  });
   const clusterCode = req.body.clusterCode;
   const opt = cluster.getClusterCfgByCode(clusterCode);
 
@@ -137,6 +128,24 @@ exports.setAppConfig = function (req, res) {
       message: e.message
     });
   }
+
+  appConfig.getAppConfig(clusterCode, type, appName, function (err, data) {
+    const [oldConfig, newConfig] = utils.configRemoveSecretFields(data.config, opt.data);
+
+    req.oplog({
+      clientId: req.ips.join('') || '-',
+      opName: 'SET_APP_CONFIG',
+      opType: 'PAGE_MODEL',
+      opLogLevel: 'NORMAL',
+      opItem: 'APP_CONFIG',
+      opItemId: appName,
+      extends: {
+        oldConfig,
+        newConfig
+      }
+    }, false);
+  });
+
   const cfgObj = {
     type,
     clusterCode,

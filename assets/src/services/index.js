@@ -5,6 +5,7 @@ import * as aclApi from './api/acl';
 import * as appApi from './api/app';
 import * as configApi from './api/config';
 import * as usageApi from './api/monitor';
+import * as oplogApi from './api/oplog';
 
 export default {
   userApi,
@@ -14,4 +15,5 @@ export default {
   appApi,
   configApi,
   usageApi,
+  oplogApi,
 };

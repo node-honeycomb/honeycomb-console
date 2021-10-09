@@ -92,3 +92,21 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
   `gmt_create` datetime NOT NULL, -- COMMENT '创建时间'
   KEY `idx_cluster_code` (`cluster_code`)
 );
+
+-- 字段名和json统一
+CREATE TABLE IF NOT EXISTS `hc_console_system_oplog` (
+  `id` INTEGER AUTO_INCREMENT PRIMARY KEY,
+  `clusterCode` varchar(50) NOT NULL DEFAULT '',
+  `clientId` text,
+  `opName` varchar(40) NOT NULL DEFAULT '',
+  `opType` varchar(20) NOT NULL DEFAULT '',
+  `opLogLevel` varchar(20) NOT NULL DEFAULT '',
+  `opItem` varchar(20) NOT NULL DEFAULT '',
+  `opItemId` varchar(255) NOT NULL DEFAULT '', 
+  `username` varchar(255) NOT NULL DEFAULT '', 
+  `socket` text,
+  `detail` text,
+  `extends` text,
+  `time` datetime NOT NULL,
+  KEY `idx_cluster_code` (`clusterCode`)
+);

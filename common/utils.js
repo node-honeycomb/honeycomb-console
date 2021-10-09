@@ -434,3 +434,46 @@ exports.getClusterApps = function (clusterIinfo, cb) {
     }
   });
 };
+
+const secretFieldNameList = [
+  /password/,
+  /passwd/
+];
+
+function getSecretFields(config, root = '') {
+  if (typeof config !== 'object')
+    return [];
+
+  return Object.keys(config)
+    .map(key => secretFieldNameList.some(pattern => pattern.test(key)) ?
+      root + key :
+      getSecretFields(config[key], root + key + '.')
+    )
+    .flat();
+}
+
+// rate = 最大可见比例
+function hideMid(str, char = '*', rate = 0.6) {
+  const count = str.length * rate * 0.5 | 0;
+
+  return str.slice(0, count) + char.repeat(str.length - count * 2) + str.slice(str.length - count);
+}
+
+exports.configRemoveSecretFields = function (oldConfig, newConfig) {
+  oldConfig = _.cloneDeep(oldConfig);
+  newConfig = _.cloneDeep(newConfig);
+  getSecretFields(newConfig).forEach(path => {
+    const oldValue = _.get(oldConfig, path, '');
+    const newValue = _.get(newConfig, path, '');
+
+    if (oldValue === newValue) {
+      _.set(oldConfig, path, '******');
+      _.set(newConfig, path, '******');
+    } else {
+      _.set(oldConfig, path, hideMid(oldValue, '#'));
+      _.set(newConfig, path, hideMid(newValue));
+    }
+  });
+
+  return [oldConfig, newConfig];
+};

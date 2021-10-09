@@ -79,7 +79,7 @@ exports.addCluster = function (req, callback) {
     opLogLevel: 'NORMAL',
     opItem: 'CLUSTER',
     opItemId: clusterCode,
-    opEnv: req.body.env,
+    // opEnv: req.body.env,
   });
 
   const clusterName = req.body.name;

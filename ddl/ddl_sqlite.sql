@@ -90,3 +90,20 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
   `user` varchar(50) DEFAULT '', -- COMMENT '操作人',
   `gmt_create` datetime NOT NULL -- COMMENT '创建时间'
 );
+
+-- 字段名和json统一
+CREATE TABLE IF NOT EXISTS `hc_console_system_oplog` (
+  `id` INTEGER PRIMARY KEY AUTOINCREMENT,
+  `clusterCode` varchar(50) NOT NULL DEFAULT '',
+  `clientId` text,
+  `opName` varchar(40) NOT NULL DEFAULT '',
+  `opType` varchar(20) NOT NULL DEFAULT '',
+  `opLogLevel` varchar(20) NOT NULL DEFAULT '',
+  `opItem` varchar(20) NOT NULL DEFAULT '',
+  `opItemId` varchar(255) NOT NULL DEFAULT '', 
+  `username` varchar(255) NOT NULL DEFAULT '', 
+  `socket` text,
+  `detail` text,
+  `extends` text,
+  `time` datetime NOT NULL
+);

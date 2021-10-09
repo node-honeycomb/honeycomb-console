@@ -56,6 +56,9 @@ module.exports = function (req, res, next) {
 
     return;
   }
+  if (pathToRegex('/api/oplog').test(pathname)) {
+    return next();
+  }
 
   if (pathToRegex('/api/log').test(pathname)) {
     const clusterCode = req.query.clusterCode || req.body.clusterCode;
