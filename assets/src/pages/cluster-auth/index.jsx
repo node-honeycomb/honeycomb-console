@@ -9,7 +9,6 @@ import PropTypes from 'prop-types';
 
 import {aclApi, appApi} from '@api';
 import {useSearch} from '@lib/hooks';
-import {getErrMsg} from '@lib/error-msg';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 import {tryParse, tryArrToStr} from '@lib/util';
@@ -34,8 +33,8 @@ const ClusterAuth = (props) => {
 
   const selectedCluster = {
     code: clusterCode,
-    id: _.get(clusters, [clusterCode, 'id']),
-    name: _.get(clusters, [clusterCode, 'name']),
+    id: _.get(clusters, `${clusterCode}.id`),
+    name: _.get(clusters, `${clusterCode}.name`),
   };
 
   console.log(clusters, clusterCode);
@@ -49,7 +48,7 @@ const ClusterAuth = (props) => {
     } catch (error) {
       notification.error({
         message: '请求权限列表失败',
-        description: getErrMsg(error.message),
+        description: error.message,
       });
     } finally {
       setLoading(false);
@@ -64,7 +63,7 @@ const ClusterAuth = (props) => {
     } catch (error) {
       notification.error({
         message: '请求应用列表失败',
-        description: getErrMsg(error.message),
+        description: error.message,
       });
     }
   };

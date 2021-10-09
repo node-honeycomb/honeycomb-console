@@ -47,10 +47,6 @@ export const setClearPolicy = (data) => {
 export const genClearList = (value) => {
   const clearList = {};
 
-  if (!value) {
-    return [];
-  }
-
   value.forEach(data => {
     // eslint-disable-next-line array-callback-return
     const _onlineList = data.versions.filter((item) => {

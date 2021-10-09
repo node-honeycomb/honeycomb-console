@@ -181,7 +181,7 @@ const Log = (props) => {
   };
 
   return (
-    <div style={{height: '100%', overflow: 'hidden'}}>
+    <div>
       <div className="page-left-side">
         <div className="list-title">日志列表</div>
         {
@@ -190,28 +190,24 @@ const Log = (props) => {
               <input
                 value={searchInputString}
                 className="file-search-bar"
-                placeholder="日志文件搜索"
+                placeholder="请键入关键词以搜索"
                 onChange={(e) => setFileSearchResultList(e)}
               />
             </div>
         }
-        <div
-          style={{height: 'calc(100% - 52px)', overflow: 'auto'}}
-        >
-          {
-            !initing && (
-              <FileTree
-                tree={isSearching ? fileSearchItem : tree}
-                loading={filesLoading}
-                onSelect={onSelectFile}
-                activeKey={activeLog}
-                defaultActiveKey={activeLog}
-                keywords={lastSearchString}
-                searchStatus={isSearching}
-              />
-            )
-          }
-        </div>
+        {
+          !initing && (
+            <FileTree
+              tree={isSearching ? fileSearchItem : tree}
+              loading={filesLoading}
+              onSelect={onSelectFile}
+              activeKey={activeLog}
+              defaultActiveKey={activeLog}
+              keywords={lastSearchString}
+              searchStatus={isSearching}
+            />
+          )
+        }
       </div>
       <div className="page-right-side">
         <LogPanel

@@ -19,12 +19,11 @@ const EditAppConfig = (props) => {
   const {appName, currentClusterCode, appType} = props;
   const [isEdit, setIsEdit] = useState(false);
   const [editorCode, setEditorCode] = useState('');
-  const [applying, setApplying] = useState(false);
 
   const editorRef = useRef();
 
   const getAppConfig = async () => {
-    if (!currentClusterCode || !appName) {
+    if (!currentClusterCode) {
       return null;
     }
 
@@ -86,26 +85,23 @@ const EditAppConfig = (props) => {
 
     const doApply = async (fixReload) => {
       try {
-        setApplying(true);
         await api.configApi.updateAppConfig(appName, editorCode, currentClusterCode, appType);
-        const key = appName;
-
-        message.success({content: '配置修改成功！', key});
+        message.success('配置修改成功！');
 
         if (fixReload) {
-          message.loading({content: '重启应用中...', key, duration: 0});
+          message.loading('重启应用中...');
 
           const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
 
           if (!appId) {
             message.destroy();
 
-            return message.warn({content: '当前应用没有正在运行的版本', key});
+            return message.warn('当前应用没有正在运行的版本');
           }
 
           await api.appApi.reload(currentClusterCode, appId);
           message.destroy();
-          message.success({content: '应用重启成功！', key});
+          message.success('应用重启成功！');
         }
 
         await getAppConfig();
@@ -115,8 +111,6 @@ const EditAppConfig = (props) => {
           message: '修改配置失败',
           description: e.message
         });
-      } finally {
-        setApplying(false);
       }
     };
 
@@ -193,16 +187,10 @@ const EditAppConfig = (props) => {
                         type="primary"
                         disabled={!hasCodeChange}
                         onClick={onApply}
-                        loading={applying}
                       >
                         应用
                       </Button>
-                      <Button
-                        onClick={onToggleEdit}
-                        disabled={applying}
-                      >
-                        取消
-                      </Button>
+                      <Button onClick={onToggleEdit}>取消</Button>
                     </React.Fragment>
                   )
                 }

@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import {Tooltip, message} from 'antd';
+import {Tooltip, message, Tag, Icon} from 'antd';
 import {PRIMARY_COLOR} from '@lib/color';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import {DesktopOutlined, CloudServerOutlined, NodeIndexOutlined} from '@ant-design/icons';
@@ -33,7 +33,7 @@ const TITLE_RENDER = {
 };
 
 const Machine = (props) => {
-  const {ip, data} = props;
+  const {ip, data, unknowPros} = props;
 
   return (
     <BannerCard className="machine">
@@ -49,6 +49,21 @@ const Machine = (props) => {
           </CopyToClipboard>
         </Tooltip>
       </div>
+      {
+        (unknowPros.data || []).map(d => {
+          const unknowProces = d.info;
+          const isLongTag = unknowProces.length > 25;
+          const tagElem = (
+            <Tag className="file-name-wrap" key={d.pid}>
+              {isLongTag ? `${unknowProces.slice(0, 25)}...` : unknowProces}
+              <Icon onClick={props.onDeleteUnknowProcess.bind(this, d.pid)} type="close" />
+            </Tag>
+          );
+
+          return isLongTag ? <Tooltip title={unknowProces} key={d.pid}>{tagElem}</Tooltip> :
+            tagElem;
+        })
+      }
       <div className="key-title">基础信息</div>
       <div>
         {
@@ -86,7 +101,7 @@ const Machine = (props) => {
           </div>
           <div>
             <span className="s-title">剩余容量</span>：
-            {_.get(data, 'diskInfo.serverRoot.capacity') * 100}%
+            {(_.get(data, 'diskInfo.serverRoot.capacity') || 0) * 100}%
             &nbsp;
             <span className="s-title">文件系统</span>：
             {_.get(data, 'diskInfo.serverRoot.filesystem')}
@@ -103,7 +118,7 @@ const Machine = (props) => {
           </div>
           <div>
             <span className="s-title">剩余容量</span>：
-            {_.get(data, 'diskInfo.logsRoot.capacity') * 100}%
+            {(_.get(data, 'diskInfo.logsRoot.capacity') || 0) * 100}%
             &nbsp;
             <span className="s-title">文件系统</span>：
             {_.get(data, 'diskInfo.logsRoot.filesystem')}
@@ -145,7 +160,9 @@ Machine.propTypes = {
     sysTime: PropTypes.string,
     timezone: PropTypes.string,
     uname: PropTypes.string
-  })
+  }),
+  unknowPros: PropTypes.array,
+  onDeleteUnknowProcess: PropTypes.func
 };
 
 /**
