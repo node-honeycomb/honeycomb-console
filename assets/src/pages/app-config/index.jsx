@@ -70,7 +70,7 @@ const AppConfig = (props) => {
         <div className="list-title">应用列表</div>
         <AppList
           onSelect={onSelectApp}
-          activeAppName={appType === 'system' ? `${appName}*${appType}` : appName}
+          activeAppName={appName}
           appType={appType}
           defaultAppName={configAppName}
         />
@@ -78,7 +78,6 @@ const AppConfig = (props) => {
       <div className="page-right-side">
         <EditAppConfig
           appName={appName}
-          appType={appType}
         />
       </div>
     </div>

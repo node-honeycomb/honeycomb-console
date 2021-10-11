@@ -2,7 +2,7 @@ import React, {useState, useEffect, useCallback} from 'react';
 import _ from 'lodash';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
-import {Table, Button, Divider, Modal, message} from 'antd';
+import {Table, Button, Divider, Modal, message, Tooltip} from 'antd';
 
 import {clusterApi} from '@api';
 import {useSearch} from '@lib/hooks';
@@ -35,7 +35,7 @@ const UserManager = (props) => {
   const {onSearch, dataSource} = useSearch({
     data: clusterList,
     keys: [
-      'name', 'code', 'endpoint', 'ips', 'env'
+      'name', 'code', 'endpoint'
     ]
   });
 
@@ -96,7 +96,20 @@ const UserManager = (props) => {
       title: 'ip列表',
       dataIndex: 'ips',
       render: (row) => {
-        return _.get(row, '[0]');
+        if (row.length > 1) {
+          const text = row.map(r => {
+            return <p key={r}>{r}</p>;
+          });
+
+          return <span>
+            <span>{_.get(row, '[0]')}</span>
+            <Tooltip placement="top" title={text}>
+              <span style={{color: '#3D6CF2', cursor: 'pointer'}}>&nbsp;&nbsp;更多</span>
+            </Tooltip>
+          </span>;
+        } else {
+          return _.get(row, '[0]');
+        }
       },
     },
     {

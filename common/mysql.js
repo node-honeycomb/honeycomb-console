@@ -3,13 +3,19 @@ const mysql = require('mysql');
 const fs = require('fs');
 const path = require('path');
 const async = require('async');
-const config = require('../config');
+
 const log = require('./log');
+const config = require('../config');
+const patch = require('../ddl/patch/mysql');
 
 if (!config.meta.user) {
   config.meta.user = config.meta.username;
 }
-if (!config.meta.connectionLimit) config.meta.connectionLimit = 3;
+
+if (!config.meta.connectionLimit) {
+  config.meta.connectionLimit = 3;
+}
+
 const pool = mysql.createPool(config.meta);
 
 // exec table create process
@@ -25,10 +31,16 @@ pool.getConnection(function (err, conn) {
       log.error(err);
       throw err;
     }
-    flagReady = true;
-    readyFn && readyFn();
+
+    const done = () => {
+      flagReady = true;
+      readyFn && readyFn();
+    };
+
+    patch(conn).then(done).catch(done);
   });
 });
+
 if (config.meta.session_variables) {
   log.debug(mysql.format('SET SESSION ?', config.meta.session_variables));
   for (let i = 0; i < config.meta.connectionLimit; i++) {

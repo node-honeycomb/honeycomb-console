@@ -5,7 +5,7 @@ import {Menu, Dropdown, Tooltip, Tag} from 'antd';
 import {
   UserOutlined, CopyOutlined, PauseCircleOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
-  BookOutlined, RedoOutlined
+  BookOutlined, RedoOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
@@ -45,8 +45,82 @@ const menu = (
   </Menu>
 );
 
+const getClusterInfoStatus = (statusObjs, coreDump, unknowPro) => {
+  const diskCapacityLimit = 0.8;
+  const memoryUsageLimit = 80;
+  let clusterStatus = 'normal'; // three status: 'normal', 'warning', 'error'
+  let memoryWarning = false;
+  let isRedWarning = false;
+
+  statusObjs.forEach(status => {
+    const serverCa = _.get(status, 'diskInfo.serverRoot.capacity');
+    const logCa = _.get(status, 'diskInfo.logsRoot.capacity');
+
+    if (
+      (serverCa > diskCapacityLimit - 0.2) ||
+        (logCa > diskCapacityLimit - 0.2) ||
+        (status.memoryUsage > memoryUsageLimit - 20)
+    ) {
+      memoryWarning = true;
+    }
+    if (
+      (serverCa > diskCapacityLimit) ||
+        (logCa > diskCapacityLimit) ||
+        (status.memoryUsage > memoryUsageLimit)
+    ) {
+      isRedWarning = true;
+    }
+  });
+  const isCoreWarn = _.some(coreDump, core => {
+    return core.data && (core.data.length > 0);
+  });
+  const isUnkWarn = _.some(unknowPro, unkn => {
+    return unkn.data && (unkn.data.length > 0);
+  });
+
+  if (memoryWarning || isCoreWarn || isUnkWarn) clusterStatus = 'warning';
+  if (isRedWarning) clusterStatus = 'error';
+
+  return clusterStatus;
+};
+
+const versionCompare = (v1, v2) => {
+  v1 = v1.replace(/_/g, '.');
+  v2 = v2.replace(/_/g, '.');
+  const aVer = v1.split('.');
+  const bVer = v2.split('.');
+
+  for (let i = 0; i < 3; i++) {
+    if (+aVer[i] > +bVer[i]) {
+      return 1;
+    } else if (+aVer[i] < +bVer[i]) {
+      return -1;
+    }
+  }
+
+  return 0;
+};
+
+const checkClusterVersion = (statusObjs) => {
+  let serverSecure = false;
+
+  statusObjs.forEach(status => {
+    const serverVer = _.get(status, 'serverVersion');
+
+    if (versionCompare(serverVer, window.CONFIG.secureServerVersion) >= 0) {
+      serverSecure = true;
+    }
+  });
+
+  return serverSecure;
+};
+
 const Header = (props) => {
-  const {currentCluster} = props;
+  const {
+    currentCluster, clusters, clusterStatus, coreDumps, unknowProcesses, onDeleteUnknowProcess
+  } = props;
+  const checkStatus = getClusterInfoStatus(clusterStatus, coreDumps, unknowProcesses);
+  const serverSecure = checkClusterVersion(clusterStatus);
 
   return (
     <div className="hc-header">
@@ -64,9 +138,19 @@ const Header = (props) => {
           <CopyOutlined />集群列表{clusterTip(currentCluster)}
         </span>
         <span
-          onClick={() => callClusterStatus({clusterCode: currentCluster.code})}
+          onClick={() => callClusterStatus({
+            clusterCode: currentCluster.code,
+            clusters: clusters,
+            serverSecure: serverSecure,
+            unknowProcesses: unknowProcesses,
+            onDeleteUnknowProcess: onDeleteUnknowProcess
+          })}
           className="menu-item show-cluster-sider">
-          <PauseCircleOutlined /> 集群信息
+          {
+            checkStatus === 'error' ?
+              <span className="error-red"><ExclamationCircleOutlined /> 集群异常</span> :
+              <span><PauseCircleOutlined /> 集群信息</span>
+          }
         </span>
       </div>
       <div className="center">
@@ -115,7 +199,12 @@ const Header = (props) => {
 
 Header.propTypes = {
   onToggleCluster: PropTypes.func,
-  currentCluster: PropTypes.object
+  currentCluster: PropTypes.object,
+  clusters: PropTypes.array,
+  clusterStatus: PropTypes.array,
+  coreDumps: PropTypes.array,
+  unknowProcesses: PropTypes.array,
+  onDeleteUnknowProcess: PropTypes.func
 };
 
 export default Header;
