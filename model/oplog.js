@@ -39,8 +39,6 @@ const GET_OPLOG = `
 `;
 
 OpLog.getOpLog = (clusterCode, startTime, endTime, callback) => {
-  console.log(startTime, endTime);
-
   db.query(
     GET_OPLOG,
     [

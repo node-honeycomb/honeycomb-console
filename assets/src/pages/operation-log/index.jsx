@@ -6,7 +6,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {withRouter} from 'dva/router';
 import CommonTitle from '@coms/common-title';
-import {Table, Tag, Modal, DatePicker} from 'antd';
+import {Table, Tag, Modal, DatePicker, notification} from 'antd';
 import {default as MonacoEditor, MonacoDiffEditor} from 'react-monaco-editor';
 
 import ClusterSelector from './coms/cluster-selector';
@@ -94,8 +94,14 @@ const OperationLog = (props) => {
     );
     api.oplogApi.queryOpLog(clusterCode, dateRange[0].format(), dateRange[1].format())
       .then(r => {
-        setDataSource(r);
+        setDataSource(r || []);
         setTableLoading(false);
+      })
+      .catch(e => {
+        notification.error({
+          message: '错误',
+          description: e.message
+        });
       });
   }, [clusterCode, dateRange, loading]);
 
