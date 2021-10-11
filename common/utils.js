@@ -477,3 +477,21 @@ exports.configRemoveSecretFields = function (oldConfig, newConfig) {
 
   return [oldConfig, newConfig];
 };
+
+const getIpOfForward = (forwarded) => {
+  if (!forwarded) {
+    return;
+  }
+
+  const ips = forwarded.split(',');
+
+  return ips[ips.length - 1];
+};
+
+exports.getIp = (req) => {
+  return _.get(req, 'headers.x-real-ip') ||
+  getIpOfForward(_.get(req, 'headers.x-forwarded-for')) ||
+  _.get(req, 'connection.remoteAddress') ||
+  _.get(req, 'socket.remoteAddress') ||
+  _.get(req, 'connection.socket.remoteAddress') || '127.0.0.1';
+};

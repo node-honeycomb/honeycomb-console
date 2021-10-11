@@ -1,6 +1,7 @@
 import React, {useEffect, useState, useCallback} from 'react';
 import {connect} from 'dva';
 import api from '@api/index';
+import _ from 'lodash';
 import CommonTitle from '@coms/common-title';
 import {Table, Tag, Drawer, DatePicker} from 'antd';
 import PropTypes from 'prop-types';
@@ -46,16 +47,15 @@ const opNameMap = {
 
 // 日志模块
 const OperationLog = (props) => {
-  const {currentClusterCode, clusters} = props;
+  const {currentClusterCode, clusters, loading} = props;
   const [clusterCode, setClusterCode] = useState(currentClusterCode);
-  const [loading, setLoading] = useState(false);
+  const [clusterList, setClusterList] = useState({});
+  const [tableLoading, setTableLoading] = useState(false);
   const [dataSource, setDataSource] = useState([]);
   const [drawerVisible, setDrawerVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState('');
   const [dateRange, setDateRange] = useState([moment().subtract(1, 'days'), moment()]);
   const [oldConfig, setOldConfig] = useState({});
-
-  clusters['_system_manage'] = {name: '系统管理'};
 
   const onClose = useCallback(() => {
     setDrawerVisible(false);
@@ -67,13 +67,22 @@ const OperationLog = (props) => {
   });
 
   useEffect(() => {
-    setLoading(true);
+    setTableLoading(true);
+    setClusterList(loading ? {
+      loading: {name: '加载中...'}
+    } :
+      {
+      // eslint-disable-next-line camelcase
+        _system_manage: {name: '系统管理'},
+        ...clusters
+      }
+    );
     api.oplogApi.queryOpLog(clusterCode, dateRange[0].format(), dateRange[1].format())
       .then(r => {
         setDataSource(r);
-        setLoading(false);
+        setTableLoading(false);
       });
-  }, [clusterCode, dateRange]);
+  }, [clusterCode, dateRange, loading]);
 
   return (
     <div>
@@ -82,7 +91,7 @@ const OperationLog = (props) => {
       </CommonTitle>
       <div className="param-box">
         <ClusterSelector
-          clusters={clusters}
+          clusters={clusterList}
           value={clusterCode}
           onChange={setClusterCode}
         />
@@ -99,7 +108,7 @@ const OperationLog = (props) => {
           />
         </div>
       </div>
-      <Table loading={loading} columns={[
+      <Table loading={tableLoading || loading} columns={[
         {
           title: '时间',
           dataIndex: 'time',
@@ -120,7 +129,7 @@ const OperationLog = (props) => {
         {
           title: '用户地址',
           dataIndex: 'socket',
-          render: socket => <span>{socket && `${socket.address} ${socket.port}` || '未记录'}</span>
+          render: socket => <span>{socket && socket.address || '未记录'}</span>
         },
         {
           title: '操作等级',
@@ -185,19 +194,21 @@ const OperationLog = (props) => {
 };
 
 const mapState2Props = (state) => {
+  const loading = state.loading;
+  const clusterLoading = _.get(loading.effects, 'global/getCluster');
+
   return {
-    currentClusterCode: state.global.currentClusterCode,
-    currentCluster: state.global.currentCluster,
-    clusters: state.global.clusters
+    ...state.global,
+    loading: clusterLoading,
   };
 };
 
 OperationLog.propTypes = {
   currentClusterCode: PropTypes.string,
-  location: PropTypes.object,
   dispatch: PropTypes.func,
   currentCluster: PropTypes.object,
   clusters: PropTypes.object,
+  loading: PropTypes.bool,
 };
 
 export default withRouter(connect(mapState2Props)(OperationLog));
