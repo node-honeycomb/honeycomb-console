@@ -16,7 +16,6 @@ import {
 
 import api from '@api';
 import msgParser from '@lib/msg-parser';
-import {downloadText} from 'download.js';
 import WhiteSpace from '@coms/white-space';
 import useInterval from '@lib/use-interval';
 import notification from '@coms/notification';
@@ -183,7 +182,19 @@ const LogPanel = (props) => {
   };
 
   const onDownload = () => {
-    downloadText(`${filename}.log`, getLogString());
+    const {ips} = filter;
+    const prefix = window.CONFIG.prefix;
+
+    if (ips.length <= 0) {
+      notification.error({
+        message: '错误',
+        description: '请在机器选择框中选择您要下载日志的机器'
+      });
+
+      return;
+    }
+
+    window.open(`${prefix}/api/log/${filename}?clusterCode=${clusterCode}&ips=${ips.join(',')}`);
   };
 
   return (

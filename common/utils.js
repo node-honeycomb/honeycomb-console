@@ -261,11 +261,11 @@ exports.callremote = function (queryPath, options, callback) {
   const qpath = endpoint + signed.queryPath;
 
   log.debug(`${options.method} ${qpath}`);
-  urllib.request(qpath, options, function (err, data) {
+  urllib.request(qpath, options, function (err, data, res) {
     if (err) {
       callback(err);
     } else {
-      callback(null, data);
+      callback(null, data, res);
     }
   });
 };
