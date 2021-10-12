@@ -94,16 +94,16 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_cluster_snapshort` (
 -- 字段名和json统一
 CREATE TABLE IF NOT EXISTS `hc_console_system_oplog` (
   `id` INTEGER PRIMARY KEY AUTOINCREMENT,
-  `clusterCode` varchar(50) NOT NULL DEFAULT '',
-  `clientId` text,
-  `opName` varchar(40) NOT NULL DEFAULT '',
-  `opType` varchar(20) NOT NULL DEFAULT '',
-  `opLogLevel` varchar(20) NOT NULL DEFAULT '',
-  `opItem` varchar(20) NOT NULL DEFAULT '',
-  `opItemId` varchar(255) NOT NULL DEFAULT '', 
+  `cluster_code` varchar(50) NOT NULL DEFAULT '',
+  `client_id` text,
+  `op_name` varchar(40) NOT NULL DEFAULT '',
+  `op_type` varchar(20) NOT NULL DEFAULT '',
+  `op_log_level` varchar(20) NOT NULL DEFAULT '',
+  `op_item` varchar(20) NOT NULL DEFAULT '',
+  `op_item_id` varchar(255) NOT NULL DEFAULT '', 
   `username` varchar(255) NOT NULL DEFAULT '', 
   `socket` text,
   `detail` text,
   `extends` text,
-  `time` datetime NOT NULL
+  `gmt_create` datetime NOT NULL
 );

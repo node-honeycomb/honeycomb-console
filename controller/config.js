@@ -130,7 +130,8 @@ exports.setAppConfig = function (req, res) {
   }
 
   appConfig.getAppConfig(clusterCode, type, appName, function (err, data) {
-    const [oldConfig, newConfig] = utils.configRemoveSecretFields(data.config, opt.data);
+    const [oldConfig, newConfig] = utils.configRemoveSecretFields(data ?
+      data.config : {}, opt.data);
 
     req.oplog({
       clientId: req.ips.join('') || '-',

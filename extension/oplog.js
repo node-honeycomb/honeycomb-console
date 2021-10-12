@@ -1,5 +1,6 @@
 const moment = require('moment');
 const oplog = require('../model/oplog');
+const utils = require('../common/utils');
 
 module.exports = function (app) {
   app.express.request.oplog = function (data, appendDetail = true) {
@@ -11,9 +12,7 @@ module.exports = function (app) {
       gmtCreate: moment().format('YYYY-MM-DD HH:mm:ss'),
       username: user.name,
       socket: {
-        address: this.client.remoteAddress,
-        port: this.client.remotePort,
-        family: this.client.remoteFamily
+        address: utils.getIp(this),
       },
       clusterCode,
       detail: appendDetail ? {
