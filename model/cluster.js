@@ -348,6 +348,32 @@ exports.getMonitedClusterCfg = function (cb) {
   });
 };
 
+const GET_CLUSTER_MONITOR_BY_CODE = `
+  select
+    monitor, name
+  from
+    hc_console_system_cluster
+  where
+    code = ?
+`;
+
+/**
+ * 获取集群监控机器人地址
+ */
+exports.getClusterMonitorByCode = function (code, cb) {
+  db.query(GET_CLUSTER_MONITOR_BY_CODE, code, function (err, data) {
+    if (err || !data) {
+      const e = new Error('GET_CLUSTER_MONITOR_BY_CODE failed: ' + err.message);
+
+      log.error(err.stack);
+
+      return cb(e);
+    }
+
+    cb(null, data);
+  });
+};
+
 exports.gClusterConfig = {};
 
 exports.getClusterCodes = () => {

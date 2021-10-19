@@ -1,6 +1,7 @@
 const moment = require('moment');
 const oplog = require('../model/oplog');
 const utils = require('../common/utils');
+const emitOplog = require('../monitor/emitOplog');
 
 module.exports = function (app) {
   app.express.request.oplog = function (data, appendDetail = true) {
@@ -23,5 +24,12 @@ module.exports = function (app) {
       } : {},
       ...data
     });
+
+    if (data.opName === 'UPDATE_CLUSTER') {
+      emitOplog(this.body.code, user.name, data);
+    } else {
+      clusterCode !== '_system_manage' &&
+      emitOplog(clusterCode, user.name, data);
+    }
   };
 };
