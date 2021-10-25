@@ -196,6 +196,10 @@ class Header extends React.Component {
     });
   }
   deleteClusterSnapshot = () => {
+    let check = window.confirm('are you sure to clean the latest cluster snapshot cache');
+    if (!check) {
+      return;
+    }
     let clusterCode = URL.parse(window.location.href, true).query.clusterCode;
     this.props.deleteClusterSnapshot({clusterCode});
   }
