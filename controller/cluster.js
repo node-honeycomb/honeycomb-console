@@ -245,77 +245,91 @@ const yaml = require('yaml');
  * @nowrap
  */
 exports.downloadClusterPatch = async function (req, res, next) {
-  let clusterCode = req.query.clusterCode;
-  let clusterSnp = await getSnapshotSync(clusterCode);
+  try {
+    let clusterCode = req.query.clusterCode;
+    let clusterSnp = await getSnapshotSync(clusterCode);
 
-  let tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
+    let tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
 
-  if (!clusterSnp) {
-    res.statusCode = 404;
-    return res.json({code: 'ERROR', data: 'empty'});
-  }
-  let serverCfg = await getAppConfig(clusterCode, 'server', 'server');
+    if (!clusterSnp) {
+      res.statusCode = 404;
+      return res.json({code: 'ERROR', data: 'empty'});
+    }
+    let serverCfg = await getAppConfig(clusterCode, 'server', 'server');
 
-  if (serverCfg) {
-    fs.sync().save(path.join(tmpDir, 'conf/custom/server.json'), JSON.stringify(serverCfg.config, null, 2));
-  }
-  let commonCfg = await getAppConfig(clusterCode, 'server', 'common');
-  if (commonCfg) {
-    fs.sync().save(path.join(tmpDir, 'conf/custom/common.json'), JSON.stringify(commonCfg.config, null, 2));
-  }
+    if (serverCfg) {
+      fs.sync().save(path.join(tmpDir, 'conf/custom/server.json'), JSON.stringify(serverCfg.config, null, 2));
+    }
+    let commonCfg = await getAppConfig(clusterCode, 'server', 'common');
+    if (commonCfg) {
+      fs.sync().save(path.join(tmpDir, 'conf/custom/common.json'), JSON.stringify(commonCfg.config, null, 2));
+    }
 
-  fs.sync().mkdir(path.join(tmpDir, 'run/appsRoot/'));
-  /*
-  { 
-    name: 'socket-app',
-    versions:[ 
-      { 
-        version: '1.0.0',
-        buildNum: '2',
-        publishAt: '5/22/2020, 2:34:00 PM',
-        appId: 'socket-app_1.0.0_2',
-        weight: 1000000.002,
-        cluster: [Array],
-        isCurrWorking: true 
-      }
-    ]
-  }
-  */
-  let apps = {};
-  for (let i = 0; i < clusterSnp.info.length; i++) {
-    let app = clusterSnp.info[i];
-    for (let n = 0; n < app.versions.length; n++) {
-      let v = app.versions[n];
-      if (!v.isCurrWorking) {
-        continue;
-      }
-      let appCfg = await getAppConfig(clusterCode, 'app', app.name);
-      if (appCfg) {
-        fs.sync().save(path.join(tmpDir, `conf/custom/apps/${app.name}.json`), JSON.stringify(appCfg.config, null, 2));
-      }
-      let pkg = await getAppPackage(clusterCode, v.appId);
-      if (pkg) {
-        await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
-        apps[v.appId] = {
-          dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
-        };
+    fs.sync().mkdir(path.join(tmpDir, 'run/appsRoot/'));
+    /*
+    { 
+      name: 'socket-app',
+      versions:[ 
+        { 
+          version: '1.0.0',
+          buildNum: '2',
+          publishAt: '5/22/2020, 2:34:00 PM',
+          appId: 'socket-app_1.0.0_2',
+          weight: 1000000.002,
+          cluster: [Array],
+          isCurrWorking: true 
+        }
+      ]
+    }
+    */
+    let apps = {};
+    for (let i = 0; i < clusterSnp.info.length; i++) {
+      let app = clusterSnp.info[i];
+      for (let n = 0; n < app.versions.length; n++) {
+        let v = app.versions[n];
+        if (!v.isCurrWorking) {
+          continue;
+        }
+        let appCfg = await getAppConfig(clusterCode, 'app', app.name);
+        if (appCfg) {
+          fs.sync().save(path.join(tmpDir, `conf/custom/apps/${app.name}.json`), JSON.stringify(appCfg.config, null, 2));
+        }
+        let pkg;
+        if (req.query.force) {
+          try {
+            pkg = await getAppPackage(clusterCode, v.appId);
+          } catch (e) {
+            log.error('download app pkg from filerepo failed, force ignore', clusterCode, app.name);
+          }
+        } else {
+          pkg = await getAppPackage(clusterCode, v.appId);
+        }
+        if (pkg) {
+          await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
+          apps[v.appId] = {
+            dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
+          };
+        }
       }
     }
-  }
-  if (Object.keys(apps).length) {
-    fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
-  }
-  res.writeHead(200, {
-    'Content-Type': 'application/force-download',
-    'Content-Disposition': 'attachment; filename=cluster_patch.tgz'
-  });
+    if (Object.keys(apps).length) {
+      fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
+    }
+    res.writeHead(200, {
+      'Content-Type': 'application/force-download',
+      'Content-Disposition': 'attachment; filename=cluster_patch.tgz'
+    });
 
-  tar.c({
-      gzip: true,
-      cwd: path.dirname(tmpDir),
-    },
-    ['cluster_patch']
-  ).pipe(res);
+    tar.c({
+        gzip: true,
+        cwd: path.dirname(tmpDir),
+      },
+      ['cluster_patch']
+    ).pipe(res);
+  } catch (e) {
+    res.statusCode = 500;
+    res.json({code: 'ERROR', message: e.message});
+  }
 };
 
 /**
