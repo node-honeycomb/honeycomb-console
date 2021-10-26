@@ -88,11 +88,6 @@ const UserManager = (props) => {
       dataIndex: 'endpoint',
     },
     {
-      title: '秘钥',
-      dataIndex: 'token',
-      render: () => '***',
-    },
-    {
       title: 'ip列表',
       dataIndex: 'ips',
       render: (row) => {
@@ -164,6 +159,9 @@ const UserManager = (props) => {
         columns={cols()}
         dataSource={dataSource}
         rowKey="id"
+        pagination={{
+          pageSize: 100
+        }}
       />
     </div>
   );

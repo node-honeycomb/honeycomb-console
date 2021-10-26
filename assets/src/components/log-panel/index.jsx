@@ -23,6 +23,13 @@ import notification from '@coms/notification';
 
 const DEFAULT_MAX_LINE = 200;
 
+const TYPE_COLOR = {
+  INFO: '#6396ee',
+  WARN: '#FF7F00',
+  DEBUG: '#242e42',
+  ERROR: '#FF0000'
+};
+
 const defaultFilter = {
   line: DEFAULT_MAX_LINE,
   day: moment().format('YYYY-MM-DD'),
@@ -298,10 +305,22 @@ const LogPanel = (props) => {
             {
               logs.success.map((log, ind) => {
                 const level = getLogLevel(log);
+                const timeTailIndex = 20;
+                const pidSliceIndex = log.indexOf('#');
+                const timestr = log.substring(0, timeTailIndex).trim();
+                const typestr = log.substring(timeTailIndex + 1, pidSliceIndex - 1).trim();
+                const pidstr = log.substring(pidSliceIndex, pidSliceIndex + 6).trim();
+                const contentstr = log.substring(pidSliceIndex + 6).trim();
 
                 return (
                   <pre className={`log-code log-${_.lowerCase(level)}`} key={ind}>
-                    {log}
+                    <span style={{color: '#91B5F3'}}>{timestr}</span>
+                    &nbsp;
+                    <span style={{color: TYPE_COLOR[typestr]}}>{typestr}</span>
+                    &nbsp;
+                    <span style={{color: '#FFA500'}}>{pidstr}</span>
+                    &nbsp;
+                    <span>{contentstr}</span>
                   </pre>
                 );
               })
