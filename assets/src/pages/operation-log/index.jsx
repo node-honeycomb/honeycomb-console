@@ -129,7 +129,7 @@ const OperationLog = (props) => {
           />
         </div>
       </div>
-      <Table loading={tableLoading || loading} columns={[
+      <Table loading={tableLoading || loading} rowKey="id" columns={[
         {
           title: '时间',
           dataIndex: 'gmtCreate',
