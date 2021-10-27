@@ -294,3 +294,65 @@ exports.queryAppUsages = function (req, callback) {
     });
   }
 };
+
+
+/**
+ * @api {get} /api/log/:file
+ * @desc 代理下载文件
+ * @nowrap
+ * @param req
+ * @param res
+ * param
+ *   file {String} fileName
+ * query
+ *   clusterCode {String} fileName
+ *   ips {String} ip list
+ */
+exports.downloadLogFileBatch = function (req, res) {
+  const file = req.params.file;
+  const clusterCode = req.query.clusterCode;
+
+  if (!file) {
+    return res.json({
+      code: 'ERROR',
+      message: 'param missing, params.file is empty'
+    });
+  }
+
+  const opt = cluster.getClusterCfgByCode(clusterCode);
+
+  if (opt.code === 'ERROR') {
+    res.statusCode = 500;
+
+    return res.json(opt);
+  }
+  let ips = req.query.ips;
+
+  ips = ips && ips.split(',');
+
+  const uri = `/api/log/${file}`;
+
+  callremote(uri, {
+    ...opt,
+    method: 'GET',
+    ips: ips,
+    streaming: true
+  }, function (err, data, r) {
+    if (err) {
+      return res.json({
+        code: 'ERROR',
+        message: err
+      });
+    } else {
+      if (r.headers['content-type'] !== 'application/octet-stream') {
+        res.setHeader('Content-type', r.headers['content-type']);
+      } else {
+        const disposition = r.headers['content-disposition'];
+
+        res.setHeader('Content-type', 'application/octet-stream');
+        res.setHeader('Content-Disposition', disposition);
+      }
+      r.pipe(res);
+    }
+  });
+};
