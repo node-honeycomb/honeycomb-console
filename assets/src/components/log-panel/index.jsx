@@ -108,7 +108,7 @@ const LogPanel = (props) => {
         fileName: getLogFileName(logFileName, moment(day, dayFormat)),
         clusterCode,
         startTime: time,
-        ips,
+        ips: ips.join(','),
         logLines: line,
         filterString: keyword
       });
