@@ -345,7 +345,7 @@ exports.downloadLogFileBatch = function (req, res) {
       });
     } else {
       if (r.headers['content-type'] !== 'application/octet-stream') {
-        res.setHeader('Content-type', 'application/json');
+        res.setHeader('Content-type', r.headers['content-type']);
       } else {
         const disposition = r.headers['content-disposition'];
 

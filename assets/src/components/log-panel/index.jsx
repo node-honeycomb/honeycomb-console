@@ -11,9 +11,10 @@ import {
 import {
   DatePicker, Select, InputNumber,
   Input, Tooltip, TimePicker, Button, Spin,
-  Empty, Switch, message
+  Empty, Switch, message, notification as antdNotification
 } from 'antd';
-
+import {downloadBlob, downloadText} from 'download.js';
+import axios from 'axios';
 import api from '@api';
 import msgParser from '@lib/msg-parser';
 import WhiteSpace from '@coms/white-space';
@@ -193,8 +194,45 @@ const LogPanel = (props) => {
 
       return;
     }
+    axios({
+      method: 'get',
+      url: `${prefix}/api/log/${filename}?clusterCode=${clusterCode}&ips=${ips.join(',')}`,
+      responseType: 'blob',
+    })
+      .then(function (response) {
+        if (response.headers['content-type'].indexOf('application/octet-stream') !== -1) {
+          const contentDisposition = response.headers['content-disposition'];
+          const startOffset = contentDisposition.indexOf('filename=') + 'filename='.length;
+          let endOffset = contentDisposition.indexOf(';', startOffset);
 
-    window.open(`${prefix}/api/log/${filename}?clusterCode=${clusterCode}&ips=${ips.join(',')}`);
+          endOffset = endOffset === -1 ? contentDisposition.length : endOffset;
+          const cdFilename = contentDisposition.slice(startOffset, endOffset).trim();
+
+          downloadBlob(cdFilename, response.data);
+        } else if (response.headers['content-type'].indexOf('application/json') !== -1) {
+          response.data.text()
+            .then(data => {
+              notification.error({
+                message: '错误',
+                description: JSON.parse(data).message
+              });
+            });
+        } else {
+          const btn = (
+            <Button type="primary" size="small" onClick={() =>
+              window.open('https://www.yuque.com/honeycomb/gz4kna/eqgdv4')}>
+              升级帮助
+            </Button>
+          );
+
+          antdNotification.info({
+            message: '提示',
+            description: '目标服务器版本不支持日志下载，将为您下载已展示的日志内容。您可以点击按钮查看如何升级。',
+            btn
+          });
+          downloadText(filename, getLogString());
+        }
+      });
   };
 
   return (
