@@ -1,7 +1,8 @@
 import React, {useState, useEffect} from 'react';
-import {Empty} from 'antd';
+import {Empty, Tooltip} from 'antd';
 import moment from 'moment';
 import PropTypes from 'prop-types';
+import {ExclamationCircleOutlined} from '@ant-design/icons';
 
 import Filter from '../filter';
 import SysChart from '../sys-chart';
@@ -83,14 +84,16 @@ const AppChart = (props) => {
         appSelected && (
           <div>
             <span className="monitor-chart-title">
-            应用CPU负载
+              <Tooltip title="cpu占比越高说明程序消耗系统cpu资源越高，范围是 0~100*cpu核心数">
+                应用CPU负载（百分比）<ExclamationCircleOutlined />
+              </Tooltip>
             </span>
             <SysChart
               data={appCpuUsage}
               loading={loading}
             />
             <span className="monitor-chart-title">
-            应用内存负载
+            应用内存负载（MB）
             </span>
             <SysChart
               data={appMemUsage}

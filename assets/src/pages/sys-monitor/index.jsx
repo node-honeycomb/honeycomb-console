@@ -113,6 +113,8 @@ const SysMonitor = (props) => {
       <CommonTitle>系统监控</CommonTitle>
       <div className="main-container">
         <div className="left-machines">
+          <AddChart onSelect={onSelect} />
+          <br />
           <div className="list-title">机器列表</div>
           {
             machines.map(m => {
@@ -121,7 +123,6 @@ const SysMonitor = (props) => {
               );
             })
           }
-          <AddChart onSelect={onSelect} />
         </div>
         <div className="right-monitor">
           {

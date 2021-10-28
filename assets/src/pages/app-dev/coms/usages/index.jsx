@@ -77,7 +77,8 @@ const Usages = (props) => {
         (usage.totalDisk - usage.avaDisk).toFixed(2))}
       title={title}
       allTitle={isMem ? '总内存(G)' : '总磁盘容量(G)'}
-      partTitle={isMem ? '可用内存(G)' : '可用磁盘容量(G)'}
+      partTitle={isMem ? '已用内存(G)' : '已用磁盘容量(G)'}
+      anotherTitle={isMem ? '剩余内存(G)' : '剩余磁盘容量(G)'}
     />
   );
 };

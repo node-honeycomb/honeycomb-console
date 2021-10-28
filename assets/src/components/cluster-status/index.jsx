@@ -1,16 +1,19 @@
 import React, {useState} from 'react';
 import _ from 'lodash';
-import {Modal, notification, Spin, Tooltip} from 'antd';
-import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
+import randomstring from 'randomstring';
+import {Modal, notification, Spin, Tooltip} from 'antd';
+
 import {clusterApi} from '@api';
 import {useRequest} from '@lib/hooks';
 import {removeModalDOM} from '@lib/util';
+
 import Machine from '../machine';
+
 import './index.less';
 
 const confirm = Modal.confirm;
-const randomstring = require('randomstring');
 
 const ORIGIN_TOKEN = '***honeycomb-default-token***';
 const getTips = (length) => {

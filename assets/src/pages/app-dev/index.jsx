@@ -186,6 +186,7 @@ const AppDev = (props) => {
         <Ring
           all={totalVersion}
           part={errorCount}
+          anotherTitle="正常应用总数"
           title="当前集群异常应用"
           allTitle="应用总数"
           partTitle="异常应用总数"

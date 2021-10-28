@@ -2,7 +2,7 @@ import React from 'react';
 import _ from 'lodash';
 import moment from 'moment';
 import PropTypes from 'prop-types';
-import {Tooltip, message, Tag, Icon} from 'antd';
+import {Tooltip, message} from 'antd';
 import {PRIMARY_COLOR} from '@lib/color';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import {DesktopOutlined, CloudServerOutlined, NodeIndexOutlined} from '@ant-design/icons';
@@ -33,7 +33,7 @@ const TITLE_RENDER = {
 };
 
 const Machine = (props) => {
-  const {ip, data, unknowPros} = props;
+  const {ip, data} = props;
 
   return (
     <BannerCard className="machine">
@@ -49,21 +49,6 @@ const Machine = (props) => {
           </CopyToClipboard>
         </Tooltip>
       </div>
-      {
-        unknowPros && (unknowPros.data || []).map(d => {
-          const unknowProces = d.info;
-          const isLongTag = unknowProces.length > 25;
-          const tagElem = (
-            <Tag className="file-name-wrap" key={d.pid}>
-              {isLongTag ? `${unknowProces.slice(0, 25)}...` : unknowProces}
-              <Icon onClick={props.onDeleteUnknowProcess.bind(this, d.pid)} type="close" />
-            </Tag>
-          );
-
-          return isLongTag ? <Tooltip title={unknowProces} key={d.pid}>{tagElem}</Tooltip> :
-            tagElem;
-        })
-      }
       <div className="key-title">基础信息</div>
       <div>
         {

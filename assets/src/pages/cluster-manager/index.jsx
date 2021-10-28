@@ -2,7 +2,10 @@ import React, {useState, useEffect, useCallback} from 'react';
 import _ from 'lodash';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
-import {Table, Button, Divider, Modal, message, Tooltip} from 'antd';
+import {
+  Table, Button, Divider, Modal,
+  message, Tooltip, Tag
+} from 'antd';
 
 import {clusterApi} from '@api';
 import {useSearch} from '@lib/hooks';
@@ -10,6 +13,12 @@ import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 
 import clusterUpset from './cluster-upset';
+
+const ENV = {
+  prod: <Tag color="green">生产环境</Tag>,
+  dev: <Tag>开发环境</Tag>,
+  pre: <Tag color="geekblue">预发环境</Tag>
+};
 
 const UserManager = (props) => {
   const [clusterList, setClusterList] = useState([]);
@@ -111,12 +120,6 @@ const UserManager = (props) => {
       title: '集群环境',
       dataIndex: 'env',
       render: (row) => {
-        const ENV = {
-          prod: '生产环境',
-          dev: '开发环境',
-          pre: '预发环境',
-        };
-
         return _.get(ENV, row);
       },
     },

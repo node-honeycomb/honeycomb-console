@@ -37,7 +37,10 @@ class Ring extends React.Component {
   }
 
   render() {
-    const {all, part, title, allTitle, partTitle, partTooltip} = this.props;
+    const {
+      all, part, title, allTitle,
+      partTitle, partTooltip, anotherTitle
+    } = this.props;
 
     const data = [
       {
@@ -45,7 +48,7 @@ class Ring extends React.Component {
         value: part
       },
       {
-        type: allTitle,
+        type: anotherTitle,
         value: all - part,
       }
     ];
@@ -80,7 +83,6 @@ class Ring extends React.Component {
           <Interval
             adjust="stack"
             position="value"
-            // color="type"
             shape="sliceShape"
             color={['type', [PRIMARY_COLOR, 'rgb(255, 255, 255)']]}
           />
@@ -105,7 +107,8 @@ Ring.propTypes = {
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   allTitle: PropTypes.string,
   partTitle: PropTypes.string,
-  partTooltip: PropTypes.any
+  partTooltip: PropTypes.any,
+  anotherTitle: PropTypes.string,
 };
 
 export default Ring;
