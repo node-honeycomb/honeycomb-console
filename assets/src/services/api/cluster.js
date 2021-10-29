@@ -59,10 +59,22 @@ export const getUnknowProcess = (clusterCode) => {
   return request.get(`/api/unknowProcess`, {params: {clusterCode}});
 };
 
-// 删除集群
+// 删除集群未知进程
 export const deleteUnknowProcess = (pid, params) => {
   return request.post(`/api/unknowProcess/${pid}/delete`, params);
 };
+
+/**
+ * 删除coredump
+ * @param {Object}} body
+ *        - clusterCode {string}
+ *        - files {string[]} 文件名
+ * @returns
+ */
+export const delCoredump = (body) => {
+  return request.post(`/api/coredump/delete`, body);
+};
+
 
 /**
  * 获取AppsConfig

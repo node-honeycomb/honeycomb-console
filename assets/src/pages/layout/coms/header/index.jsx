@@ -5,11 +5,13 @@ import {Menu, Dropdown, Tooltip, Tag} from 'antd';
 import {
   UserOutlined, CopyOutlined, PauseCircleOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
-  BookOutlined, RedoOutlined, ExclamationCircleOutlined
+  BookOutlined, RedoOutlined, WarningOutlined
 } from '@ant-design/icons';
 
 import WhiteSpace from '@coms/white-space';
 import callClusterStatus from '@coms/cluster-status';
+
+import {callClusterError} from '../clust-error';
 
 import clusterTip from '../cluster-tip';
 
@@ -45,43 +47,19 @@ const menu = (
   </Menu>
 );
 
-const getClusterInfoStatus = (statusObjs, coreDump, unknowPro) => {
-  const diskCapacityLimit = 0.8;
-  const memoryUsageLimit = 80;
-  let clusterStatus = 'normal'; // three status: 'normal', 'warning', 'error'
-  let memoryWarning = false;
-  let isRedWarning = false;
+const getIsClusterError = (currentCluster, coreDump, unknowPro) => {
+  const isToken = currentCluster.token === '***honeycomb-default-token***';
 
-  statusObjs.forEach(status => {
-    const serverCa = _.get(status, 'diskInfo.serverRoot.capacity');
-    const logCa = _.get(status, 'diskInfo.logsRoot.capacity');
-
-    if (
-      (serverCa > diskCapacityLimit - 0.2) ||
-        (logCa > diskCapacityLimit - 0.2) ||
-        (status.memoryUsage > memoryUsageLimit - 20)
-    ) {
-      memoryWarning = true;
-    }
-    if (
-      (serverCa > diskCapacityLimit) ||
-        (logCa > diskCapacityLimit) ||
-        (status.memoryUsage > memoryUsageLimit)
-    ) {
-      isRedWarning = true;
-    }
-  });
   const isCoreWarn = _.some(coreDump, core => {
     return core.data && (core.data.length > 0);
   });
+
   const isUnkWarn = _.some(unknowPro, unkn => {
     return unkn.data && (unkn.data.length > 0);
   });
 
-  if (memoryWarning || isCoreWarn || isUnkWarn) clusterStatus = 'warning';
-  if (isRedWarning) clusterStatus = 'error';
 
-  return clusterStatus;
+  return isCoreWarn || isUnkWarn || isToken;
 };
 
 const versionCompare = (v1, v2) => {
@@ -117,9 +95,11 @@ const checkClusterVersion = (statusObjs) => {
 
 const Header = (props) => {
   const {
-    currentCluster, clusters, clusterStatus, coreDumps, unknowProcesses, onDeleteUnknowProcess
+    currentCluster, clusters, clusterStatus, coreDumps,
+    unknowProcesses, onDeleteUnknowProcess,
   } = props;
-  const checkStatus = getClusterInfoStatus(clusterStatus, coreDumps, unknowProcesses);
+
+  const isClusterError = getIsClusterError(currentCluster, coreDumps, unknowProcesses);
   const serverSecure = checkClusterVersion(clusterStatus);
 
   return (
@@ -141,17 +121,35 @@ const Header = (props) => {
           onClick={() => callClusterStatus({
             clusterCode: currentCluster.code,
             clusters: clusters,
-            serverSecure: serverSecure,
-            unknowProcesses: unknowProcesses,
-            onDeleteUnknowProcess: onDeleteUnknowProcess
           })}
           className="menu-item show-cluster-sider">
-          {
-            checkStatus === 'error' ?
-              <span className="error-red"><ExclamationCircleOutlined /> 集群异常</span> :
-              <span><PauseCircleOutlined /> 集群信息</span>
-          }
+          <span><PauseCircleOutlined /> 集群信息</span>
         </span>
+        {
+          isClusterError && (
+            <span
+              className="menu-item show-cluster-sider"
+              style={{
+                color: 'red',
+                alignItems: 'center',
+                display: 'flex'
+              }}
+              onClick={() => callClusterError(
+                {
+                  serverSecure: serverSecure,
+                  unknowProcesses: unknowProcesses,
+                  onDeleteUnknowProcess: onDeleteUnknowProcess,
+                  currentCluster,
+                  coreDumps
+                }
+              )}
+            >
+              <WarningOutlined
+              />
+              集群异常
+            </span>
+          )
+        }
       </div>
       <div className="center">
       </div>

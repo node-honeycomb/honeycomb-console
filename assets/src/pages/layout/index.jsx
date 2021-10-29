@@ -95,6 +95,7 @@ class AppLayout extends React.Component {
     const statusObjs = statusObjPro.map(pro => {
       return _.get(pro, 'data') || {};
     }) || [];
+
     const coreDumpArr = _.get(coreDump, ['success']) || [];
     const unkProArr = _.get(unknowPro, ['success']) || [];
 
@@ -210,7 +211,8 @@ class AppLayout extends React.Component {
 
   render() {
     const {
-      clusterVisible, errorMsg, clusters, clusterStatus, coreDumps, unknowProcesses
+      clusterVisible, errorMsg, clusters, clusterStatus,
+      coreDumps, unknowProcesses
     } = this.state;
     const {currentCluster, currentClusterCode} = this.props;
 

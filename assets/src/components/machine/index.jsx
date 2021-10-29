@@ -145,9 +145,7 @@ Machine.propTypes = {
     sysTime: PropTypes.string,
     timezone: PropTypes.string,
     uname: PropTypes.string
-  }),
-  unknowPros: PropTypes.array,
-  onDeleteUnknowProcess: PropTypes.func
+  })
 };
 
 /**

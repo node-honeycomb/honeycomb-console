@@ -42,7 +42,7 @@ const detectCluster = (cluster) => {
         emitClusterError({
           clusterCode,
           clusterName,
-          message: err.message,
+          message: err && err.message,
           monitor: cluster.monitor,
         });
 

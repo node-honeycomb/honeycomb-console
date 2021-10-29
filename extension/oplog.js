@@ -1,7 +1,7 @@
 const moment = require('moment');
 const oplog = require('../model/oplog');
 const utils = require('../common/utils');
-const emitOplog = require('../monitor/emitOplog');
+const emitOplog = require('../monitor/emit-op-log');
 
 module.exports = function (app) {
   app.express.request.oplog = function (data, appendDetail = true) {

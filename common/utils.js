@@ -1,11 +1,11 @@
 /* eslint-disable max-len */
 const fs = require('fs');
-const crypto = require('crypto');
-const childProcess = require('child_process');
-const url = require('url');
-const qs = require('querystring');
 const _ = require('lodash');
+const url = require('url');
 const urllib = require('urllib');
+const crypto = require('crypto');
+const qs = require('querystring');
+const childProcess = require('child_process');
 
 const log = require('./log');
 
@@ -444,12 +444,13 @@ function getSecretFields(config, root = '') {
   if (typeof config !== 'object')
     return [];
 
-  return Object.keys(config)
-    .map(key => secretFieldNameList.some(pattern => pattern.test(key)) ?
-      root + key :
-      getSecretFields(config[key], root + key + '.')
-    )
-    .flat();
+  return _.flat(
+    Object.keys(config)
+      .map(key => secretFieldNameList.some(pattern => pattern.test(key)) ?
+        root + key :
+        getSecretFields(config[key], root + key + '.')
+      )
+  );
 }
 
 // rate = 最大可见比例
