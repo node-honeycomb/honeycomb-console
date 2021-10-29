@@ -31,6 +31,7 @@ const ClusterSelector = (props) => {
         value={value}
         style={{width: '200px'}}
         onChange={onChange}
+        optionFilterProp="children"
         showSearch
       >
         {getOptions(clusters)}

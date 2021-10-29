@@ -82,8 +82,7 @@ const OperationLog = (props) => {
   });
 
   useEffect(() => {
-    setTableLoading(true);
-    setClusterList(loading ? {
+    setClusterList(loading || !clusters ? {
       loading: {name: '加载中...'}
     } :
       {
@@ -92,18 +91,24 @@ const OperationLog = (props) => {
         ...clusters
       }
     );
-    api.oplogApi.queryOpLog(clusterCode, dateRange[0].format(), dateRange[1].format())
-      .then(r => {
-        setDataSource(r || []);
-        setTableLoading(false);
-      })
-      .catch(e => {
-        notification.error({
-          message: '错误',
-          description: e.message
+  }, [loading, clusters]);
+
+  useEffect(() => {
+    if (clusterCode) {
+      setTableLoading(true);
+      api.oplogApi.queryOpLog(clusterCode, dateRange[0].format(), dateRange[1].format())
+        .then(r => {
+          setDataSource(r || []);
+          setTableLoading(false);
+        })
+        .catch(e => {
+          notification.error({
+            message: '错误',
+            description: e.message
+          });
         });
-      });
-  }, [clusterCode, dateRange, loading]);
+    }
+  }, [clusterCode, dateRange]);
 
   return (
     <div>
