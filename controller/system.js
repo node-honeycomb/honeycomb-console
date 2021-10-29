@@ -107,7 +107,7 @@ exports.deleteCoredump = function (req, callback) {
     opName: 'DELETE_COREDUMP',
     opType: 'PAGE_MODEL',
     // eslint-disable-next-line
-    opLogLevel: 'RISKY', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
+    opLogLevel: 'LIMIT', // HIGH_RISK / RISKY / LIMIT / NORMAL http://twiki.corp.taobao.com/bin/view/SRE/Taobao_Security/DataSecPolicy
     opItem: 'SYSTEM',
   });
   const clusterCode = req.body.clusterCode;

@@ -440,26 +440,27 @@ const secretFieldNameList = [
   /passwd/
 ];
 
+// 找到config对象中字段名符合secretFieldNameList中模式的路径
 function getSecretFields(config, root = '') {
   if (typeof config !== 'object')
     return [];
 
   return _.flatten(
-    Object.keys(config)
-      .map(key => secretFieldNameList.some(pattern => pattern.test(key)) ?
+    _.map(Object.keys(config),
+      key => _.some(secretFieldNameList, pattern => pattern.test(key)) ?
         root + key :
         getSecretFields(config[key], root + key + '.')
-      )
-  );
+    ));
 }
+// 隐藏字符串中间部分 rate = 隐藏比例
+function hideMid(str, char = '*', rate = 0.5) {
+  const count = str.length * rate | 0;
 
-// rate = 最大可见比例
-function hideMid(str, char = '*', rate = 0.6) {
-  const count = str.length * rate * 0.5 | 0;
-
-  return str.slice(0, count) + char.repeat(str.length - count * 2) + str.slice(str.length - count);
+  return str.slice(0, Math.ceil(count / 2)) +
+    char.repeat(str.length - count) +
+    str.slice(str.length - Math.floor(count / 2));
 }
-
+// 隐藏config对象中涉及隐私部分的字段值
 exports.configRemoveSecretFields = function (oldConfig, newConfig) {
   oldConfig = _.cloneDeep(oldConfig);
   newConfig = _.cloneDeep(newConfig);

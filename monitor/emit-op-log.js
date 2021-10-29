@@ -19,7 +19,7 @@ const opNameMap = {
   ADD_CLUSTER: '创建集群',
   UPDATE_CLUSTER: '更新集群',
   DELETE_CLUSTER: '删除集群',
-  DELETE_COREDUMP: 'DELETE_COREDUMP',
+  DELETE_COREDUMP: '清理COREDUMP',
   DELETE_UNKNOWPROCESS: '删除未知的process',
   CLEAN_APP_EXIT_RECORD: '清理应用多余版本',
   REMOVE_WORKER: '删除worker',
