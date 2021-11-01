@@ -131,7 +131,7 @@ const DELETE_APPS_CONFIG = `
       select id from hc_console_system_cluster_apps_config 
       where
         cluster_code = ? and type = ? and app = ?
-      order by id desc limit 3
+      order by id desc limit 10
     ) topids
   )
 `;

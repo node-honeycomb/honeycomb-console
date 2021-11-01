@@ -16,6 +16,14 @@ export const getAppConfig = (appName, clusterCode, type) => {
  * @param {String} clusterCode 集群code
  * @param {String} type 应用类型
  */
-export const updateAppConfig = (appName, appConfig, clusterCode, type) => {
-  return request.post(`/api/config/${appName}/update`, {appConfig, clusterCode, type});
+export const updateAppConfig = (appName, appConfig, clusterCode, type, saveConfig) => {
+  return request.post(`/api/config/${appName}/update`, {appConfig, clusterCode, type, saveConfig});
+};
+
+/**
+ * @param {String} appName 应用配置
+ * @param {String} clusterCode 集群code
+ */
+export const getAppConfigHistory = (appName, clusterCode) => {
+  return request.get(`/api/config/${appName}/history?clusterCode=${clusterCode}`);
 };

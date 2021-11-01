@@ -107,11 +107,13 @@ exports.getAppConfigHistory = function (req, res) {
  *  type {String} 更新类型 app | server
  * @body
  *  clusterCode {String} 集群code
+ *  saveConfig {String} 是否保存Config 'false' = 不保存 其他值 保存
  */
 exports.setAppConfig = function (req, res) {
   const appName = req.params.appName;
   const type = req.body.type;
   const clusterCode = req.body.clusterCode;
+  const saveConfig = req.body.saveConfig;
   const opt = cluster.getClusterCfgByCode(clusterCode);
 
   if (opt.code === 'ERROR') {
@@ -155,7 +157,7 @@ exports.setAppConfig = function (req, res) {
     user: req.session.username
   };
 
-  appConfig.save(cfgObj, (err) => {
+  const setConfig = (err) => {
     if (err) {
       return res.json({
         code: 'ERROR',
@@ -172,5 +174,11 @@ exports.setAppConfig = function (req, res) {
         res.json({code: 'SUCCESS'});
       }
     });
-  });
+  };
+
+  if (saveConfig === 'false') {
+    setConfig();
+  } else {
+    appConfig.save(cfgObj, setConfig);
+  }
 };

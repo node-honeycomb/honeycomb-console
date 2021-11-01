@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useCallback} from 'react';
 import _ from 'lodash';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
@@ -12,18 +12,20 @@ import parser from 'editor-json-parser';
 import notification from '@coms/notification';
 
 import callCodeDiff from './code-diff';
+import callCodeHistory from './code-history';
 
 import './index.less';
 
 const EditAppConfig = (props) => {
   const {appName, currentClusterCode, appType} = props;
   const [isEdit, setIsEdit] = useState(false);
+  const [oldCode, setOldCode] = useState('');
   const [editorCode, setEditorCode] = useState('');
 
   const editorRef = useRef();
 
   const getAppConfig = async () => {
-    if (!currentClusterCode) {
+    if (!currentClusterCode || !appName) {
       return null;
     }
 
@@ -38,6 +40,7 @@ const EditAppConfig = (props) => {
     const code = JSON.stringify(_.get(result, 'success[0].data'), null, 2);
 
     setEditorCode(code);
+    setOldCode(code);
 
     if (editorRef.current) {
       editorRef.current.setSelection({
@@ -51,7 +54,7 @@ const EditAppConfig = (props) => {
     return code;
   };
 
-  const {result, loading} = useRequest({
+  const {loading} = useRequest({
     request: async () => {
       return getAppConfig();
     },
@@ -65,8 +68,50 @@ const EditAppConfig = (props) => {
   }, [appName, currentClusterCode, appType]);
 
 
+  const showCodeHistory = useCallback(() => callCodeHistory({
+    appName,
+    clusterCode: currentClusterCode,
+    newCode: oldCode,
+    onOk: (config, reload) => {
+      config = JSON.stringify(config, null, '  ');
+      setEditorCode(config);
+      doApply(reload, config, 'false');
+    }
+  }), [appName, currentClusterCode, editorCode, oldCode]);
+
   const onToggleEdit = () => {
     setIsEdit(!isEdit);
+  };
+
+  const doApply = async (fixReload, config = editorCode, saveConfig = 'true') => {
+    try {
+      await api.configApi.updateAppConfig(appName, config, currentClusterCode, appType, saveConfig);
+      message.success('配置修改成功！');
+
+      if (fixReload) {
+        message.loading('重启应用中...');
+
+        const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
+
+        if (!appId) {
+          message.destroy();
+
+          return message.warn('当前应用没有正在运行的版本');
+        }
+
+        await api.appApi.reload(currentClusterCode, appId);
+        message.destroy();
+        message.success('应用重启成功！');
+      }
+
+      await getAppConfig();
+      setIsEdit(false);
+    } catch (e) {
+      notification.error({
+        message: '修改配置失败',
+        description: e.message
+      });
+    }
   };
 
   // 应用配置
@@ -83,40 +128,9 @@ const EditAppConfig = (props) => {
       return;
     }
 
-    const doApply = async (fixReload) => {
-      try {
-        await api.configApi.updateAppConfig(appName, editorCode, currentClusterCode, appType);
-        message.success('配置修改成功！');
-
-        if (fixReload) {
-          message.loading('重启应用中...');
-
-          const appId = await api.appApi.getWorkingAppId(currentClusterCode, appName);
-
-          if (!appId) {
-            message.destroy();
-
-            return message.warn('当前应用没有正在运行的版本');
-          }
-
-          await api.appApi.reload(currentClusterCode, appId);
-          message.destroy();
-          message.success('应用重启成功！');
-        }
-
-        await getAppConfig();
-        setIsEdit(false);
-      } catch (e) {
-        notification.error({
-          message: '修改配置失败',
-          description: e.message
-        });
-      }
-    };
-
     callCodeDiff({
       newCode: editorCode,
-      oldCode: result,
+      oldCode: oldCode,
       onOk: (reload) => {
         let fixReload = reload;
 
@@ -139,7 +153,7 @@ const EditAppConfig = (props) => {
   };
 
   // 代码是否编辑过
-  const hasCodeChange = result.trim() !== editorCode.trim();
+  const hasCodeChange = oldCode.trim() !== editorCode.trim();
 
   return (
     <React.Fragment>
@@ -204,7 +218,9 @@ const EditAppConfig = (props) => {
                       >
                       编辑
                       </Button>
-                      <Button>配置对比</Button>
+                      <Button onClick={showCodeHistory}>
+                        历史配置
+                      </Button>
                     </React.Fragment>
                   )
                 }

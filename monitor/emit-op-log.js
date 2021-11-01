@@ -36,7 +36,7 @@ function msgTemplate(clusterName, username, data) {
     markdown: {
       title: 'HC操作通知',
       text: `#### 集群 ${clusterName} 操作通知
-> 用户 ${username} **${opNameMap[data.opName]}** ${data.opItemId}
+> 用户 ${username} **${opNameMap[data.opName]}** ${data.opItemId || ''}
 
 > 该操作为 **${LEVEL_MAP[data.opLogLevel]}** 操作`
     },
