@@ -434,7 +434,6 @@ exports.getClusterApps = function (clusterIinfo, cb) {
     }
   });
 };
-
 const secretFieldNameList = [
   /password/,
   /passwd/
@@ -442,7 +441,9 @@ const secretFieldNameList = [
 
 // 找到config对象中字段名符合secretFieldNameList中模式的路径
 function getSecretFields(config, root = '') {
-  if (typeof config !== 'object')
+  const configType = Object.prototype.toString.call(config).slice(8, -1);
+
+  if (configType !== 'Object' && configType !== 'Array')
     return [];
 
   return _.flatten(
@@ -479,7 +480,6 @@ exports.configRemoveSecretFields = function (oldConfig, newConfig) {
 
   return [oldConfig, newConfig];
 };
-
 const getIpOfForward = (forwarded) => {
   if (!forwarded) {
     return;
