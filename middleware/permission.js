@@ -60,6 +60,34 @@ module.exports = function (req, res, next) {
     return next();
   }
 
+  if (pathToRegex('/api/downloadLogFile').test(pathname)) {
+    const clusterCode = req.query.clusterCode || req.body.clusterCode;
+    const fileName = req.query.file;
+
+    if (!fileName || !clusterCode) {
+      return next();
+    }
+    if (fileName.indexOf('/') === -1) {
+      return next();
+    }
+
+    let appName = '';
+    const logFile = fileName.match(/^([^/.]+).+/);
+
+    if (logFile && logFile[1]) {
+      appName = logFile[1];
+    }
+
+    const isPermitted = user.containsApp(clusterCode, appName);
+
+    isPermitted ? next() : res.status(401).json({
+      code: 'Error',
+      message: 'Unauthorized'
+    });
+
+    return;
+  }
+
   if (pathToRegex('/api/log').test(pathname)) {
     const clusterCode = req.query.clusterCode || req.body.clusterCode;
     const fileName = req.query.fileName;

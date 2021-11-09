@@ -297,19 +297,18 @@ exports.queryAppUsages = function (req, callback) {
 
 
 /**
- * @api {get} /api/log/:file
+ * @api {get} /api/downloadLogFile
  * @desc 代理下载文件
  * @nowrap
  * @param req
  * @param res
- * param
- *   file {String} fileName
  * query
- *   clusterCode {String} fileName
+ *   file {String} fileName
+ *   clusterCode {String} clusterCode
  *   ips {String} ip list
  */
 exports.downloadLogFileBatch = function (req, res) {
-  const file = req.params.file;
+  const file = req.query.file;
   const clusterCode = req.query.clusterCode;
 
   if (!file) {
@@ -330,7 +329,11 @@ exports.downloadLogFileBatch = function (req, res) {
 
   ips = ips && ips.split(',');
 
-  const uri = `/api/log/${file}`;
+  opt.data = {
+    file
+  };
+
+  const uri = '/api/downloadLogFile';
 
   callremote(uri, {
     ...opt,
