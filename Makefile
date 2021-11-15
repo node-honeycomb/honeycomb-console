@@ -26,6 +26,7 @@ release: clean
 	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
+	@cd ./assets && cp -r ./static ../out/release/assets/static
 	@cd out/release && cp -r .package/* ./assets/
 	@cd out/release/config && cat config_production.js > config.js
 
