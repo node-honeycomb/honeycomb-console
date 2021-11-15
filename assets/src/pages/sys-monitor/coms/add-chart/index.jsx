@@ -25,9 +25,6 @@ const AddChart = (props) => {
 
   return (
     <div className="add-chart">
-      <div className="add-btn" onClick={onAdd}>
-        <PlusOutlined /> 应用监控
-      </div>
       <Affix target={() => document.getElementById('main-content') || document.body}>
         <div>
           {
@@ -59,6 +56,9 @@ const AddChart = (props) => {
           }
         </div>
       </Affix>
+      <div className="add-btn" onClick={onAdd}>
+        <PlusOutlined /> 应用监控
+      </div>
     </div>
   );
 };

@@ -113,6 +113,7 @@ const SysMonitor = (props) => {
       <CommonTitle>系统监控</CommonTitle>
       <div className="main-container">
         <div className="left-machines">
+          <div className="list-title">应用监控</div>
           <AddChart onSelect={onSelect} />
           <br />
           <div className="list-title">机器列表</div>

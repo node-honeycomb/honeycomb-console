@@ -44,7 +44,7 @@ const UserManager = (props) => {
   const {onSearch, dataSource} = useSearch({
     data: clusterList,
     keys: [
-      'name', 'code', 'endpoint'
+      'name', 'code', 'endpoint', 'ips'
     ]
   });
 
