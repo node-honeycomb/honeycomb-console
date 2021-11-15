@@ -1,12 +1,14 @@
 import React, {useState, useEffect} from 'react';
-import ReactDOM from 'react-dom';
-import PropTypes from 'prop-types';
-import {Modal, Button, List, notification} from 'antd';
 import moment from 'moment';
 import {diff} from 'just-diff';
+import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 import parser from 'editor-json-parser';
-import {MonacoDiffEditor} from 'react-monaco-editor';
 import {removeModalDOM} from '@lib/util';
+import {UserOutlined} from '@ant-design/icons';
+import {MonacoDiffEditor} from 'react-monaco-editor';
+import {Modal, Button, List, notification} from 'antd';
+
 import api from '@api';
 
 const isJSONEql = (a, b) => {
@@ -131,7 +133,7 @@ const CodeHistory = (props) => {
       <div style={{height: '100%'}}>
         <div style={{
           margin: '0 auto',
-          width: '30%',
+          width: '20%',
           height: '100%',
           display: 'inline-block',
           verticalAlign: 'top',
@@ -145,7 +147,9 @@ const CodeHistory = (props) => {
                 backgroundColor: selectedItem === item ? '#f3f3f3' : null,
                 cursor: 'pointer',
                 paddingLeft: '20px',
-                paddingRight: '10px'
+                paddingRight: '10px',
+                paddingTop: 5,
+                paddingBottom: 5
               }}
               onClick={() => {
                 selectConfig(item);
@@ -153,7 +157,7 @@ const CodeHistory = (props) => {
               >
                 <List.Item.Meta
                   title={moment(item.gmt_create).format('YYYY-MM-DD HH:mm')}
-                  description={item.user}
+                  description={(<span><UserOutlined /> {item.user}</span>)}
                 />
               </List.Item>
             )}

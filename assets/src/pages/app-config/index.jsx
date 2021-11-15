@@ -78,6 +78,7 @@ const AppConfig = (props) => {
       <div className="page-right-side">
         <EditAppConfig
           appName={appName}
+          appType={appType}
         />
       </div>
     </div>

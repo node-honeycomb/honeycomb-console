@@ -49,7 +49,7 @@ const getAppTree = (appNames = []) => {
 
   // 公共配置
   tree.push({
-    key: 'common*system',
+    key: 'common*server',
     title: '公共配置',
     level: 1,
     parent: SYSTEM_APP
@@ -57,7 +57,7 @@ const getAppTree = (appNames = []) => {
 
   // 公共配置
   tree.push({
-    key: 'server*system',
+    key: 'server*server',
     title: '系统配置',
     level: 1,
     parent: SYSTEM_APP
@@ -116,6 +116,7 @@ const AppList = (props) => {
 
       return null;
     }
+
     if (v.target.value === '') {
       setFileSearchItem([]);
       setLastSearchString(v.target.value);
@@ -124,6 +125,7 @@ const AppList = (props) => {
 
       return null;
     }
+
     setSearchInputString(v.target.value);
     // 搜寻到的item列表原型
     let tmpSearchItemList = [];
