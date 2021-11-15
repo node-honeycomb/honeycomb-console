@@ -37,6 +37,8 @@ if (db.ready) {
   });
 }
 
-startMonitor();
+if (config.monitor && config.monitor.enable) {
+  startMonitor();
+}
 
 module.exports = app;

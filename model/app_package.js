@@ -7,7 +7,7 @@ const db = require('../common/db');
 const config = require('../config');
 
 
-let storage;
+let storage = false;
 
 if (config.storage) {
   try {
@@ -36,6 +36,11 @@ exports.savePackage = (data, callback) => {
       if (err) {
         err.message = `storage save failed, app: ${data.appId}, path: ${data.pkg}` + err.message;
         log.error(err.message);
+
+        return callback(err);
+      }
+      if (!fkey) {
+        const err = new Error('storage save failed, return empty fileKey');
 
         return callback(err);
       }

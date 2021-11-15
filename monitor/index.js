@@ -7,8 +7,10 @@ const Cluster = require('../model/cluster');
 const {callremote} = require('../common/utils');
 const {emitClusterError, emitAppError} = require('./error');
 
+// 最大容忍错误次数
+const maxRetry = cfg.monitor.maxRetry || 3;
 // 默认每 5 分钟扫描一次
-const cycle = cfg.monitorCycle || 1000 * 60 * 5;
+const monitorInterval = cfg.monitor.monitorInterval || 1000 * 60 * 5;
 const getMonitedClusterCfg = util.promisify(Cluster.getMonitedClusterCfg);
 
 const q = queue({
@@ -17,12 +19,18 @@ const q = queue({
   timeout: 1000 * 60   // 每一个检测最多1分钟
 });
 
+const delay = (time) => {
+  return new Promise((res) => {
+    setTimeout(res, time);
+  });
+};
+
 /**
  * 检查当前cluster是否存在异常
  * 1. 异常机器
  * 2. 异常应用 exception
  */
-const detectCluster = (cluster) => {
+const detectCluster = async (cluster) => {
   const path = '/api/apps';
   const clusterCode = cluster.code;
   const clusterName = cluster.name;
@@ -32,21 +40,20 @@ const detectCluster = (cluster) => {
     return;
   }
 
-  return new Promise((res) => {
+  // 请求远端server
+  const detectRemote = () => new Promise((res, rej) => {
     callremote(path, cluster, function (err, result) {
       if (err || result.code !== 'SUCCESS') {
         const errMsg = err && err.message || result.message;
 
         log.error('get apps from servers failed: ', errMsg);
 
-        emitClusterError({
+        return rej({
           clusterCode,
           clusterName,
           message: err && err.message,
           monitor: cluster.monitor,
         });
-
-        return res();
       }
 
       const ips = [];
@@ -98,6 +105,28 @@ const detectCluster = (cluster) => {
       });
     });
   });
+
+  for (let i = 0; i < maxRetry + 1; i++) {
+    try {
+      await detectRemote();
+      break;
+    } catch (e) {
+      log.warn(`detect cluster ${clusterCode} failed, try count: ${i}`);
+
+      if (i !== maxRetry) {
+        await delay(3000);
+        continue;
+      }
+
+      if (e.appIds) {
+        return emitAppError(e);
+      }
+
+      return emitClusterError(e);
+    }
+  }
+
+  log.info(`detect cluster ${clusterCode} successfully!`);
 };
 
 async function detect() {
@@ -119,7 +148,7 @@ async function startMonitor() {
 
   setInterval(() => {
     detect();
-  }, cycle);
+  }, monitorInterval);
 }
 
 module.exports = startMonitor;

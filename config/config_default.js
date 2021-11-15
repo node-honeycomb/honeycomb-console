@@ -52,6 +52,12 @@ module.exports = {
   // port: 9000,
   prefix: '/honeycomb-console',
   middleware: {
+    relocate: {
+      module: '../middleware/relocate.js',
+      config: {
+        host: ''
+      }
+    },
     cookieSession: {
       config: {
         secret: '** change this config when publish **'
@@ -124,9 +130,14 @@ module.exports = {
   },
   // 是否关闭上传功能
   hideUpload: false,
-  // 默认监控间隔：5 min
-  monitorCycle: 1000 * 60 * 5,
-  docUrl: 'https://www.yuque.com/honeycomb/gz4kna',
-  // 当前环境的名称，将会显示到 title 上
-  envName: ''
+  /**
+   * 监控
+   */
+  monitor: {
+    enable: false,
+    // 默认监控间隔：5 min
+    monitorInterval: 1000 * 60 * 5,
+    // 容忍最大错误发生次数
+    maxRetry: 3
+  }
 };

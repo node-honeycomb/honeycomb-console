@@ -48,9 +48,11 @@ module.exports = function (app, options) {
         if (!user || !pwd) {
           res.status(500);
         }
+        if (config.middleware.appAuth && !config.middleware.appAuth.enable) {
+          return res.status(403).end('Forbidden');
+        }
 
-        pwd = utils.sha256(pwd);
-
+        pwd = utils.genPwd(pwd, config.salt);
         User.countUser((err, data) => {
           if (err) {
             return next(err);

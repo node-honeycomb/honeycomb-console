@@ -9,7 +9,7 @@ const appPackage = require('../model/app_package');
 
 const callremote = utils.callremote;
 
-function saveSnapShort(clusterCode) {
+function saveSnapShot(clusterCode) {
   const opt = cluster.getClusterCfgByCode(clusterCode);
 
   if (opt.code === 'ERROR') {
@@ -19,16 +19,16 @@ function saveSnapShort(clusterCode) {
   }
   utils.getClusterApps(opt, (err, data) => {
     if (err) {
-      log.error('snapshort faild, get cluster info failed', err);
+      log.error('snapshot faild, get cluster info failed', err);
     } else {
       const obj = {
         clusterCode,
         info: data
       };
 
-      cluster.saveSnapshort(obj, (err) => {
+      cluster.saveSnapshot(obj, (err) => {
         if (err) {
-          log.error('save snapshort failed', err);
+          log.error('save snapshot failed', err);
         }
       });
     }
@@ -98,7 +98,7 @@ exports.publishApp = function (req, callback) {
   const recover = req.query.recover === 'true';
 
   async.waterfall([
-    function (cb) {
+    function receivePkg(cb) {
       const form = new formidable.IncomingForm();
 
       form.maxFileSize = 1000 * 1024 * 1024;
@@ -126,7 +126,7 @@ exports.publishApp = function (req, callback) {
         cb(null, files.pkg);
       });
     },
-    function (file, cb) {
+    function savePackage(file, cb) {
       const appId = file.name.replace(/.tgz$/, '');
       const appInfo = utils.parseAppId(appId);
       const obj = {
@@ -177,7 +177,7 @@ exports.publishApp = function (req, callback) {
       });
     } else {
       if (!recover) {
-        saveSnapShort(clusterCode);
+        saveSnapShot(clusterCode);
       }
 
       return callback(null, results.data);
@@ -278,7 +278,7 @@ exports.deleteApp = function (req, callback) {
           log.error('delete apppackage failed', err.message);
         }
       });
-      saveSnapShort(clusterCode);
+      saveSnapShot(clusterCode);
 
       return callback(null, results.data);
     }
@@ -414,7 +414,7 @@ exports.startApp = function (req, callback) {
       });
     } else {
       log.debug(`start app ${appId} results:`, results);
-      saveSnapShort(clusterCode);
+      saveSnapShot(clusterCode);
 
       return callback(null, results.data);
     }
@@ -461,7 +461,7 @@ exports.stopApp = function (req, callback) {
       });
     } else {
       log.debug(`stop app ${appId} results:`, results);
-      saveSnapShort(clusterCode);
+      saveSnapShot(clusterCode);
 
       return callback(null, results.data);
     }
