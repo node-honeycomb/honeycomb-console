@@ -60,7 +60,7 @@ module.exports = function (req, res, next) {
     return next();
   }
 
-  if (pathToRegex('/api/downloadLogFile').test(pathname)) {
+  if (pathToRegex('/api/download-log-file').test(pathname)) {
     const clusterCode = req.query.clusterCode || req.body.clusterCode;
     const fileName = req.query.file;
 

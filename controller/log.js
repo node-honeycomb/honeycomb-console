@@ -297,7 +297,7 @@ exports.queryAppUsages = function (req, callback) {
 
 
 /**
- * @api {get} /api/downloadLogFile
+ * @api {get} /api/download-log-file
  * @desc 代理下载文件
  * @nowrap
  * @param req
@@ -333,7 +333,7 @@ exports.downloadLogFileBatch = function (req, res) {
     file
   };
 
-  const uri = '/api/downloadLogFile';
+  const uri = '/api/download-log-file';
 
   callremote(uri, {
     ...opt,

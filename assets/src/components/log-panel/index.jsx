@@ -203,7 +203,7 @@ const LogPanel = (props) => {
     }
     axios({
       method: 'get',
-      url: `${prefix}/api/downloadLogFile`,
+      url: `${prefix}/api/download-log-file`,
       params: {
         clusterCode,
         file: filename,
