@@ -7,7 +7,7 @@ import {
 } from 'bizcharts';
 import {Tooltip as AntTooltip} from 'antd';
 
-import {PRIMARY_COLOR} from '@lib/color';
+import {PRIMARY_COLOR, ERROR_COLOR, WARN_COLOR} from '@lib/color';
 
 import './index.less';
 
@@ -53,6 +53,17 @@ class Ring extends React.Component {
       }
     ];
 
+    const percent = getPercent(part, all);
+
+    let color = PRIMARY_COLOR;
+
+    if (percent >= 75) {
+      color = WARN_COLOR;
+    } else if (percent >= 85) {
+      color = ERROR_COLOR;
+    }
+
+
     return (
       <div className="ring-card">
         <Chart
@@ -65,7 +76,7 @@ class Ring extends React.Component {
         >
           <Annotation.Text
             position={['50%', '50%']}
-            content={`${getPercent(part, all)}%`}
+            content={`${percent}%`}
             style={{
               lineHeight: '240px',
               fontSize: '20',
@@ -84,7 +95,7 @@ class Ring extends React.Component {
             adjust="stack"
             position="value"
             shape="sliceShape"
-            color={['type', [PRIMARY_COLOR, 'rgb(255, 255, 255)']]}
+            color={['type', [color, 'rgb(255, 255, 255)']]}
           />
           <Interaction type="element-single-selected" />
         </Chart>

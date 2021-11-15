@@ -4,7 +4,7 @@ import {connect} from 'dva';
 import PropTypes from 'prop-types';
 import {
   Table, Button, Divider, Modal,
-  message, Tooltip, Tag
+  message, Tag
 } from 'antd';
 
 import {clusterApi} from '@api';
@@ -100,20 +100,15 @@ const UserManager = (props) => {
       title: 'ip列表',
       dataIndex: 'ips',
       render: (row) => {
-        if (row.length > 1) {
-          const text = row.map(r => {
-            return <p key={r}>{r}</p>;
-          });
-
-          return <span>
-            <span>{_.get(row, '[0]')}</span>
-            <Tooltip placement="top" title={text}>
-              <span style={{color: '#3D6CF2', cursor: 'pointer'}}>&nbsp;&nbsp;更多</span>
-            </Tooltip>
-          </span>;
-        } else {
-          return _.get(row, '[0]');
-        }
+        return <span>
+          {
+            row.map(ip => {
+              return (
+                <div key={ip}>{ip}</div>
+              );
+            })
+          }
+        </span>;
       },
     },
     {

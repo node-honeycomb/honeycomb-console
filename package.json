@@ -7,7 +7,7 @@
   "scripts": {
     "start": "concurrently -r 'npm:client' 'npm:server'",
     "server": "honeycomb start",
-    "client": "cd assets && npx honeypack start",
+    "client": "cd assets && npx honeypack start --host 0.0.0.0",
     "eslint": "eslint --fix --ext .js --ext .jsx --ignore-path .eslintignore ."
   },
   "license": "MIT",
