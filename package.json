@@ -2,7 +2,7 @@
   "name": "honeycomb-console",
   "version": "0.2.13",
   "build": "1",
-  "description": "Honeycomb admin console",
+  "description": "Honeycomb Admin Console",
   "main": "app.js",
   "scripts": {},
   "license": "MIT",
