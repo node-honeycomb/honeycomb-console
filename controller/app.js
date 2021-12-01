@@ -84,8 +84,10 @@ exports.publishApp = function (req, callback) {
   let recover = req.query.recover === 'true';
   async.waterfall([
     function receivePkg(cb) {
-      let form = new formidable.IncomingForm();
-      form.maxFileSize = 1000 * 1024 * 1024;
+      let form = formidable({
+        multiples: true,
+        maxFileSize: 1024 * 1024 * 1024
+      });
       form.parse(req, function (err, fields, files) {
         req.oplog({
           clientId: req.ips.join('') || '-',
@@ -104,18 +106,28 @@ exports.publishApp = function (req, callback) {
           err.code = 'ERROR_APP_PACKAGE_EMPTY';
           return cb(err);
         }
+        /**
+         * pkg
+              lastModifiedDate: 2021-12-01T14:01:41.881Z,
+              filepath: '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T/38a440630f5c6043e53edfd00',
+              newFilename: '38a440630f5c6043e53edfd00',
+              originalFilename: 'socket-app_1.0.0_2.tgz',
+              mimetype: 'application/gzip',
+              hashAlgorithm: false,
+              size: 540
+         */
         cb(null, files.pkg);
       });
     },
     function savePackage(file, cb) {
-      let appId = file.name.replace(/.tgz$/, '');
+      let appId = file.originalFilename.replace(/.tgz$/, '');
       let appInfo = utils.parseAppId(appId);
       let obj = {
         clusterCode,
         appId: appInfo.id,
         appName: appInfo.name,
         weight: appInfo.weight,
-        pkg: file.path,
+        pkg: file.filepath,
         user: req.session.username
       };
       if (!recover) {
@@ -131,9 +143,9 @@ exports.publishApp = function (req, callback) {
       if (opt.code === 'ERROR') {
         return cb(opt);
       }
-      log.info(`publish "${file.name}" to server: ${opt.endpoint}`);
+      log.info(`publish "${file.originalFilename}" to server: ${opt.endpoint}`);
       let form = formstream();
-      form.file('pkg', file.path, file.name);
+      form.file('pkg', file.filepath, file.originalFilename);
       let path = '/api/publish';
       opt.method = 'POST';
       opt.headers = form.headers();
