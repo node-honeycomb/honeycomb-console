@@ -9,6 +9,7 @@ import {
 
 import {clusterApi} from '@api';
 import {useSearch} from '@lib/hooks';
+import {openSnapshot} from '@coms/snapshot';
 import CommonTitle from '@coms/common-title';
 import notification from '@coms/notification';
 
@@ -83,6 +84,15 @@ const UserManager = (props) => {
     });
   };
 
+  /**
+   * 列出当前集群的快照
+   */
+  const onClusterSnapshot = (cluster) => {
+    const clusterCode = cluster.code;
+
+    openSnapshot(clusterCode);
+  };
+
   const cols = () => [
     {
       title: '集群名称',
@@ -130,9 +140,16 @@ const UserManager = (props) => {
               编辑
             </Button>
             <Divider type="vertical" />
-
             <Button style={style} type="link" onClick={() => handleConfirm(row)}>
               删除
+            </Button>
+            <Divider type="vertical" />
+            <Button
+              style={style}
+              type="link"
+              onClick={() => onClusterSnapshot(row)}
+            >
+              快照
             </Button>
           </div>
         );

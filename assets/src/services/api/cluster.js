@@ -91,3 +91,19 @@ export const getAppsConfig = (appId, params) => {
 export const setAppConfig = (appId, params) => {
   return request.post(`/api/config/${appId}/update`, params);
 };
+
+
+/**
+ * 获取当前 cluster 的 snapshot
+ */
+export const getSnapshot = (clusterCode) => {
+  return request.get(`/api/cluster/snapshot/list`, {params: {clusterCode}});
+};
+
+/**
+ * 删除snapshot
+ */
+export const deleteSnapshot = (clusterCode, snapshotId) => {
+  return request.delete(`/api/cluster/snapshot/delete`, {data: {clusterCode, snapshotId}});
+};
+

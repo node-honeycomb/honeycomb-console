@@ -1,11 +1,11 @@
-const async = require('async');
-const lodash = require('lodash');
-const fs = require('xfs');
 const os = require('os');
-const path = require('path');
-const uuid = require('uuid').v4;
+const fs = require('xfs');
 const tar = require('tar');
 const yaml = require('yaml');
+const path = require('path');
+const async = require('async');
+const uuid = require('uuid').v4;
+const lodash = require('lodash');
 const promisify = require('util').promisify;
 
 const log = require('../common/log');
@@ -289,8 +289,7 @@ exports.downloadClusterPatch = async function (req, res) {
     const serverCfg = await getAppConfig(clusterCode, 'server', 'server');
 
     if (serverCfg) {
-      fs
-        .sync()
+      fs.sync()
         .save(
           path.join(
             tmpDir, 'conf/custom/server.json'),
@@ -300,8 +299,7 @@ exports.downloadClusterPatch = async function (req, res) {
     const commonCfg = await getAppConfig(clusterCode, 'server', 'common');
 
     if (commonCfg) {
-      fs
-        .sync()
+      fs.sync()
         .save(
           path.join(tmpDir, 'conf/custom/common.json'),
           JSON.stringify(commonCfg.config, null, 2)
@@ -384,14 +382,40 @@ exports.downloadClusterPatch = async function (req, res) {
 };
 
 /**
- * @api {delete} /api/cluster/deleteSnapshot
+ * 删除某一个版本的快照
+ * @api {delete} /api/cluster/snapshot/delete
+ * @body
+ *  clusterCode {String} 集群code
+ *  snapshotId {Number} 快照版本id
  */
-exports.deleteSnapshot = function (req, cb) {
-  const clusterCode = req.body.clusterCode;
+exports.deleteSnapshot = async (req, cb) => {
+  const {clusterCode, snapshotId} = req.body;
 
   if (!clusterCode) {
-    return new Error('missing query: clusterCode');
+    return cb('missing query: snapshotId');
   }
-  cluster.deleteSnapshot(clusterCode, cb);
+
+  if (!snapshotId) {
+    return cb('missing query: snapshotId');
+  }
+
+  cluster.deleteSnapshot(clusterCode, snapshotId, cb);
 };
 
+/**
+ * 查询所有的 snapshot
+ * @api {get} /api/cluster/snapshot/list
+ * @query
+ *    clusterCode {String} 集群code
+ */
+exports.listSnapshot = async (req, cb) => {
+  const {clusterCode} = req.query;
+
+  if (!clusterCode) {
+    return cb(null, []);
+  }
+
+  const result = await promisify(cluster.listSnapshot)(clusterCode);
+
+  return cb(null, result);
+};

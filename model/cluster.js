@@ -473,16 +473,41 @@ exports.getSnapshot = (clusterCode, cb) => {
   });
 };
 
-
-const SQL_DELETE_CLUSTER_SNAPSHOTS = `
-  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id in (
-    select id from hc_console_system_cluster_snapshort where cluster_code = ?
-    order by id desc limit 1
-  )
+const SQL_LIST_CLUSTER_SNAPSHOT = `
+  select 
+    id, cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
+  from 
+    hc_console_system_cluster_snapshort 
+  where 
+    cluster_code = ?
+  order by id desc
 `;
 
-exports.deleteSnapshot = (clusterCode, cb) => {
-  db.query(SQL_DELETE_CLUSTER_SNAPSHOTS, [clusterCode, clusterCode], (err, data) => {
+
+exports.listSnapshot = (clusterCode, cb) => {
+  db.query(SQL_LIST_CLUSTER_SNAPSHOT, [clusterCode], (err, data) => {
+    if (err) {
+      return cb(err);
+    }
+    if (!data || !data.length) {
+      return cb([]);
+    }
+
+    data.forEach(item => {
+      item.info = JSON.parse(item.info);
+    });
+
+    cb(null, data);
+  });
+};
+
+
+const SQL_DELETE_CLUSTER_SNAPSHOTS = `
+  delete from hc_console_system_cluster_snapshort where cluster_code = ? and id = ?
+`;
+
+exports.deleteSnapshot = (clusterCode, snapshotId, cb) => {
+  db.query(SQL_DELETE_CLUSTER_SNAPSHOTS, [clusterCode, snapshotId], (err, data) => {
     if (err) {
       log.error('delete snapshot failed', err.message);
     }
