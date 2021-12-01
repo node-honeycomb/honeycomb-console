@@ -17,7 +17,7 @@
     "editor-json-parser": "1.1.1",
     "formidable": "1.1.1",
     "formstream": "1.1.0",
-    "hc-bee": "1.0.3",
+    "hc-bee": "^1.0.10",
     "hc-signature-auth": "1.0.7",
     "honeypack": "1.0.15",
     "http-proxy-middleware": "^1.0.4",
