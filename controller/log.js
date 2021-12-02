@@ -262,6 +262,10 @@ exports.queryAppUsages = function (req, callback) {
           const appIds = Object.keys(appUsage);
 
           appIds.forEach(function (appId) {
+            if (!appUsage[appId]) {
+              return;
+            }
+
             const appUsages = appUsage[appId].split('^');
             let cpu = 0;
             let mem = 0;
