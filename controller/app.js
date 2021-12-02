@@ -101,7 +101,7 @@ exports.publishApp = function (req, callback) {
           err.code = 'ERROR_UPLOAD_APP_PACKAGE_FAILED';
           return cb(err);
         }
-        if (!files || !Object.keys(files).length) {
+        if (!files || !files.pkg) {
           let err = new Error('app package empty');
           err.code = 'ERROR_APP_PACKAGE_EMPTY';
           return cb(err);
