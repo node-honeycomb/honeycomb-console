@@ -99,7 +99,7 @@ exports.publishApp = function (req, callback) {
 
   async.waterfall([
     function receivePkg(cb) {
-      let form = formidable({
+      const form = formidable({
         multiples: true,
         maxFileSize: 1024 * 1024 * 1024
       });
@@ -118,7 +118,7 @@ exports.publishApp = function (req, callback) {
 
           return cb(err);
         }
-        if (!files || !Object.keys(files).length) {
+        if (!files || !files.pkg) {
           const err = new Error('app package empty');
 
           err.code = 'ERROR_APP_PACKAGE_EMPTY';
@@ -139,10 +139,10 @@ exports.publishApp = function (req, callback) {
       });
     },
     function savePackage(file, cb) {
-      let appId = file.originalFilename.replace(/.tgz$/, '');
-      let appInfo = utils.parseAppId(appId);
+      const appId = file.originalFilename.replace(/.tgz$/, '');
+      const appInfo = utils.parseAppId(appId);
 
-      let obj = {
+      const obj = {
         clusterCode,
         appId: appInfo.id,
         appName: appInfo.name,
@@ -166,9 +166,11 @@ exports.publishApp = function (req, callback) {
         return cb(opt);
       }
       log.info(`publish "${file.originalFilename}" to server: ${opt.endpoint}`);
-      let form = formstream();
+      const form = formstream();
+
       form.file('pkg', file.filepath, file.originalFilename);
-      let path = '/api/publish';
+      const path = '/api/publish';
+
       opt.method = 'POST';
       opt.headers = form.headers();
       opt.stream = form;
