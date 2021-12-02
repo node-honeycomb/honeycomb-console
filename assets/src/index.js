@@ -11,6 +11,11 @@ import './index.less';
 
 const {isLogin} = window.CONFIG;
 
+// 修改 title
+if (window.CONFIG.envName) {
+  document.title = `${window.CONFIG.envName}·Honeycomb-Console`;
+}
+
 const app = dva({
   history: createBrowserHistory(),
 });

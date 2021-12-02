@@ -11,6 +11,7 @@ module.exports = {
       level: 'INFO'
     }
   },
+  envName: '本地环境',
   meta: {
     /*
     driver: 'mysql', // mysql or sql.js, default sql.js

@@ -1,7 +1,7 @@
 import React from 'react';
 import _ from 'lodash';
-import PropTypes from 'prop-types';
 import {message} from 'antd';
+import PropTypes from 'prop-types';
 
 import {connect} from 'dva';
 import {withRouter, routerRedux} from 'dva/router';
@@ -217,7 +217,7 @@ class AppLayout extends React.Component {
     const {currentCluster, currentClusterCode} = this.props;
 
     return (
-      <div>
+      <div> 
         <HcHeader
           onToggleCluster={this.onToggleCluster}
           clusters={clusters}
