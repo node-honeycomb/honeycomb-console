@@ -11,7 +11,7 @@ module.exports = function (app) {
 
     oplog.add({
       gmtCreate: moment().format('YYYY-MM-DD HH:mm:ss'),
-      username: user.name,
+      username: (user && user.name) || 'unkown',
       socket: {
         address: utils.getIp(this),
       },
