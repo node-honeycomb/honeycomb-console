@@ -102,8 +102,8 @@ CREATE TABLE IF NOT EXISTS `hc_console_system_oplog` (
   `op_item` varchar(20) NOT NULL DEFAULT '',
   `op_item_id` varchar(255) NOT NULL DEFAULT '', 
   `username` varchar(255) NOT NULL DEFAULT '', 
-  `socket` text,
-  `detail` text,
-  `extends` text,
+  `socket` text NOT NULL DEFAULT '{}',
+  `detail` text NOT NULL DEFAULT '{}',
+  `extends` text NOT NULL DEFAULT '{}',
   `gmt_create` datetime NOT NULL
 );
