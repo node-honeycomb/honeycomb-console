@@ -266,6 +266,10 @@ exports.queryAppUsages = function (req, callback) {
               return;
             }
 
+            if (typeof appUsage[appId] !== 'string') {
+              return;
+            }
+
             const appUsages = appUsage[appId].split('^');
             let cpu = 0;
             let mem = 0;

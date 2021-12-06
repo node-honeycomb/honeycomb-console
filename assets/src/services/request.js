@@ -11,7 +11,7 @@ const headers = {
 // 公共请求响应体
 const instance = axios.create({
   baseURL: `${prefix}`,
-  timeout: 1000 * 60,
+  timeout: 1000 * 60 * 20,  // default timeout to 20min
   headers: {
     'Content-Type': 'application/json',
     ...headers,
