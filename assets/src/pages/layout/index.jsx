@@ -217,7 +217,7 @@ class AppLayout extends React.Component {
     const {currentCluster, currentClusterCode} = this.props;
 
     return (
-      <div> 
+      <div>
         <HcHeader
           onToggleCluster={this.onToggleCluster}
           clusters={clusters}

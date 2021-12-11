@@ -387,6 +387,7 @@ exports.gClusterConfig = {};
 exports.getClusterCodes = () => {
   return Object.keys(exports.gClusterConfig);
 };
+
 /**
  * 更新集群配置在内存中的缓存
  */
@@ -599,6 +600,7 @@ function callremoteWithRetry(queryPath, options, callback, retry) {
   }
   check(queryPath, options);
 }
+
 /**
  * 修复集群worker, 通过检测联通性，淘汰漂移的节点
  */
@@ -609,13 +611,23 @@ exports.fixCluster = function (clusterCode, callback) {
   if (opt.code === 'ERROR') {
     return callback(opt);
   }
-  const path = '/api/status';
+
+  const path = '/api/ping';
 
   opt.ips = opt.ips.concat(opt.ipsOffline || []);
+  opt.clusterCode = clusterCode;
 
   callremoteWithRetry(path, opt, function (err, results) {
     if (err) {
       const errMsg = err && err.message;
+
+      // honeycomb-server 尚未支持这个接口
+      if (errMsg.includes('Cannot GET')) {
+        return callback({
+          code: 'ERROR',
+          message: '当前honeycomb-server尚未支持该功能，请升级honeycomb-server到>=2.0.12_1！'
+        });
+      }
 
       log.error('get status info failed: ', errMsg);
       const code = err && err.code || 'ERROR';

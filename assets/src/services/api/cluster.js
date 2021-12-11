@@ -107,3 +107,16 @@ export const deleteSnapshot = (clusterCode, snapshotId) => {
   return request.delete(`/api/cluster/snapshot/delete`, {data: {clusterCode, snapshotId}});
 };
 
+
+/**
+ * 尝试修复cluster，将无用的ip清除出去
+ * @param clusterCode
+ */
+export const fixCluster = (clusterCode) => {
+  const params = {
+    clusterCode
+  };
+
+  return request.get('/api/cluster/fix', {params});
+};
+

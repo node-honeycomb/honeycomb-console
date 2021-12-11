@@ -128,7 +128,8 @@ exports.publishApp = function (req, callback) {
         /**
          * pkg
               lastModifiedDate: 2021-12-01T14:01:41.881Z,
-              filepath: '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T/38a440630f5c6043e53edfd00',
+              filepath:
+                - '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T/38a440630f5c6043e53edfd00',
               newFilename: '38a440630f5c6043e53edfd00',
               originalFilename: 'socket-app_1.0.0_2.tgz',
               mimetype: 'application/gzip',

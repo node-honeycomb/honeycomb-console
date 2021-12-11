@@ -22,6 +22,7 @@ const ENV = {
 };
 
 const UserManager = (props) => {
+  const [fixing, setFixing] = useState(false);
   const [clusterList, setClusterList] = useState([]);
 
   const getCluster = async () => {
@@ -135,7 +136,7 @@ const UserManager = (props) => {
         const style = {padding: '0px'};
 
         return (
-          <div>
+          <div style={{whiteSpace: 'nowrap'}}>
             <Button style={style} type="link" onClick={() => handleEdit(row)}>
               编辑
             </Button>
@@ -151,12 +152,71 @@ const UserManager = (props) => {
             >
               快照
             </Button>
+            <Divider type="vertical" />
+            <Button
+              style={style}
+              type="link"
+              onClick={async () => {
+                try {
+                  await fixACluster(row.code);
+                  message.success('修复成功！');
+                } catch (e) {
+                  message.error(`修复失败：${e.message}`);
+                }
+              }}
+            >
+              修复
+            </Button>
           </div>
         );
       },
     },
   ];
 
+  const onFixAllCluster = async () => {
+    const key = 'fix-cluster';
+    const total = clusterList.length;
+    let success = 0;
+    let failed = 0;
+
+    setFixing(true);
+
+    // eslint-disable-next-line
+    for (let cluster of clusterList) {
+      const {code, name} = cluster;
+
+      message.loading({
+        content: `[${success}/${total}] 修复集群 ${name} 中`,
+        key
+      });
+
+      try {
+        success++;
+        await fixACluster(code);
+        message.loading({
+          content: `[${success}/${total}] 集群 ${name} 修复成功！`,
+          key
+        });
+      } catch (e) {
+        failed++;
+      }
+    }
+
+    setFixing(false);
+    message.success({
+      content: `所有集群修复完毕，成功 ${total - failed} 个，失败 ${failed} 个！`,
+      key
+    });
+  };
+
+  /**
+   * 调用API，订正某一个集群的信息
+   * @param clusterCode
+   */
+  const fixACluster = async (clusterCode) => {
+    await clusterApi.fixCluster(clusterCode);
+    await getCluster();
+  };
 
   return (
     <div>
@@ -166,8 +226,20 @@ const UserManager = (props) => {
       >
         集群管理
       </CommonTitle>
-      <Button type="primary" className="margin-b10" onClick={onAddCluster}>
+      <Button
+        type="primary"
+        className="margin-b10"
+        onClick={onAddCluster}
+      >
         + 添加集群
+      </Button>
+      &nbsp;&nbsp;
+      <Button
+        className="margin-b10"
+        onClick={onFixAllCluster}
+        loading={fixing}
+      >
+        修复集群
       </Button>
       <Table
         loading={props.loading}
