@@ -21,3 +21,4 @@ assets/package-lock.json
 .yo-rc.json
 assets/.honeypack_cache/*
 auto_check.js
+assets/static/*

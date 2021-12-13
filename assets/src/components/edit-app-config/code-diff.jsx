@@ -63,8 +63,8 @@ const CodeDiff = (props) => {
     >
       <div style={{margin: '0 auto'}}>
         <DiffEditor
-          width="900"
-          height="600"
+          width="900px"
+          height="500px"
           defaultLanguage="json"
           original={oldCode}
           modified={newCode}

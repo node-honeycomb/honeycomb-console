@@ -4,7 +4,6 @@ const webpack = require('webpack');
 const ReplaceCSSUrl = require('webpack-plugin-replace-css-url');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const ProgressBarPlugin = require('progress-bar-webpack-plugin');
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 const {ESBuildPlugin, ESBuildMinifyPlugin} = require('esbuild-loader');
 const WebpackDynamicPublicPathPlugin = require('webpack-dynamic-public-path');
 const errorOverlayMiddleware = require('react-dev-utils/errorOverlayMiddleware');
@@ -169,7 +168,6 @@ const config = {
       }
     ),
     new webpack.HotModuleReplacementPlugin(),
-    new MonacoWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: '[name].css'
     }),

@@ -1,15 +1,22 @@
 import dva from 'dva';
 import createLoading from 'dva-loading';
 import {createBrowserHistory} from 'history';
+import {loader} from '@monaco-editor/react';
 
 import router from './router';
+import userModel from './model/user';
 import loginRouter from './login-router';
 import globalModel from './model/global';
-import userModel from './model/user';
 
 import './index.less';
 
-const {isLogin} = window.CONFIG;
+const {isLogin, prefix} = window.CONFIG;
+
+loader.config({
+  paths: {
+    vs: `${prefix}/assets/static/vs`
+  }
+});
 
 // 修改 title
 if (window.CONFIG.envName) {

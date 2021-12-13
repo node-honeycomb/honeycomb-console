@@ -158,6 +158,7 @@ const UserManager = (props) => {
               type="link"
               onClick={async () => {
                 try {
+                  message.loading('修复中...');
                   await fixACluster(row.code);
                   message.success('修复成功！');
                 } catch (e) {
@@ -187,7 +188,8 @@ const UserManager = (props) => {
 
       message.loading({
         content: `[${success}/${total}] 修复集群 ${name} 中`,
-        key
+        key,
+        duration: 1000
       });
 
       try {
@@ -195,7 +197,8 @@ const UserManager = (props) => {
         await fixACluster(code);
         message.loading({
           content: `[${success}/${total}] 集群 ${name} 修复成功！`,
-          key
+          key,
+          duration: 1000
         });
       } catch (e) {
         failed++;
@@ -205,8 +208,11 @@ const UserManager = (props) => {
     setFixing(false);
     message.success({
       content: `所有集群修复完毕，成功 ${total - failed} 个，失败 ${failed} 个！`,
-      key
+      key,
+      duration: 1000
     });
+
+    message.destroy(key);
   };
 
   /**
