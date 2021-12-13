@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import {Modal, Button} from 'antd';
-import {MonacoDiffEditor} from 'react-monaco-editor';
+import {DiffEditor} from '@monaco-editor/react';
 import {removeModalDOM} from '@lib/util';
 
 const CodeDiff = (props) => {
@@ -62,12 +62,12 @@ const CodeDiff = (props) => {
       className="code-diff-modal"
     >
       <div style={{margin: '0 auto'}}>
-        <MonacoDiffEditor
+        <DiffEditor
           width="900"
           height="600"
-          language="json"
+          defaultLanguage="json"
           original={oldCode}
-          value={newCode}
+          modified={newCode}
           readOnly={true}
         />
       </div>

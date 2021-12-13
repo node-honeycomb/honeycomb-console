@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import parser from 'editor-json-parser';
 import {removeModalDOM} from '@lib/util';
 import {UserOutlined} from '@ant-design/icons';
-import {MonacoDiffEditor} from 'react-monaco-editor';
+import {DiffEditor} from '@monaco-editor/react';
 import {Modal, Button, List, notification} from 'antd';
 
 import api from '@api';
@@ -168,12 +168,12 @@ const CodeHistory = (props) => {
           height: '100%',
           display: 'inline-block'
         }}>
-          <MonacoDiffEditor
+          <DiffEditor
             width="100%"
             height="100%"
             language="json"
             original={oldCode}
-            value={newCode}
+            modified={newCode}
             readOnly={true}
           />
         </div>

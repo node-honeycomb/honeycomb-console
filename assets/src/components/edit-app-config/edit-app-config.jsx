@@ -3,7 +3,7 @@ import _ from 'lodash';
 import {connect} from 'dva';
 import PropTypes from 'prop-types';
 import {withRouter} from 'dva/router';
-import MonacoEditor from 'react-monaco-editor';
+import MonacoEditor from '@monaco-editor/react';
 import {Button, Spin, Modal, Empty, message} from 'antd';
 
 import api from '@api';

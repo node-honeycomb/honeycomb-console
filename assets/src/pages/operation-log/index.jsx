@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import {withRouter} from 'dva/router';
 import CommonTitle from '@coms/common-title';
 import {Table, Tag, Modal, DatePicker, notification} from 'antd';
-import {default as MonacoEditor, MonacoDiffEditor} from 'react-monaco-editor';
+import {default as MonacoEditor, DiffEditor} from '@monaco-editor/react';
 
 import ClusterSelector from './coms/cluster-selector';
 
@@ -213,12 +213,12 @@ const OperationLog = (props) => {
         }}
       >
         {drawerVisible ? (oldConfig !== null ?
-          <MonacoDiffEditor
+          <DiffEditor
             width="100%"
             height="100%"
             language="json"
             original={JSON.stringify(oldConfig, null, 2)}
-            value={JSON.stringify(selectedItem, null, 2)}
+            modified={JSON.stringify(selectedItem, null, 2)}
             readOnly={true}
             options={{
               automaticLayout: true
