@@ -182,11 +182,15 @@ const OperationLog = (props) => {
           render: (_, record) => (
             <a onClick={() => {
               if (record.opName === 'SET_APP_CONFIG') {
-                setOldConfig(record.extends.oldConfig);
-                setSelectedItem(record.extends.newConfig);
-                setDrawerVisible(true);
+                try {
+                  setOldConfig(record.extends.oldConfig);
+                  setSelectedItem(record.extends.newConfig);
+                  setDrawerVisible(true);
 
-                return;
+                  return;
+                } catch (e) {
+                  e;
+                }
               }
               setOldConfig(null);
               setSelectedItem(record);

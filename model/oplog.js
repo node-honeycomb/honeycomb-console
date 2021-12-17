@@ -4,6 +4,15 @@ const moment = require('moment');
 
 const db = require('../common/db');
 
+// 如果可以转为对象则返回对象，否则返回原值
+const parseValue = (value) => {
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return value;
+  }
+};
+
 const OpLog = {};
 const noop = (err) => err && console.log(err);
 
@@ -53,10 +62,9 @@ OpLog.getOpLog = (clusterCode, startTime, endTime, callback) => {
         return callback(err);
       } else {
         callback(null, data.map(log => {
-          log.detail && (log.detail = JSON.parse(log.detail));
-          log.extends && (log.extends = JSON.parse(log.extends));
-          log.socket && (log.socket = JSON.parse(log.socket));
-
+          log.detail && (log.detail = parseValue(log.detail));
+          log.extends && (log.extends = parseValue(log.extends));
+          log.socket && (log.socket = parseValue(log.socket));
 
           // eslint-disable-next-line
           for (const [k, v] of Object.entries(log)) {
