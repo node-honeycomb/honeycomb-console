@@ -331,9 +331,6 @@ exports.downloadClusterPatch = async function (req, res) {
       for (let n = 0; n < app.versions.length; n++) {
         const v = app.versions[n];
 
-        if (!v.isCurrWorking) {
-          continue;
-        }
         const appCfg = await getAppConfig(clusterCode, 'app', app.name);
 
         if (appCfg) {
@@ -342,6 +339,11 @@ exports.downloadClusterPatch = async function (req, res) {
             JSON.stringify(appCfg.config, null, 2)
           );
         }
+
+        if (!v.isCurrWorking) {
+          continue;
+        }
+
         let pkg;
 
         if (req.query.force) {
