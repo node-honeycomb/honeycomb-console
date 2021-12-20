@@ -95,6 +95,7 @@ exports.listApp = function (req, callback) {
  */
 exports.publishApp = function (req, callback) {
   const clusterCode = req.query.clusterCode;
+  const timeout = req.query.timeout;
   const recover = req.query.recover === 'true';
 
   async.waterfall([
@@ -175,7 +176,7 @@ exports.publishApp = function (req, callback) {
       opt.method = 'POST';
       opt.headers = form.headers();
       opt.stream = form;
-      opt.timeout = 1000000;
+      opt.timeout = timeout || 1000000;
       callremote(path, opt, cb);
     }
   ], function (err, results) {
@@ -261,6 +262,7 @@ exports.cleanAppExitRecord = function (req, callback) {
  */
 exports.deleteApp = function (req, callback) {
   const appId = req.params && req.params.appId;
+  const timeout = req.query.timeout;
 
   req.oplog({
     clientId: req.ips.join('') || '-',
@@ -278,7 +280,7 @@ exports.deleteApp = function (req, callback) {
     return callback(opt);
   }
   const path = `/api/delete/${appId}`;
-
+  opt.timeout = timeout || 60000;
   opt.method = 'POST';
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
@@ -407,6 +409,7 @@ exports.reloadApp = function (req, callback) {
  */
 exports.startApp = function (req, callback) {
   const appId = req.params && req.params.appId;
+  const timeout = req.query.timeout;
 
   req.oplog({
     clientId: req.ips.join('') || '-',
@@ -424,7 +427,7 @@ exports.startApp = function (req, callback) {
   }
   const path = `/api/start/${appId}`;
   opt.method = 'POST';
-  opt.timeout = 30000;
+  opt.timeout = timeout || 60000;
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
       const errMsg = err && err.message || results.message;
