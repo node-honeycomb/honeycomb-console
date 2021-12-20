@@ -423,8 +423,8 @@ exports.startApp = function (req, callback) {
     return callback(opt);
   }
   const path = `/api/start/${appId}`;
-
   opt.method = 'POST';
+  opt.timeout = 30000;
   callremote(path, opt, function (err, results) {
     if (err || results.code !== 'SUCCESS') {
       const errMsg = err && err.message || results.message;
