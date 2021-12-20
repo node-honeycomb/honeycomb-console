@@ -230,7 +230,7 @@ exports.sign = function (queryPath, options, token) {
  * @param  {Object}   options  [description]
  * @param  {Function} callback [description]
  */
-exports.callremote = function (queryPath, options, callback) {
+exports.callremote = function (queryPath, options, callback, maxRetry) {
   let endpoint = options.endpoint;
   const token = options.token;
   const ips = options.ips.join(',');
@@ -260,13 +260,21 @@ exports.callremote = function (queryPath, options, callback) {
   const qpath = endpoint + signed.queryPath;
 
   log.debug(`${options.method} ${qpath}`);
-  urllib.request(qpath, options, function (err, data, res) {
+
+  let retry = 0;
+  function done(err, data, res) {
     if (err) {
-      callback(err);
+      if (maxRetry && retry < maxRetry) {
+        retry ++;
+        return urllib.request(qpath, options, done);
+      } else {
+        callback(err);
+      }
     } else {
       callback(null, data, res);
     }
-  });
+  }
+  urllib.request(qpath, options, done);
 };
 
 /**
@@ -400,7 +408,7 @@ exports.mergeAppInfo = function (ips, apps) {
 };
 
 
-exports.getClusterApps = function (clusterIinfo, cb) {
+exports.getClusterApps = function (clusterIinfo, cb, maxRetry) {
   const path = '/api/apps';
 
   clusterIinfo.timeout = 5000;
@@ -423,15 +431,21 @@ exports.getClusterApps = function (clusterIinfo, cb) {
         if (/^__\w+__$/.test(app.name)) {
           return;
         }
-        app.versions.sort((a, b) => {
+        let onlineApps = [];
+        app.versions.forEach((v) => {
+          if (v.isCurrWorking) {
+            onlineApps.push(v);
+          }
+        });
+        onlineApps.sort((a, b) => {
           return a.weight > b.weight ? -1 : 1;
         });
-        app.versions = app.versions.slice(0, 2);
+        app.versions = onlineApps.slice(0, 2);
         res.push(app);
       });
       cb(null, res);
     }
-  });
+  }, maxRetry);
 };
 const secretFieldNameList = [
   /password/,

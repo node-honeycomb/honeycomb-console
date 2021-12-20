@@ -11,28 +11,28 @@ const callremote = utils.callremote;
 
 function saveSnapShot(clusterCode) {
   const opt = cluster.getClusterCfgByCode(clusterCode);
-
   if (opt.code === 'ERROR') {
-    log.warn();
-
-    return;
+    return callback(new Error('saveSnapShot() failed, clusterCode not found'));
   }
   utils.getClusterApps(opt, (err, data) => {
     if (err) {
-      log.error('snapshot faild, get cluster info failed', err);
+      err.message = 'saveSnapShot failed, getClusterApps() failed: ' + err.message;
+      return callback(err);
     } else {
       const obj = {
         clusterCode,
         info: data
       };
-
       cluster.saveSnapshot(obj, (err) => {
         if (err) {
-          log.error('save snapshot failed', err);
+          err.message = 'saveSnapShot() failed:' + err.message;
+          callback(err);
+        } else {
+          callback();
         }
       });
     }
-  });
+  }, 3);
 }
 
 /**
@@ -191,10 +191,16 @@ exports.publishApp = function (req, callback) {
       });
     } else {
       if (!recover) {
-        saveSnapShot(clusterCode);
+        saveSnapShot(clusterCode, (err) => {
+          if (err) {
+            return callback(err);
+          } else {
+            callback(null, results.data);
+          }
+        });
+      } else {
+        callback(null, results.data);
       }
-
-      return callback(null, results.data);
     }
   });
 };
@@ -292,9 +298,13 @@ exports.deleteApp = function (req, callback) {
           log.error('delete apppackage failed', err.message);
         }
       });
-      saveSnapShot(clusterCode);
-
-      return callback(null, results.data);
+      saveSnapShot(clusterCode, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, results.data);
+        }
+      });
     }
   });
 };
@@ -428,9 +438,13 @@ exports.startApp = function (req, callback) {
       });
     } else {
       log.debug(`start app ${appId} results:`, results);
-      saveSnapShot(clusterCode);
-
-      return callback(null, results.data);
+      saveSnapShot(clusterCode, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, results.data);
+        }
+      });
     }
   });
 };
@@ -475,9 +489,13 @@ exports.stopApp = function (req, callback) {
       });
     } else {
       log.debug(`stop app ${appId} results:`, results);
-      saveSnapShot(clusterCode);
-
-      return callback(null, results.data);
+      saveSnapShot(clusterCode, (err) => {
+        if (err) {
+          callback(err);
+        } else {
+          callback(null, results.data);
+        }
+      });
     }
   });
 };

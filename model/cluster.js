@@ -551,11 +551,22 @@ exports.saveSnapshot = (obj, cb) => {
     obj.user || '',
     new Date()
   ];
-
-  db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, (err) => {
-    cb(err);
-    exports.cleanSnapshot(obj.clusterCode);
-  });
+  let retry = 0;
+  let maxRetry = 3;
+  function done(err) {
+    if (err) {
+      if (retry < maxRetry) {
+        retry ++;
+        db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, done);
+      } else {
+        cb(err);
+      }
+    } else {
+      cb();
+      exports.cleanSnapshot(obj.clusterCode);
+    }
+  }
+  db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, done);
 };
 
 
