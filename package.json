@@ -1,6 +1,6 @@
 {
   "name": "honeycomb-console",
-  "version": "2.0.7",
+  "version": "2.0.8",
   "build": "12",
   "description": "Honeycomb admin console",
   "main": "app.js",
@@ -29,7 +29,7 @@
     "sql.js": "^1.1.0",
     "svg-captcha": "^1.4.0",
     "tar": "^6.0.2",
-    "urllib": "2.20.0",
+    "urllib": "2.38.0",
     "uuid": "^8.1.0",
     "xfs": "^0.2.4",
     "yaml": "^1.10.0"
