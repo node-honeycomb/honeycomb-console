@@ -282,9 +282,8 @@ exports.downloadClusterPatch = async function (req, res) {
     const tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
 
     if (!clusterSnp) {
-      res.statusCode = 404;
-
-      return res.json({code: 'ERROR', data: 'empty'});
+      res.statusCode = 204;
+      return res.end();
     }
     const serverCfg = await getAppConfig(clusterCode, 'server', 'server');
 
