@@ -14,11 +14,11 @@ const titles = [
     width: '170px'
   },
   {
-    name: '版本号',
+    name: '版本',
     width: '100px'
   },
   {
-    name: '处理单元',
+    name: '进程数',
     width: '60px',
     info: '用于标识当前每台机器上的进程数'
   },
@@ -31,14 +31,14 @@ const titles = [
     width: '120px'
   },
   {
-    name: '平均内存',
-    width: '90px',
-    info: `获取从${before}到现在的平均内存`
-  },
-  {
-    name: '平均cpu',
+    name: 'CPU',
     width: '90px',
     info: <span>获取从{before}到现在的平均CPU负载，{SYS_CPU_TIPS}</span>
+  },
+  {
+    name: 'MEM',
+    width: '90px',
+    info: `获取从${before}到现在的平均内存`
   }
 ];
 

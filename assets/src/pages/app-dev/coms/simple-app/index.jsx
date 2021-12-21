@@ -196,20 +196,20 @@ const SimpleApp = (props) => {
                     clusterCode={currentClusterCode}
                   />
                 </span>
-                <span className="mem">
-                  {
-                    isCurrWorking && (
-                      <React.Fragment>
-                        {avgMem} mb <AppK appName={name} k={memK} />
-                      </React.Fragment>
-                    )
-                  }
-                </span>
                 <span className="cpu">
                   {
                     isCurrWorking && (
                       <React.Fragment>
                         {avgCpu} <AppK appName={name} k={cpuK} />
+                      </React.Fragment>
+                    )
+                  }
+                </span>
+                <span className="mem">
+                  {
+                    isCurrWorking && (
+                      <React.Fragment>
+                        {avgMem}MB<AppK appName={name} k={memK} />
                       </React.Fragment>
                     )
                   }

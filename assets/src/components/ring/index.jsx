@@ -68,8 +68,8 @@ class Ring extends React.Component {
       <div className="ring-card">
         <Chart
           data={data}
-          height={120}
-          width={120}
+          height={80}
+          width={80}
           pure
           autoFit
           animate={true}
@@ -95,7 +95,7 @@ class Ring extends React.Component {
             adjust="stack"
             position="value"
             shape="sliceShape"
-            color={['type', [color, 'rgb(255, 255, 255)']]}
+            color={['type', [color, '#455168']]}
           />
           <Interaction type="element-single-selected" />
         </Chart>

@@ -7,7 +7,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {withRouter} from 'dva/router';
 import {Spin, Tooltip, Menu, Dropdown, Drawer} from 'antd';
-import {SettingOutlined, FormatPainterOutlined, CheckCircleOutlined} from '@ant-design/icons';
+import {SettingOutlined, DeleteOutlined, CheckCircleOutlined} from '@ant-design/icons';
 
 import api from '@api/index';
 import Ring from '@coms/ring';
@@ -187,9 +187,9 @@ const AppDev = (props) => {
           all={totalVersion}
           part={errorCount}
           anotherTitle="正常应用总数"
-          title="当前集群异常应用"
+          title="异常应用"
           allTitle="应用总数"
-          partTitle="异常应用总数"
+          partTitle="异常应用"
           partTooltip={(
             <span>
               {
@@ -223,13 +223,13 @@ const AppDev = (props) => {
 
       <div className="app-div-title">
         应用列表
-        <WhiteSpace />
+        <WhiteSpace /><WhiteSpace /><WhiteSpace /><WhiteSpace />
         <Dropdown overlay={menu}>
           <SettingOutlined />
         </Dropdown>
-        <WhiteSpace />
+        <WhiteSpace /><WhiteSpace />
         <Tooltip title="应用清理">
-          <FormatPainterOutlined onClick={() => setClearListVisible(true)} />
+          <DeleteOutlined onClick={() => setClearListVisible(true)} />
         </Tooltip>
       </div>
       <div className="app-list">

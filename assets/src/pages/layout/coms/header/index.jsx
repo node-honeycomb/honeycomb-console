@@ -123,7 +123,7 @@ const Header = (props) => {
             clusters: clusters,
           })}
           className="menu-item show-cluster-sider">
-          <span><ClusterOutlined /> 集群信息</span>
+          <span><ClusterOutlined />集群信息</span>
         </span>
         {
           isClusterError && (
