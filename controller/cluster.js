@@ -283,6 +283,7 @@ exports.downloadClusterPatch = async function (req, res) {
 
     if (!clusterSnp) {
       res.statusCode = 204;
+
       return res.end();
     }
     const serverCfg = await getAppConfig(clusterCode, 'server', 'server');
