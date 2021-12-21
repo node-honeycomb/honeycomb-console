@@ -1,4 +1,4 @@
-/* eslint-disable max-len */
+/* eslint-disable max-lines */
 const fs = require('fs');
 const _ = require('lodash');
 const url = require('url');

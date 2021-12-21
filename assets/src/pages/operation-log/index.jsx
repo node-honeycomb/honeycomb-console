@@ -50,7 +50,7 @@ const opNameMap = {
   DELETE_CLUSTER: '删除集群',
   DELETE_COREDUMP: '清理COREDUMP',
   DELETE_UNKNOWPROCESS: '删除未知的process',
-  CLEAN_APP_EXIT_RECORD: '清理应用多余版本',
+  CLEAN_APP_EXIT_RECORD: '清理异常退出记录',
   REMOVE_WORKER: '删除worker',
   ADD_WORKER: '创建worker',
   REGISTER_WORKER: '注册worker',

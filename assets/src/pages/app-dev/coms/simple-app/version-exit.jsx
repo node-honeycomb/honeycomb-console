@@ -50,6 +50,7 @@ const VersionExit = (props) => {
     Modal.confirm({
       width: '40%',
       title: '应用近期退出情况',
+      keyboard: false,
       content: (() => {
         return (
           <Table
@@ -63,6 +64,10 @@ const VersionExit = (props) => {
       okText: '关闭',
       cancelText: '清空记录',
       onCancel: async () => {
+        if (version.appId === '__ADMIN__') {
+          return message.warning('管控进程不支持清空记录！');
+        }
+
         try {
           await apis.appApi.cleanAppExit(clusterCode, version.appId);
 

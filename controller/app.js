@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 'use strict';
 const async = require('async');
 const formstream = require('formstream');

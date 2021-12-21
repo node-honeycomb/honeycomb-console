@@ -11,7 +11,7 @@ const before = moment().format('HH:00:00');
 const titles = [
   {
     name: '应用名',
-    width: '150px'
+    width: '170px'
   },
   {
     name: '版本号',
