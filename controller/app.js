@@ -9,20 +9,26 @@ const appPackage = require('../model/app_package');
 
 const callremote = utils.callremote;
 
-function saveSnapShot(clusterCode) {
+function saveSnapShot(clusterCode, callback) {
   const opt = cluster.getClusterCfgByCode(clusterCode);
+
   if (opt.code === 'ERROR') {
     return callback(new Error('saveSnapShot() failed, clusterCode not found'));
+  }
+  if (!callback) {
+    callback = () => {};
   }
   utils.getClusterApps(opt, (err, data) => {
     if (err) {
       err.message = 'saveSnapShot failed, getClusterApps() failed: ' + err.message;
+
       return callback(err);
     } else {
       const obj = {
         clusterCode,
         info: data
       };
+
       cluster.saveSnapshot(obj, (err) => {
         if (err) {
           err.message = 'saveSnapShot() failed:' + err.message;
@@ -280,6 +286,7 @@ exports.deleteApp = function (req, callback) {
     return callback(opt);
   }
   const path = `/api/delete/${appId}`;
+
   opt.timeout = timeout || 60000;
   opt.method = 'POST';
   callremote(path, opt, function (err, results) {
@@ -426,6 +433,7 @@ exports.startApp = function (req, callback) {
     return callback(opt);
   }
   const path = `/api/start/${appId}`;
+
   opt.method = 'POST';
   opt.timeout = timeout || 60000;
   callremote(path, opt, function (err, results) {

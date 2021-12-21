@@ -1,3 +1,9 @@
 {
-  "extends": "aliyun"
+  "extends": "aliyun",
+  "overrides": [{
+    "files": ["*.*"],
+    "rules": {
+      "max-len": "off"
+    }
+  }]
 }

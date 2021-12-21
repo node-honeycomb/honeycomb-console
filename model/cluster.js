@@ -552,11 +552,12 @@ exports.saveSnapshot = (obj, cb) => {
     new Date()
   ];
   let retry = 0;
-  let maxRetry = 3;
+  const maxRetry = 3;
+
   function done(err) {
     if (err) {
       if (retry < maxRetry) {
-        retry ++;
+        retry++;
         db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, done);
       } else {
         cb(err);

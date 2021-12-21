@@ -250,7 +250,7 @@ exports.callremote = function (queryPath, options, callback, maxRetry) {
     queryPath += '&ips=' + ips;
   }
   if (options.timeout) {
-    queryPath += '&timeout=' + timeout;
+    queryPath += '&timeout=' + options.timeout;
   }
   if (endpoint.endsWith('/')) {
     endpoint = endpoint.substring(0, endpoint.length - 1);
@@ -265,10 +265,12 @@ exports.callremote = function (queryPath, options, callback, maxRetry) {
   log.debug(`${options.method} ${qpath}`);
 
   let retry = 0;
+
   function done(err, data, res) {
     if (err) {
       if (maxRetry && retry < maxRetry) {
-        retry ++;
+        retry++;
+
         return urllib.request(qpath, options, done);
       } else {
         callback(err);
@@ -434,7 +436,8 @@ exports.getClusterApps = function (clusterIinfo, cb, maxRetry) {
         if (/^__\w+__$/.test(app.name)) {
           return;
         }
-        let onlineApps = [];
+        const onlineApps = [];
+
         app.versions.forEach((v) => {
           if (v.isCurrWorking) {
             onlineApps.push(v);

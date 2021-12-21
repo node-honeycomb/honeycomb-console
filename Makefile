@@ -7,8 +7,8 @@ BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 TESTS_ENV = test/env.js
 
 install:
-	@cnpm install
-	@cd assets && cnpm install
+	@npm install --registry=https://registry.npmmirror.com
+	@cd assets && npm install --registry=https://registry.npmmirror.com
 
 test:
 	NODE_ENV=test $(BIN_MOCHA) \
@@ -21,8 +21,8 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release/assets && NODE_ENV=development cnpm install
-	@cd out/release && NODE_ENV=production cnpm install
+	@cd out/release/assets && NODE_ENV=development npm install --registry=https://registry.npmmirror.com
+	@cd out/release && NODE_ENV=production npm install --registry=https://registry.npmmirror.com
 	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
 	@rm -rf out/release/assets/
 	@mkdir -p out/release/assets
