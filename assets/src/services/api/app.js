@@ -85,3 +85,14 @@ export const upload = async (clusterCode, file, onProgress) => {
     }
   });
 };
+
+/**
+ * 清理某一个应用的退出记录
+ * @param clusterCode
+ * @param appId
+ */
+export const cleanAppExit = async (clusterCode, appId) => {
+  const body = {clusterCode};
+
+  return request.post(`/api/app/${appId}/clean_exit_record`, body);
+};

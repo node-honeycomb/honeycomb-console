@@ -157,13 +157,29 @@ const UserManager = (props) => {
               style={style}
               type="link"
               onClick={async () => {
+                const key = (new Date()).toString();
+
                 try {
-                  message.loading('修复中...');
+                  message.loading({
+                    content: '修复中...',
+                    duration: 1000,
+                    key: key
+                  });
                   await fixACluster(row.code);
-                  message.success('修复成功！');
+                  message.success({
+                    content: '修复成功！',
+                    key
+                  });
                 } catch (e) {
-                  message.error(`修复失败：${e.message}`);
+                  message.error({
+                    content: `修复失败：${e.message}`,
+                    key
+                  });
                 }
+
+                setTimeout(() => {
+                  message.destroy(key);
+                }, 1000);
               }}
             >
               修复
