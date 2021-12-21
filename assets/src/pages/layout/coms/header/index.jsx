@@ -3,7 +3,7 @@ import _ from 'lodash';
 import PropTypes from 'prop-types';
 import {Menu, Dropdown, Tooltip, Tag} from 'antd';
 import {
-  UserOutlined, CopyOutlined, PauseCircleOutlined,
+  UserOutlined, CopyOutlined, ClusterOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
   BookOutlined, RedoOutlined, WarningOutlined
 } from '@ant-design/icons';
@@ -123,7 +123,7 @@ const Header = (props) => {
             clusters: clusters,
           })}
           className="menu-item show-cluster-sider">
-          <span><PauseCircleOutlined /> 集群信息</span>
+          <span><ClusterOutlined /> 集群信息</span>
         </span>
         {
           isClusterError && (

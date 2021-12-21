@@ -17,6 +17,7 @@ import AppK from './app-k';
 import VersionOp from './version-op';
 import getProc from './lib/get-proc';
 import AppStatus from './app-status';
+import VersionExit from './version-exit';
 import {MENU_ACTIONS} from '../app/app-op';
 import {getCurrentWorking} from '../../util';
 import {getAvgUsage, getUsageK} from './lib/calc-usage';
@@ -190,6 +191,10 @@ const SimpleApp = (props) => {
                   {
                     isCurrWorking && <CheckCircleOutlined style={{color: '#389e0d'}} />
                   }
+                  <VersionExit
+                    version={version}
+                    clusterCode={currentClusterCode}
+                  />
                 </span>
                 <span className="mem">
                   {

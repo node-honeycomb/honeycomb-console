@@ -12,11 +12,15 @@ const Snapshot = (props) => {
 
   const init = (async () => {
     setLoading(true);
-    const list = await api.clusterApi.getSnapshot(clusterCode);
+    try {
+      const list = await api.clusterApi.getSnapshot(clusterCode);
+
+      setData(list);
+    } catch (e) {
+      console.error(e);
+    }
 
     setLoading(false);
-
-    setData(list);
   });
 
   useEffect(() => {

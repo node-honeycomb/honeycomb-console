@@ -1,3 +1,5 @@
+@import '../../index.less';
+
 .app {
   display: flex;
   padding: 12px;
@@ -32,7 +34,7 @@
       }
     }
   }
-  
+
   .app-name {
     align-items: center;
     display: flex;
@@ -105,5 +107,12 @@
   .loading-btn {
     color: #737373;
     cursor: not-allowed;
+  }
+
+  .version-exit {
+    color: @warning-color;
+    display: inline-block;
+    transform: translateY(-1.5px);
+    cursor: pointer;
   }
 }
