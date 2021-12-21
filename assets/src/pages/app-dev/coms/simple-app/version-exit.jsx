@@ -16,8 +16,12 @@ const VersionExit = (props) => {
   const errorExitRecord = [];
 
   version.cluster.forEach(cluster => {
-    errorExitCount += cluster.errorExitCount;
+    errorExitCount += cluster.errorExitCount || 0;
     const ip = cluster.ip;
+
+    if (!cluster.errorExitRecord) {
+      return;
+    }
 
     cluster.errorExitRecord.forEach(time => {
       errorExitRecord.push({

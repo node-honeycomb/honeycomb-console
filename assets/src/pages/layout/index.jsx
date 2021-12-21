@@ -193,7 +193,7 @@ class AppLayout extends React.Component {
 
   renderError = () => {
     return (
-      <div className="error-msg">😵 Something Went Wrong... <br /> Error: {this.state.errorMsg}</div>
+      <div className="error-msg">😵 程序崩溃了，请到<a rel="noreferrer" href="https://github.com/node-honeycomb/honeycomb-console/issues" target="_blank">这里</a>给我们反馈吧 <br /> Error: {this.state.errorMsg}</div>
     );
   }
 
