@@ -125,7 +125,7 @@ module.exports = function (app, options) {
         const capt = svgCaptcha.create({
           size: 4,
           noise: 3,
-          background: '#fff',
+          background: '#ddd',
           ignoreChars: '0o1il'
         });
 
