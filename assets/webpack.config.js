@@ -91,7 +91,7 @@ const config = {
             cacheDirectory: path.join(__dirname, '.honeypack_cache/babel-loader'),
             presets: [['env', {
               targets: {
-                browsers: 'Chrome >= 50'
+                browsers: 'Chrome <= 70'
               }
             }], 'react'],
 
@@ -176,7 +176,9 @@ const config = {
         css: ['stylesheet'],
       }
     }),
-    new ESBuildPlugin(),
+    new ESBuildPlugin({
+      
+    }),
     new WebpackDynamicPublicPathPlugin({
       externalPublicPath: 'window.CONFIG.prefix + "/assets/"'
     })
