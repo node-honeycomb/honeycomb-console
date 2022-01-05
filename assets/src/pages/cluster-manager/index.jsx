@@ -198,28 +198,31 @@ const UserManager = (props) => {
 
     setFixing(true);
 
+    await Promise.all(_.chunk(clusterList, 5).map(async list => {
     // eslint-disable-next-line
-    for (let cluster of clusterList) {
-      const {code, name} = cluster;
+    for (let cluster of list) {
+        const {code, name} = cluster;
 
-      message.loading({
-        content: `[${success}/${total}] 修复集群 ${name} 中`,
-        key,
-        duration: 1000
-      });
-
-      try {
-        success++;
-        await fixACluster(code);
         message.loading({
-          content: `[${success}/${total}] 集群 ${name} 修复成功！`,
+          content: `[${success}/${total}] 修复集群 ${name} 中`,
           key,
           duration: 1000
         });
-      } catch (e) {
-        failed++;
+
+        try {
+          success++;
+          await fixACluster(code);
+          message.loading({
+            content: `[${success}/${total}] 集群 ${name} 修复成功！`,
+            key,
+            duration: 1000
+          });
+        } catch (e) {
+          failed++;
+        }
       }
-    }
+    }));
+
 
     setFixing(false);
     message.success({

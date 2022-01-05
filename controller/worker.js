@@ -86,18 +86,23 @@ exports.registerWorker = function (req, callback) {
     opLogLevel: 'NORMAL',
     opItem: 'WORKER',
     opItemId: ip,
-    extends: {env: 'production'}
+    extends: {
+      env: 'production'
+    }
   });
+
   log.info('register worker: ', ip, code);
 
-  cluster.addCluster(name, code, token, endpoint, 'production', (err) => {
+  cluster.addCluster(name, code, token, endpoint, 'prod', (err) => {
     if (err && !/unique|duplicate/i.test(err.message)) {
       return callback(err);
     }
-    cluster.updateCluster(name, code, token, endpoint, 'production', (err) => {
+
+    cluster.updateCluster(name, code, token, endpoint, 'prod', (err) => {
       if (err) {
         return callback(err);
       }
+
       cluster.addWorker(ip, code, (err) => {
         if (err && !/unique|duplicate/i.test(err.message)) {
           log.error(`register worker: ${ip} failed:`, err.message);
