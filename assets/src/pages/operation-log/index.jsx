@@ -139,14 +139,18 @@ const OperationLog = (props) => {
           title: '时间',
           dataIndex: 'gmtCreate',
           sorter: (a, b) => moment(a.gmtCreate).subtract(moment(b.gmtCreate), 'seconds'),
-          render: text => <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>
+          render(text) {
+            return <span>{moment(text).format('YYYY-MM-DD HH:mm')}</span>;
+          }
         },
         {
           title: '操作名',
           dataIndex: 'opName',
           filters: Object.entries(opNameMap).map(([k, v]) => ({text: v, value: k})),
           onFilter: (value, record) => record.opName === value,
-          render: text => <span>{opNameMap[text]}</span>
+          render(text) {
+            return <span>{opNameMap[text]}</span>;
+          }
         },
         {
           title: '操作人',
@@ -155,17 +159,23 @@ const OperationLog = (props) => {
         {
           title: '操作IP',
           dataIndex: 'socket',
-          render: socket => <span>{socket && socket.address || '未记录'}</span>
+          render(socket) {
+            return <span>{socket && socket.address || '未记录'}</span>;
+          }
         },
         {
           title: '操作风险',
           dataIndex: 'opLogLevel',
-          render: text => <Tag color={colorMap[text]}>{LEVEL_MAP[text]}</Tag>
+          render(text) {
+            return <Tag color={colorMap[text]}>{LEVEL_MAP[text]}</Tag>;
+          }
         },
         {
           title: '操作对象',
           dataIndex: 'opItem',
-          render: text => opItemMap[text]
+          render(text) {
+            return opItemMap[text];
+          }
         },
         {
           title: '操作对象ID',
@@ -179,26 +189,28 @@ const OperationLog = (props) => {
         {
           title: '详细',
           dataIndex: 'detail',
-          render: (_, record) => (
-            <a onClick={() => {
-              if (record.opName === 'SET_APP_CONFIG') {
-                try {
-                  setOldConfig(record.extends.oldConfig);
-                  setSelectedItem(record.extends.newConfig);
-                  setDrawerVisible(true);
+          render(_, record) {
+            (
+              <a onClick={() => {
+                if (record.opName === 'SET_APP_CONFIG') {
+                  try {
+                    setOldConfig(record.extends.oldConfig);
+                    setSelectedItem(record.extends.newConfig);
+                    setDrawerVisible(true);
 
-                  return;
-                } catch (e) {
-                  e;
+                    return;
+                  } catch (e) {
+                    e;
+                  }
                 }
-              }
-              setOldConfig(null);
-              setSelectedItem(record);
-              setDrawerVisible(true);
-            }}>
+                setOldConfig(null);
+                setSelectedItem(record);
+                setDrawerVisible(true);
+              }}>
             查看
-            </a>
-          )
+              </a>
+            );
+          }
         },
       ]} dataSource={dataSource}></Table>
       <Modal

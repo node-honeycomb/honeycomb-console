@@ -110,7 +110,7 @@ const UserManager = (props) => {
     {
       title: 'ip列表',
       dataIndex: 'ips',
-      render: (row) => {
+      render(row) {
         return <span>
           {
             row.map(ip => {

@@ -1,22 +1,12 @@
-const os = require('os');
-const fs = require('xfs');
 const tar = require('tar');
-const yaml = require('yaml');
 const path = require('path');
 const async = require('async');
-const uuid = require('uuid').v4;
 const lodash = require('lodash');
 const promisify = require('util').promisify;
 
 const log = require('../common/log');
 const cluster = require('../model/cluster');
 const userAcl = require('../model/user_acl');
-const appConfig = require('../model/app_config');
-const appPackage = require('../model/app_package');
-const getSnapshotSync = promisify(cluster.getSnapshot);
-const getAppConfig = promisify(appConfig.getAppConfig);
-const getAppPackage = promisify(appPackage.getPackage);
-
 
 function getFilterCluster(gClusterConfig, req) {
   const clusterConfig = {};
@@ -266,118 +256,33 @@ exports.fixCluster = function (req, callback) {
   cluster.fixCluster(clusterCode, callback);
 };
 
-
-const mv = promisify(fs.mv);
-
 /**
  * 下载集群的patch包
  * @api {GET} /api/cluster/patch
  * @nowrap
  */
 exports.downloadClusterPatch = async function (req, res) {
-  try {
-    const clusterCode = req.query.clusterCode;
-    const clusterSnp = await getSnapshotSync(clusterCode);
+  const clusterCode = req.query.clusterCode;
+  const dir = await cluster.downloadPatch(clusterCode, req.query.force);
 
-    const tmpDir = path.join(os.tmpdir(), uuid(), 'cluster_patch');
+  if (dir === null) {
+    res.statusCode = 204;
 
-    if (!clusterSnp) {
-      res.statusCode = 204;
-
-      return res.end();
-    }
-    const serverCfg = await getAppConfig(clusterCode, 'server', 'server');
-
-    if (serverCfg) {
-      fs.sync()
-        .save(
-          path.join(
-            tmpDir, 'conf/custom/server.json'),
-          JSON.stringify(serverCfg.config, null, 2)
-        );
-    }
-    const commonCfg = await getAppConfig(clusterCode, 'server', 'common');
-
-    if (commonCfg) {
-      fs.sync()
-        .save(
-          path.join(tmpDir, 'conf/custom/common.json'),
-          JSON.stringify(commonCfg.config, null, 2)
-        );
-    }
-
-    fs.sync().mkdir(path.join(tmpDir, 'run/appsRoot/'));
-    /*
-    {
-      name: 'socket-app',
-      versions:[
-        {
-          version: '1.0.0',
-          buildNum: '2',
-          publishAt: '5/22/2020, 2:34:00 PM',
-          appId: 'socket-app_1.0.0_2',
-          weight: 1000000.002,
-          cluster: [Array],
-          isCurrWorking: true
-        }
-      ]
-    }
-    */
-    const apps = {};
-
-    for (let i = 0; i < clusterSnp.info.length; i++) {
-      const app = clusterSnp.info[i];
-
-      for (let n = 0; n < app.versions.length; n++) {
-        const v = app.versions[n];
-
-        if (!v.isCurrWorking) {
-          continue;
-        }
-        const appCfg = await getAppConfig(clusterCode, 'app', app.name);
-
-        if (appCfg) {
-          fs.sync().save(
-            path.join(tmpDir, `conf/custom/apps/${app.name}.json`),
-            JSON.stringify(appCfg.config, null, 2)
-          );
-        }
-        let pkg;
-
-        if (req.query.force) {
-          try {
-            pkg = await getAppPackage(clusterCode, v.appId);
-          } catch (e) {
-            log.error('download app pkg from filerepo failed, force ignore', clusterCode, app.name);
-          }
-        } else {
-          pkg = await getAppPackage(clusterCode, v.appId);
-        }
-        if (pkg) {
-          await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
-          apps[v.appId] = {
-            dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
-          };
-        }
-      }
-    }
-    if (Object.keys(apps).length) {
-      fs.sync().save(path.join(tmpDir, 'run/app.mount.info.yaml'), yaml.stringify(apps));
-    }
+    return res.end();
+  } else if (dir instanceof Error) {
+    res.statusCode = 500;
+    res.json({code: 'ERROR', message: dir.message});
+  } else {
     res.writeHead(200, {
       'Content-Type': 'application/force-download',
       'Content-Disposition': 'attachment; filename=cluster_patch.tgz'
     });
-
     tar.c({
       gzip: true,
-      cwd: path.dirname(tmpDir),
+      cwd: path.dirname(dir),
     },
     ['cluster_patch']
     ).pipe(res);
-  } catch (e) {
-    res.statusCode = 500;
-    res.json({code: 'ERROR', message: e.message});
   }
 };
 

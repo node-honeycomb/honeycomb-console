@@ -81,16 +81,16 @@ exports.deletePackage = (clusterCode, appId, callback) => {
     [clusterCode, appId],
     function (err, data) {
       if (err) {
-        log.error('delete app pkg: query pkg info failed:', err);
+        log.error(`[${clusterCode} ${appId}] delete app pkg: query pkg info failed:`, err);
 
         return callback(err);
       } else {
-        log.info('delete app pkg: query pkg info successfully', JSON.stringify(data[0]));
+        log.info(`[${clusterCode} ${appId}] delete app pkg: query pkg info successfully`, JSON.stringify(data[0]));
         if (data[0]) {
           if (storage && storage.delete && data[0].package) {
             storage.delete(data[0].package.toString(), (err) => {
               if (err) {
-                log.error(`delete package from storage failed, cluster: ${clusterCode} appId: ${appId}`, err);
+                log.error(`[${clusterCode} ${appId}] delete package from storage failed:`, err);
               }
               db.query(DELETE_APP_PKG, [clusterCode, appId], callback);
             });
@@ -123,18 +123,18 @@ exports.getPackage = (clusterCode, appId, callback) => {
     [clusterCode, appId],
     function (err, data) {
       if (err) {
-        log.error('get app pkg:  failed when query pkg info:', err);
+        log.error(`[${clusterCode} ${appId}] get app pkg:  failed when query pkg info:`, err);
 
         return callback(err);
       } else {
-        log.info('get app pkg: query pkg info success', JSON.stringify(data[0]));
+        log.info(`[${clusterCode} ${appId}] get app pkg: query pkg info success`, JSON.stringify(data[0]));
         if (data[0] && data[0].package) {
           const tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
 
           if (storage) {
             storage.get(data[0].package.toString(), tmpFile, (err) => {
               if (err) {
-                log.error(`get app package failed, cluster: ${clusterCode} appId: ${appId}`, err);
+                log.error(`[${clusterCode} ${appId}] get app package failed:`, err);
 
                 return callback(err);
               }

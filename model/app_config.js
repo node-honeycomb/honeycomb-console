@@ -49,11 +49,11 @@ AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
     [clusterCode, type, app],
     function (err, data) {
       if (err) {
-        log.error('get app config failed:', err);
+        log.error(`[${clusterCode} ${app}] get app config failed:`, err);
 
         return callback(err);
       } else {
-        log.info('get app config success');
+        log.info(`[${clusterCode} ${app}] get app config success`);
         if (data[0]) {
           data[0].config = JSON.parse(data[0].config);
         }
@@ -79,11 +79,11 @@ AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
     [appCfg.clusterCode, appCfg.app],
     function (err, data) {
       if (err) {
-        log.error('get app config failed:', err);
+        log.error(`[${appCfg.clusterCode} ${appCfg.app}] get app config failed:`, err);
 
         return callback(err);
       } else {
-        log.info('get app config success');
+        log.info(`[${appCfg.clusterCode} ${appCfg.app}] get app config success`);
         data.forEach((d) => {
           d.config = JSON.parse(d.config);
         });
