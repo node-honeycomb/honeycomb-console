@@ -21,8 +21,8 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude assets/.honeypack_cache  --exclude .github --exclude .git --exclude test --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release && NODE_ENV=production npm install --registry=https://registry.npmmirror.com
-	@cd out/release/assets && NODE_ENV=development npm install --registry=https://registry.npmmirror.com
+	@cd out/release && npm install --production --registry=https://registry.npmmirror.com
+	@cd out/release/assets && npm install --dev --registry=https://registry.npmmirror.com
 	@cd out/release/assets && NODE_ENV=production ./node_modules/.bin/honeypack build && mv .package ../
 	@mkdir out/release/assets.final
 	@cp -rf out/release/assets/static out/release/assets.final/
