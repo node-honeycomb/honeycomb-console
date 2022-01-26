@@ -20,14 +20,16 @@ test:
 
 release: clean
 	@mkdir -p ./out/release
-	@rsync -av . ./out/release --exclude .git --exclude tests --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release/assets && NODE_ENV=development npm install --registry=https://registry.npmmirror.com
+	@rsync -av . ./out/release --exclude assets/.honeypack_cache  --exclude .github --exclude .git --exclude test --exclude out --exclude node_modules --exclude run --exclude logs
 	@cd out/release && NODE_ENV=production npm install --registry=https://registry.npmmirror.com
-	@cd out/release/assets && NODE_ENV=production ../node_modules/.bin/honeypack build && mv .package ../
+	@cd out/release/assets && NODE_ENV=development npm install --registry=https://registry.npmmirror.com
+	@cd out/release/assets && NODE_ENV=production ./node_modules/.bin/honeypack build && mv .package ../
+	@mkdir out/release/assets.final
+	@cp -rf out/release/assets/static out/release/assets.final/
+	@mv out/release/.package/* out/release/assets.final/
 	@rm -rf out/release/assets/
-	@mkdir -p out/release/assets
-	@cd ./assets && cp -r ./static ../out/release/assets/static
-	@cd out/release && cp -r .package/* ./assets/
+	@rm -rf out/release/.package/
+	@mv -f out/release/assets.final out/release/assets
 	@cd out/release/config && cat config_production.js > config.js
 
 test-cov:
