@@ -11,8 +11,7 @@ module.exports = {
   },
   meta: {
     // DB config
-    driver: 'sql.js', // mysql, sql.js, default sqlite
-    dbfile: '${serverRoot}/run/honeycomb-console.sqlite.db'
+    driver: 'mysql' // mysql, sql.js, default sqlite
   },
   middleware: {
     cookieSession: {

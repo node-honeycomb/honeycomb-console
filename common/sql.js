@@ -1,5 +1,13 @@
 const fs = require('xfs');
-const SQLJS = require('sql.js');
+let SQLJS;
+try {
+  SQLJS = require('sql.js');
+} catch (e) {
+  if (e.code === 'MODULE_NOT_FOUND') {
+    console.log("default build do not include sql.js module any more, you should using mysql, or install sql.js manually");
+    process.exit(1);
+  }
+}
 const path = require('path');
 const async = require('async');
 const sqlString = require('sqlstring');
