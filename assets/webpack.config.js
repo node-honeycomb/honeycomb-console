@@ -177,7 +177,7 @@ const config = {
       }
     }),
     new ESBuildPlugin({
-      
+
     }),
     new WebpackDynamicPublicPathPlugin({
       externalPublicPath: 'window.CONFIG.prefix + "/assets/"'
