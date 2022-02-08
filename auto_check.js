@@ -69,9 +69,6 @@ async function run2() {
 
     await fixClusterSync(clusterCode);
     const clusterInfo = cluster.getClusterCfgByCode(clusterCode);
-
-    const clusterSnp = await getSnapshortSync(clusterCode);
-
     let clusterSnp = await getSnapshotSync(clusterCode);
     if (!clusterSnp) {
       continue;
