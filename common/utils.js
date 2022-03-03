@@ -249,9 +249,14 @@ exports.callremote = function (queryPath, options, callback, maxRetry) {
   } else {
     queryPath += '&ips=' + ips;
   }
-  if (options.timeout) {
+  if (options.timeout && !options.queryTimeout) {
     queryPath += '&timeout=' + options.timeout;
   }
+
+  if (options.queryTimeout) {
+    queryPath += '&timeout=' + options.queryTimeout;
+  }
+
   if (endpoint.endsWith('/')) {
     endpoint = endpoint.substring(0, endpoint.length - 1);
   }

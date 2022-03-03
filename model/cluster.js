@@ -634,6 +634,7 @@ exports.fixCluster = function (clusterCode, callback) {
 
   opt.ips = opt.ips.concat(opt.ipsOffline || []);
   opt.clusterCode = clusterCode;
+  opt.queryTimeout = 1000;
 
   callremoteWithRetry(path, opt, function (err, results) {
     if (err) {
