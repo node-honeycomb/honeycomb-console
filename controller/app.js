@@ -10,38 +10,6 @@ const appPackage = require('../model/app_package');
 
 const callremote = utils.callremote;
 
-function saveSnapShot(clusterCode, callback) {
-  const opt = cluster.getClusterCfgByCode(clusterCode);
-
-  if (opt.code === 'ERROR') {
-    return callback(new Error('saveSnapShot() failed, clusterCode not found'));
-  }
-  if (!callback) {
-    callback = () => {};
-  }
-  utils.getClusterApps(opt, (err, data) => {
-    if (err) {
-      err.message = 'saveSnapShot failed, getClusterApps() failed: ' + err.message;
-
-      return callback(err);
-    } else {
-      const obj = {
-        clusterCode,
-        info: data
-      };
-
-      cluster.saveSnapshot(obj, (err) => {
-        if (err) {
-          err.message = 'saveSnapShot() failed:' + err.message;
-          callback(err);
-        } else {
-          callback();
-        }
-      });
-    }
-  }, 3);
-}
-
 /**
  * 获取app列表
  * @api {get} /api/app/list
@@ -199,7 +167,7 @@ exports.publishApp = function (req, callback) {
       });
     } else {
       if (!recover) {
-        saveSnapShot(clusterCode, (err) => {
+        cluster.saveSnapShot2(clusterCode, (err) => {
           if (err) {
             return callback(err);
           } else {
@@ -308,7 +276,7 @@ exports.deleteApp = function (req, callback) {
           log.error('delete apppackage failed', err.message);
         }
       });
-      saveSnapShot(clusterCode, (err) => {
+      cluster.saveSnapShot2(clusterCode, (err) => {
         if (err) {
           callback(err);
         } else {
@@ -450,7 +418,7 @@ exports.startApp = function (req, callback) {
       });
     } else {
       log.debug(`start app ${appId} results:`, results);
-      saveSnapShot(clusterCode, (err) => {
+      cluster.saveSnapShot2(clusterCode, (err) => {
         if (err) {
           callback(err);
         } else {
@@ -501,7 +469,7 @@ exports.stopApp = function (req, callback) {
       });
     } else {
       log.debug(`stop app ${appId} results:`, results);
-      saveSnapShot(clusterCode, (err) => {
+      cluster.saveSnapShot2(clusterCode, (err) => {
         if (err) {
           callback(err);
         } else {

@@ -576,6 +576,36 @@ exports.saveSnapshot = (obj, cb) => {
   db.query(SQL_INSERT_CLUSTER_SNAPSHOT, param, done);
 };
 
+exports.saveSnapShot2 = function (clusterCode, callback) {
+  const opt = exports.getClusterCfgByCode(clusterCode);
+  if (!callback) {
+    callback = () => {};
+  }
+  if (opt.code === 'ERROR') {
+    return callback(new Error('saveSnapShot() failed, clusterCode not found'));
+  }
+  utils.getClusterApps(opt, (err, data) => {
+    if (err) {
+      err.message = 'saveSnapShot failed, getClusterApps() failed: ' + err.message;
+      return callback(err);
+    } else {
+      const obj = {
+        clusterCode,
+        info: data
+      };
+      exports.saveSnapshot(obj, (err) => {
+        if (err) {
+          err.message = 'saveSnapShot() failed:' + err.message;
+          callback(err);
+        } else {
+          callback();
+        }
+      });
+    }
+  }, 3);
+};
+
+
 
 function callremoteWithRetry(queryPath, options, callback, retry) {
   let count = 0;

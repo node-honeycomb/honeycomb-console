@@ -134,7 +134,6 @@ exports.setAppConfig = function (req, res) {
   appConfig.getAppConfig(clusterCode, type, appName, function (err, data) {
     const [oldConfig, newConfig] = utils.configRemoveSecretFields(data ?
       data.config : {}, opt.data);
-
     req.oplog({
       clientId: req.ips.join('') || '-',
       opName: 'SET_APP_CONFIG',
@@ -171,7 +170,13 @@ exports.setAppConfig = function (req, res) {
           message: err.message
         });
       } else {
-        res.json({code: 'SUCCESS'});
+        cluster.saveSnapShot2(clusterCode, function (err) {
+          if (err) {
+            res.json({code: 'ERROR', message: err.message});
+          } else {
+            res.json({code: 'SUCCESS'});
+          }
+        })
       }
     });
   };
