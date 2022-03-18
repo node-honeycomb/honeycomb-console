@@ -139,5 +139,6 @@ module.exports = {
     monitorInterval: 1000 * 60 * 5,
     // 容忍最大错误发生次数
     maxRetry: 3
-  }
+  },
+  docUrl: "https://www.yuque.com/honeycomb/gz4kna"
 };
