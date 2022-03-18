@@ -578,6 +578,7 @@ exports.saveSnapshot = (obj, cb) => {
 
 exports.saveSnapShot2 = function (clusterCode, callback) {
   const opt = exports.getClusterCfgByCode(clusterCode);
+
   if (!callback) {
     callback = () => {};
   }
@@ -587,12 +588,14 @@ exports.saveSnapShot2 = function (clusterCode, callback) {
   utils.getClusterApps(opt, (err, data) => {
     if (err) {
       err.message = 'saveSnapShot failed, getClusterApps() failed: ' + err.message;
+
       return callback(err);
     } else {
       const obj = {
         clusterCode,
         info: data
       };
+
       exports.saveSnapshot(obj, (err) => {
         if (err) {
           err.message = 'saveSnapShot() failed:' + err.message;
@@ -604,7 +607,6 @@ exports.saveSnapShot2 = function (clusterCode, callback) {
     }
   }, 3);
 };
-
 
 
 function callremoteWithRetry(queryPath, options, callback, retry) {
