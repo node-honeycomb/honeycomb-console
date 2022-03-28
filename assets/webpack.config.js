@@ -188,7 +188,9 @@ const config = {
   optimization: {
     minimize: isProduct,
     minimizer: [
-      new ESBuildMinifyPlugin()
+      new ESBuildMinifyPlugin({
+        target: 'es2015'
+      })
     ]
   }
 };
