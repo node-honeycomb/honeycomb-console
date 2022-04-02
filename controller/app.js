@@ -159,6 +159,7 @@ exports.publishApp = function (req, callback) {
       const errMsg = err && err.message || results.message;
 
       log.error('publish app failed:', errMsg);
+      log.error(err);
       const code = (err && err.code) || (results && results.code) || 'ERROR';
 
       return callback({
