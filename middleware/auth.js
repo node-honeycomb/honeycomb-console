@@ -39,6 +39,7 @@ module.exports = function (app, options) {
 
     const throwError = (error) => {
       res.status(200);
+
       return res.send(error);
     };
 
