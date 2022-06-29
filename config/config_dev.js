@@ -13,13 +13,13 @@ module.exports = {
   },
   envName: '本地环境',
   meta: {
-    /*
+
     driver: 'mysql', // mysql or sql.js, default sql.js
-    host     : '127.0.0.1',
-    user     : 'root',
-    password : '12345678',
-    database : 'honeycomb-console'
-    */
+    host: '127.0.0.1',
+    user: 'root',
+    password: 'root',
+    database: 'honeycomb-console'
+
   },
   port: 9000,
   middleware: {

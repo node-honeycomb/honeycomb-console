@@ -2,7 +2,8 @@
 'use strict';
 const async = require('async');
 const formstream = require('formstream');
-const formidable = require('formidable');
+const multer = require('multer');
+const os = require('os');
 const log = require('../common/log');
 const utils = require('../common/utils');
 const cluster = require('../model/cluster');
@@ -57,44 +58,48 @@ exports.listApp = function (req, callback) {
   });
 };
 
+
+const upload = multer({
+  dest: os.tmpdir(),
+  limits: {
+    fields: 1024,
+    fileSize: 1024 * 1024 * 1024
+  }
+}).single('pkg');
+
 /**
  * 发布一个app当当前集群
  * @api {post} /api/app/publish
- * @param req
- * @param callback
  * @query
  *  clusterCode {String} 集群code
  *  recover {Enum} 作用位置 true/false
  * @body
  *  file {File} 文件tgz包
+ * @nowrap
  */
-exports.publishApp = function (req, callback) {
+exports.publishApp = function (req, res) {
   const clusterCode = req.query.clusterCode;
   const timeout = req.query.timeout;
   const recover = req.query.recover === 'true';
 
   async.waterfall([
     function receivePkg(cb) {
-      const form = formidable({
-        multiples: true,
-        maxFileSize: 1024 * 1024 * 1024
-      });
-
-      form.parse(req, function (err, fields, files) {
+      upload(req, res, function (err) {
         req.oplog({
           clientId: req.ips.join('') || '-',
           opName: 'PUBLISH_APP',
           opType: 'PAGE_MODEL',
           opLogLevel: 'NORMAL',
           opItem: 'APP',
-          opItemId: files && files.pkg && files.pkg.name || 'UNKNOW_FILE_NAME'
+          opItemId: req.file && req.file.originalname || 'UNKNOW_FILE_NAME'
         });
+
         if (err) {
           err.code = 'ERROR_UPLOAD_APP_PACKAGE_FAILED';
 
           return cb(err);
         }
-        if (!files || !files.pkg) {
+        if (!req.file) {
           const err = new Error('app package empty');
 
           err.code = 'ERROR_APP_PACKAGE_EMPTY';
@@ -102,21 +107,22 @@ exports.publishApp = function (req, callback) {
           return cb(err);
         }
         /**
-         * pkg
-              lastModifiedDate: 2021-12-01T14:01:41.881Z,
-              filepath:
-                - '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T/38a440630f5c6043e53edfd00',
-              newFilename: '38a440630f5c6043e53edfd00',
-              originalFilename: 'socket-app_1.0.0_2.tgz',
-              mimetype: 'application/gzip',
-              hashAlgorithm: false,
-              size: 540
+         {
+            fieldname: 'pkg',
+            originalname: 'simple-app.tgz',
+            encoding: '7bit',
+            mimetype: 'application/gzip',
+            destination: '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T',
+            filename: 'd417d59db835bf78f9f51605db354920',
+            path: '/var/folders/m5/x6j8n4hs7gjf9l8vm6bdms4w0000gn/T/d417d59db835bf78f9f51605db354920',
+            size: 729
+          }
          */
-        cb(null, files.pkg);
+        cb(null, req.file);
       });
     },
     function savePackage(file, cb) {
-      const appId = file.originalFilename.replace(/.tgz$/, '');
+      const appId = file.originalname.replace(/.tgz$/, '');
       const appInfo = utils.parseAppId(appId);
 
       const obj = {
@@ -124,7 +130,7 @@ exports.publishApp = function (req, callback) {
         appId: appInfo.id,
         appName: appInfo.name,
         weight: appInfo.weight,
-        pkg: file.filepath,
+        pkg: file.path,
         user: req.session.username
       };
 
@@ -142,10 +148,10 @@ exports.publishApp = function (req, callback) {
       if (opt.code === 'ERROR') {
         return cb(opt);
       }
-      log.info(`publish "${file.originalFilename}" to server: ${opt.endpoint}`);
+      log.info(`publish "${file.originalname}" to server: ${opt.endpoint}`);
       const form = formstream();
 
-      form.file('pkg', file.filepath, file.originalFilename);
+      form.file('pkg', file.path, file.originalname);
       const path = '/api/publish';
 
       opt.method = 'POST';
@@ -162,7 +168,7 @@ exports.publishApp = function (req, callback) {
       log.error(err);
       const code = (err && err.code) || (results && results.code) || 'ERROR';
 
-      return callback({
+      return res.json({
         code: code,
         message: errMsg
       });
@@ -170,13 +176,22 @@ exports.publishApp = function (req, callback) {
       if (!recover) {
         cluster.saveSnapShot2(clusterCode, (err) => {
           if (err) {
-            return callback(err);
+            return res.json({
+              code: err.code,
+              message: err.message
+            });
           } else {
-            callback(null, results.data);
+            return res.json({
+              code: 'SUCCESS',
+              data: results.data
+            });
           }
         });
       } else {
-        callback(null, results.data);
+        res.json({
+          code: 'SUCCESS',
+          data: results.data
+        });
       }
     }
   });

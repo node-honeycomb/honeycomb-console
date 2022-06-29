@@ -140,5 +140,5 @@ module.exports = {
     // 容忍最大错误发生次数
     maxRetry: 3
   },
-  docUrl: "https://www.yuque.com/honeycomb/gz4kna"
+  docUrl: 'https://www.yuque.com/honeycomb/gz4kna'
 };
