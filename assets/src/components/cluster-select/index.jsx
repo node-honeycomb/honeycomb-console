@@ -28,6 +28,9 @@ const ClusterSelect = (props) => {
 
   const onClickCluster = (clusterCode) => {
     setClusterCode(clusterCode);
+    props.onOk(clusterCode);
+    setVisible(false);
+    props.close();
   };
 
   return (

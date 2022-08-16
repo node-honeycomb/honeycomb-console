@@ -1,7 +1,8 @@
 import React from 'react';
 import _ from 'lodash';
+import {clusterApi} from '@api';
 import PropTypes from 'prop-types';
-import {Menu, Dropdown, Tooltip, Tag} from 'antd';
+import {Menu, Dropdown, Tooltip, Tag, message} from 'antd';
 import {
   UserOutlined, CopyOutlined, ClusterOutlined,
   LogoutOutlined, InfoCircleOutlined, SettingOutlined,
@@ -62,6 +63,27 @@ const getIsClusterError = (currentCluster, coreDump, unknowPro) => {
   return isCoreWarn || isUnkWarn || isToken;
 };
 
+async function fixCluster(data) {
+  const key = (new Date()).toString();
+  try {
+    message.loading({
+      content: '修复中...',
+      duration: 1000,
+      key: key
+    });
+    await clusterApi.fixCluster(data.clusterCode);
+    message.success({
+      content: '修复成功！',
+      key
+    });
+  } catch (e) {
+    message.error({
+      content: `修复失败：${e.message}`,
+      key
+    });
+  }
+};
+
 const versionCompare = (v1, v2) => {
   v1 = v1.replace(/_/g, '.');
   v2 = v2.replace(/_/g, '.');
@@ -95,7 +117,7 @@ const checkClusterVersion = (statusObjs) => {
 
 const Header = (props) => {
   const {
-    currentCluster, clusters, clusterStatus, coreDumps,
+    currentCluster, clusterStatus, coreDumps,
     unknowProcesses, onDeleteUnknowProcess,
   } = props;
 
@@ -119,12 +141,14 @@ const Header = (props) => {
         </span>
         <span
           onClick={() => callClusterStatus({
-            clusterCode: currentCluster.code,
-            clusters: clusters,
+            clusterCode: currentCluster.code
           })}
           className="menu-item show-cluster-sider">
-          <span><ClusterOutlined />集群信息</span>
+          <span><ClusterOutlined />集群信息</span>          
         </span>
+        <span className="menu-item" onClick={() => fixCluster({
+            clusterCode: currentCluster.code
+          })}>-FIX</span>
         {
           isClusterError && (
             <span
@@ -198,7 +222,6 @@ const Header = (props) => {
 Header.propTypes = {
   onToggleCluster: PropTypes.func,
   currentCluster: PropTypes.object,
-  clusters: PropTypes.array,
   clusterStatus: PropTypes.array,
   coreDumps: PropTypes.array,
   unknowProcesses: PropTypes.array,
