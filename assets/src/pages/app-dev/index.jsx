@@ -154,6 +154,10 @@ const AppDev = (props) => {
         }
       }
 
+      // if (currentClusterCode) {
+      api.clusterApi.fixCluster(currentClusterCode);
+      //}
+
       await getUsage(apps);
     })();
   }, [currentClusterCode]);

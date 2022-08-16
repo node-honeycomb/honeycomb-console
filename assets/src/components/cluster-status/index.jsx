@@ -88,7 +88,6 @@ const ClusterStatus = (props) => {
 ClusterStatus.propTypes = {
   clusterCode: PropTypes.string,
   close: PropTypes.func,
-  clusters: PropTypes.array,
   serverSecure: PropTypes.bool,
 };
 
