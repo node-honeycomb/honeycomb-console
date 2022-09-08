@@ -65,6 +65,7 @@ const getIsClusterError = (currentCluster, coreDump, unknowPro) => {
 
 async function fixCluster(data) {
   const key = (new Date()).toString();
+
   try {
     message.loading({
       content: '修复中...',
@@ -82,7 +83,7 @@ async function fixCluster(data) {
       key
     });
   }
-};
+}
 
 const versionCompare = (v1, v2) => {
   v1 = v1.replace(/_/g, '.');
@@ -144,11 +145,11 @@ const Header = (props) => {
             clusterCode: currentCluster.code
           })}
           className="menu-item show-cluster-sider">
-          <span><ClusterOutlined />集群信息</span>          
+          <span><ClusterOutlined />集群信息</span>
         </span>
         <span className="menu-item" onClick={() => fixCluster({
-            clusterCode: currentCluster.code
-          })}>-FIX</span>
+          clusterCode: currentCluster.code
+        })}>-FIX</span>
         {
           isClusterError && (
             <span

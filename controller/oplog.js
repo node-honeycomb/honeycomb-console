@@ -28,3 +28,31 @@ exports.queryOpLog = function (req, res) {
       res.json({code: 'SUCCESS', data});
     });
 };
+
+/**
+ * 记录日志列表
+ * @api {get} /api/oplog/publish
+ * @nowrap
+ * @query
+ *   file {string} app tgz file name
+ */
+exports.logPublishOpLog = function (req, res) {
+  const file = req.query.file;
+
+  if (!file) {
+    return res.json({
+      code: 'ERROR',
+      message: 'missing param'
+    });
+  }
+  req.oplog({
+    clientId: req.ips.join('') || '-',
+    opName: 'PUBLISH_APP',
+    opType: 'PAGE_MODEL',
+    opLogLevel: 'NORMAL',
+    opItem: 'APP',
+    opItemId: file
+  });
+
+  res.json({code: 'SUCCESS', data: null});
+};
