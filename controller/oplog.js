@@ -45,6 +45,8 @@ exports.logOpLog = function (req, res) {
 
   let opLogLevel = 'NORMAL';
 
+  res.setHeader('content-type', 'image/png');
+
   switch (opName) {
     case 'PACK_APP':
       opLogLevel = 'NORMAL';
@@ -52,9 +54,12 @@ exports.logOpLog = function (req, res) {
     case 'PUBLISH_APP':
       opLogLevel = 'RISKY';
       break;
+    case 'DOWNLOAD_APP':
+      opLogLevel = 'RISKY';
+      break;
+    default:
+      return res.send('unknow opName');
   }
-
-  res.setHeader('content-type', 'image/png');
 
   if (!file || !clusterCode || !opName) {
     return res.send('missing param, file and clusterCode');

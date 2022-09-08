@@ -46,6 +46,7 @@ const opNameMap = {
   PACK_APP: '打包应用',
   PUBLISH_APP: '发布应用',
   DELETE_APP: '删除应用',
+  DOWNLOAD_APP: '下载应用',
   ADD_CLUSTER: '创建集群',
   UPDATE_CLUSTER: '更新集群',
   DELETE_CLUSTER: '删除集群',
