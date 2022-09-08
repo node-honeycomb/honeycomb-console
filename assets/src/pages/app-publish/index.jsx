@@ -32,6 +32,7 @@ const AppPublish = (props) => {
 
   const {currentClusterCode, currentCluster} = props;
   const query = qs.parse(location.search);
+  const hcConsoleEndpoint = encodeURIComponent(location.protocol + '//' + location.hostname + window.CONFIG.prefix);
 
   return (
     <div className="app-publish">
@@ -48,7 +49,7 @@ const AppPublish = (props) => {
               >
                 <iframe
                   className="publish-iframe"
-                  src={`${page.src}?clusterCode=${currentClusterCode}&env=${currentCluster.env}`}
+                  src={`${page.src}?clusterCode=${currentClusterCode}&env=${currentCluster.env}&console=${hcConsoleEndpoint}`}
                 />
               </TabPane>
             );

@@ -35,14 +35,16 @@ exports.queryOpLog = function (req, res) {
  * @nowrap
  * @query
  *   file {string} app tgz file name
+ *   clusterCode {string} cluster code
  */
 exports.logPublishOpLog = function (req, res) {
   const file = req.query.file;
+  const clusterCode = req.query.clusterCode;
 
-  if (!file) {
+  if (!file || !clusterCode) {
     return res.json({
       code: 'ERROR',
-      message: 'missing param'
+      message: 'missing param, file and clusterCode'
     });
   }
   req.oplog({
