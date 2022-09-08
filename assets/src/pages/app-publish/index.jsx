@@ -33,6 +33,7 @@ const AppPublish = (props) => {
   const {currentClusterCode, currentCluster} = props;
   const query = qs.parse(location.search);
   const hcConsoleEndpoint = encodeURIComponent(window.location.protocol + '//' + window.location.hostname + window.CONFIG.prefix);
+
   return (
     <div className="app-publish">
       <Tabs
