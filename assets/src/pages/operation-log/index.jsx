@@ -43,6 +43,7 @@ const opNameMap = {
   RELOAD_APP: '重载应用',
   START_APP: '启动应用',
   STOP_APP: '停止应用',
+  PACK_APP: '打包应用',
   PUBLISH_APP: '发布应用',
   DELETE_APP: '删除应用',
   ADD_CLUSTER: '创建集群',

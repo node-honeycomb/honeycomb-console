@@ -31,30 +31,41 @@ exports.queryOpLog = function (req, res) {
 
 /**
  * 记录日志列表
- * @api {get} /api/oplog/publish
+ * @api {get} /api/oplog/log
  * @nowrap
  * @query
+ *   opName {string} PUBLISH_APP PACK_APP
  *   file {string} app tgz file name
  *   clusterCode {string} cluster code
  */
-exports.logPublishOpLog = function (req, res) {
+exports.logOpLog = function (req, res) {
   const file = req.query.file;
   const clusterCode = req.query.clusterCode;
+  const opName = req.query.opName;
 
-  if (!file || !clusterCode) {
-    return res.json({
-      code: 'ERROR',
-      message: 'missing param, file and clusterCode'
-    });
+  let opLogLevel = 'NORMAL';
+
+  switch (opName) {
+    case 'PACK_APP':
+      opLogLevel = 'NORMAL';
+      break;
+    case 'PUBLISH_APP':
+      opLogLevel = 'RISKY';
+      break;
+  }
+
+  res.setHeader('content-type', 'image/png');
+
+  if (!file || !clusterCode || !opName) {
+    return res.send('missing param, file and clusterCode');
   }
   req.oplog({
     clientId: req.ips.join('') || '-',
-    opName: 'PUBLISH_APP',
+    opName: opName,
     opType: 'PAGE_MODEL',
-    opLogLevel: 'NORMAL',
+    opLogLevel: opLogLevel, // HIGH_RISK / RISKY / LIMIT / NORMAL
     opItem: 'APP',
     opItemId: file
   });
-
-  res.json({code: 'SUCCESS', data: null});
+  res.send('');
 };
