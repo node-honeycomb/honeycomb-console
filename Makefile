@@ -7,8 +7,8 @@ BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
 TESTS_ENV = test/env.js
 
 install:
-	@npm install --registry=https://registry.npmmirror.com
-	@cd assets && npm install --registry=https://registry.npmmirror.com
+	@npm install --registry=https://registry.npmmirror.com --legacy-peer-deps
+	@cd assets && npm install --registry=https://registry.npmmirror.com --legacy-peer-deps
 
 test:
 	NODE_ENV=test $(BIN_MOCHA) \

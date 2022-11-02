@@ -1,6 +1,6 @@
 {
   "name": "honeycomb-console",
-  "version": "2.0.22",
+  "version": "2.0.23",
   "build": "2",
   "description": "Honeycomb admin console",
   "main": "app.js",
@@ -37,7 +37,7 @@
     "@commitlint/config-conventional": "^8.2.0",
     "babel-eslint": "^8.2.3",
     "concurrently": "^5.2.0",
-    "eslint": "^6.8.0",
+    "eslint": "^6.0.0",
     "eslint-config-ali": "^9.0.2",
     "eslint-config-aliyun": "^2.1.1",
     "eslint-plugin-import": "^2.20.2",
