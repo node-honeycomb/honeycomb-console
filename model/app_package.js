@@ -2,9 +2,11 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const uuid = require('uuid').v4;
 const log = require('../common/log');
 const db = require('../common/db');
 const config = require('../config');
+
 
 
 let storage = false;
@@ -129,7 +131,8 @@ exports.getPackage = (clusterCode, appId, callback) => {
       } else {
         log.info(`[${clusterCode} ${appId}] get app pkg: query pkg info success`, JSON.stringify(data[0]));
         if (data[0] && data[0].package) {
-          const tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.tgz');
+          // 并发时，需要确保文件名唯一，确保每个请求有独立文件
+          const tmpFile = path.join(os.tmpdir(), data[0].clusterCode + '^' + data[0].appId + '.' + uuid() + '.tgz');
 
           if (storage) {
             storage.get(data[0].package.toString(), tmpFile, (err) => {

@@ -899,7 +899,7 @@ exports.downloadPatch = async function (clusterCode, forceDownload) {
         } else {
           pkg = await getAppPackage(clusterCode, v.appId);
         }
-        if (pkg) {
+        if (pkg && fs.existsSync(pkg.package)) {
           await mv(pkg.package, path.join(tmpDir, `run/appsRoot/${v.appId}.tgz`));
           apps[v.appId] = {
             dir: `/home/admin/honeycomb/run/appsRoot/${v.appId}`
