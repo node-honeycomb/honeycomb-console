@@ -72,7 +72,7 @@ exports.queryLog = function (req, res) {
     });
   }
   if (req.query.ips) {
-    opt.ips = req.query.ips.split(',');
+    opt.ips = req.query.ips.split(',').filter(ip => opt.ips.includes(ip))
   }
   opt.data = {
     fileName: processFileName(req.query),
