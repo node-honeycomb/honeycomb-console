@@ -8,7 +8,6 @@ const db = require('../common/db');
 const config = require('../config');
 
 
-
 let storage = false;
 
 if (config.storage) {

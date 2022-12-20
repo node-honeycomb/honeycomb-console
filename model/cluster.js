@@ -620,6 +620,9 @@ function callremoteWithRetry(queryPath, options, callback, retry) {
       if (err) {
         return callback(err);
       }
+      if (!results.data) {
+        return callback('no results for remote call:' + queryPath);
+      }
       // log.debug('get status results:', results);
       const errList = results.data.error;
       const okList = results.data.success;
