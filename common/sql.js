@@ -16,47 +16,12 @@ const sqlString = require('sqlstring');
 const log = require('./log');
 const config = require('../config');
 
-const dbfile = config.meta.dbfile;
-const buf = fs.existsSync(dbfile) ? fs.readFileSync(dbfile) : undefined;
+let dbfile;
+let buf;
 let db;
 let readyFn = null;
 let flagReady = false;
 
-// eslint-disable-next-line
-SQLJS().then((SQL) => {
-  db = new SQL.Database(buf);
-  let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
-
-  statments = statments.split(/\n\n/);
-  let flag = false;
-
-  async.eachSeries(statments, (st, done) => {
-    try {
-      db.exec(st);
-    } catch (e) {
-      if (e && /^(alter|rename)/ig.test(st)) {
-        // do nothing
-      } else {
-        throw e;
-      }
-    }
-    flag = flag || /^(insert|delete|update|create|alter)/i.test(st.trim());
-    done();
-  }, (err) => {
-    if (err) {
-      return log.error(err);
-    }
-    if (flag) {
-      console.log('save db init');
-      fs.sync().save(dbfile, new Buffer(db.export()));
-    }
-    flagReady = true;
-    if (readyFn) {
-      console.log('sql.js db ready');
-      readyFn();
-    }
-  });
-});
 
 function transfer(data) {
   data = data[0];
@@ -118,6 +83,44 @@ exports.ready = function (cb) {
     return cb();
   }
   readyFn = cb;
+
+  dbfile = config.meta.dbfile;
+  buf = fs.existsSync(dbfile) ? fs.readFileSync(dbfile) : undefined;
+  // eslint-disable-next-line
+  SQLJS().then((SQL) => {
+    db = new SQL.Database(buf);
+    let statments = fs.readFileSync(path.join(__dirname, '../ddl/ddl_sqlite.sql')).toString();
+
+    statments = statments.split(/\n\n/);
+    let flag = false;
+
+    async.eachSeries(statments, (st, done) => {
+      try {
+        db.exec(st);
+      } catch (e) {
+        if (e && /^(alter|rename)/ig.test(st)) {
+          // do nothing
+        } else {
+          throw e;
+        }
+      }
+      flag = flag || /^(insert|delete|update|create|alter)/i.test(st.trim());
+      done();
+    }, (err) => {
+      if (err) {
+        return log.error(err);
+      }
+      if (flag) {
+        console.log('save db init');
+        fs.sync().save(dbfile, new Buffer(db.export()));
+      }
+      flagReady = true;
+      if (readyFn) {
+        console.log('sql.js db ready');
+        readyFn();
+      }
+    });
+  });
 };
 
 exports.type = 'sqlite';

@@ -175,7 +175,7 @@ User.updateUserRole = function (name, role, callback) {
 User.RoleType = RoleType;
 
 // TODO: 暂时放这里，后面所有初始化动作放一个文件夹中，前提是需要先改写sql初始化机制保证顺序执行
-function userInit(callback) {
+User.init = function (callback) {
   callback = callback || function () {};
   if (config.defaultUser && config.defaultPassword) {
     User.countUser((err, data) => {
@@ -189,20 +189,10 @@ function userInit(callback) {
         callback(err);
       });
     });
+  } else {
+    callback();
   }
-}
+};
 
-userInit((err) => {
-  if (err) {
-    if (err.code === 'ER_NO_SUCH_TABLE') {
-      // TODO: sql顺序需要可控
-      return setTimeout(userInit, 1000);
-    }
-    if (err.code === 'ER_DUP_ENTRY') {
-      return;
-    }
-    log.error('init user error', err);
-  }
-});
 
 module.exports = User;

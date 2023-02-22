@@ -8,18 +8,20 @@ const db = require('../common/db');
 const config = require('../config');
 
 
-
 let storage = false;
 
-if (config.storage) {
-  try {
-    config.storage.log = log;
-    storage = require('../common/storage/' + config.storage.driver)(config.storage);
-  } catch (e) {
-    log.error('get storage driver error', e);
-    storage = undefined;
+exports.init = function (cb) {
+  if (config.storage) {
+    try {
+      config.storage.log = log;
+      storage = require('../common/storage/' + config.storage.driver)(config.storage);
+    } catch (e) {
+      log.error('get storage driver error', e);
+      storage = undefined;
+    }
   }
-}
+  cb();
+};
 /**
  * 保存pkg到数据库
  */
