@@ -1,7 +1,7 @@
 {
   "name": "honeycomb-console",
-  "version": "2.0.24",
-  "build": "2",
+  "version": "2.0.25",
+  "build": "3",
   "description": "Honeycomb admin console",
   "main": "app.js",
   "scripts": {
@@ -15,8 +15,7 @@
     "async": "3.2.0",
     "editor-json-parser": "1.1.1",
     "formstream": "1.1.1",
-    "hc-bee": "^1.0.21-test.1",
-    "hc-service-client": "1.1.5",
+    "hc-bee": "^1.0.21",
     "hc-signature-auth": "1.0.7",
     "ip": "1.1.4",
     "lodash": "4.17.21",

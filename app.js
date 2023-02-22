@@ -5,7 +5,6 @@ const App = require('hc-bee');
 const app = new App();
 
 const config = require('./config');
-const startMonitor = require('./monitor');
 
 app.server.setTimeout(300000);
 
@@ -39,7 +38,7 @@ if (db.ready) {
 }
 
 if (config.monitor && config.monitor.enable) {
-  startMonitor();
+  require('./monitor')();
 }
 
 module.exports = app;
