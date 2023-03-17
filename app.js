@@ -11,22 +11,23 @@ app.server.setTimeout(300000);
 config.username = app.config.username;
 config.password = app.config.password;
 
-const cluster = require('./model/cluster');
+const model = require('./model');
 const db = require('./common/db');
 
 if (db.ready) {
-  db.ready(() => {
-    cluster.getClusterCfg(() => {
-      app.ready(true);
-      /*
-      if (config.autoCheck) {
-        require('./auto_check');
-      }
-      */
-    });
+  app.onConfigReady((done) => {
+    function readyFn() {
+      db.ready(() => {
+        model.init(() => {
+          app.ready(true);
+        });
+      });
+      done();
+    }
+    readyFn();
   });
 } else {
-  cluster.getClusterCfg(() => {
+  model.init(() => {
     app.ready(true);
     /*
     if (config.autoCheck) {

@@ -3,12 +3,13 @@ BIN_ISTANBUL = ./node_modules/.bin/istanbul
 
 VERSION = $(shell cat package.json | awk -F '"' '/version" *: *"/{print $$4}')
 BUILD_NO = $(shell cat package.json | awk -F '"' '/build" *: *"/{print $$4}')
+NPM = tnpm
 
 TESTS_ENV = test/env.js
 
 install:
-	@npm install --registry=https://registry.npmmirror.com --legacy-peer-deps
-	@cd assets && npm install --registry=https://registry.npmmirror.com --legacy-peer-deps
+	@$(NPM) install --registry=https://registry.tnpmmirror.com --legacy-peer-deps
+	@cd assets && $(NPM) install --registry=https://registry.tnpmmirror.com --legacy-peer-deps
 
 test:
 	NODE_ENV=test $(BIN_MOCHA) \
@@ -21,8 +22,8 @@ test:
 release: clean
 	@mkdir -p ./out/release
 	@rsync -av . ./out/release --exclude assets/.honeypack_cache  --exclude .github --exclude .git --exclude test --exclude out --exclude node_modules --exclude run --exclude logs
-	@cd out/release && npm install --production --registry=https://registry.npmmirror.com
-	@cd out/release/assets && npm install --dev --registry=https://registry.npmmirror.com
+	@cd out/release && $(NPM) install --production --registry=https://registry.tnpmmirror.com
+	@cd out/release/assets && $(NPM) install --dev --registry=https://registry.tnpmmirror.com
 	@cd out/release/assets && NODE_ENV=production ./node_modules/.bin/honeypack build && mv .package ../
 	@mkdir out/release/assets.final
 	@cp -rf out/release/assets/static out/release/assets.final/
@@ -60,6 +61,6 @@ tag:
 
 release-linux:
 	docker run -it --rm -v $(shell pwd):/workspace centos/nodejs-8-centos7 /bin/bash -c \
-	"cd /workspace  && registry=https://registry.npm.taobao.org make package"
+	"cd /workspace  && registry=https://registry.tnpm.taobao.org make package"
 
 .PHONY: install test
