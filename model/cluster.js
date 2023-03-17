@@ -674,7 +674,7 @@ exports.fixCluster = function (clusterCode, callback) {
 
   callremoteWithRetry(path, opt, function (err, results) {
     if (err) {
-      const errMsg = err && err.message;
+      const errMsg = err.message || err.toString();
 
       // honeycomb-server 尚未支持这个接口
       if (errMsg.includes('Cannot GET')) {
