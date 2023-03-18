@@ -57,11 +57,6 @@ const getLogFileName = (templateFileName, time) => {
   return filename;
 };
 
-const getLogLevel = (log) => {
-  const m = log.match(/^\d+-\d+:\d+:\d+\.\d+ (\w+)/);
-
-  return m;
-};
 
 const LogPanel = (props) => {
   const {logFileName, clusterCode, currentCluster} = props;
@@ -358,13 +353,41 @@ const LogPanel = (props) => {
             }
             {
               logs.success.map((log, ind) => {
-                const level = getLogLevel(log);
-                const timeTailIndex = 20;
-                const pidSliceIndex = log.indexOf('#');
-                const timestr = log.substring(0, timeTailIndex).trim();
-                const typestr = log.substring(timeTailIndex + 1, pidSliceIndex - 1).trim();
-                const pidstr = log.substring(pidSliceIndex, pidSliceIndex + 6).trim();
-                const contentstr = log.substring(pidSliceIndex + 6).trim();
+                let offset = 0;
+                // time format
+                // 2023-03-18 23:00:34,644
+                // 20230316-22:14:48.293
+                // 20230316-17:35:09.81
+                // 2023-03-16 23:58:57.917
+                // 2023/03/16 23:58:57.917
+                let timestr = log.match(/^\s*\d{4}(-|\/)?\d{2}(-|\/)?\d{2}( |-|_|\.)\d{2}:\d{2}:\d{2}(\.|,)?(\d+)?/);
+
+                if (timestr) {
+                  offset += timestr[0].length;
+                  timestr = timestr[0].trim();
+                } else {
+                  timestr = '';
+                }
+
+                let level = log.substr(offset).match(/^\s*\[?[A-Z]+\]?/);
+
+                if (level) {
+                  offset += level[0].length;
+                  level = level[0];
+                } else {
+                  level = '';
+                }
+                const typestr = level;
+
+                let pidstr = log.substr(offset).match(/^\s*#\d+(-\d+)?/);
+
+                if (pidstr) {
+                  offset += pidstr[0];
+                  pidstr = pidstr[0];
+                } else {
+                  pidstr = '';
+                }
+                const contentstr = log.substring(offset).trim();
 
                 return (
                   <pre className={`log-code log-${_.lowerCase(level)}`} key={ind}>
