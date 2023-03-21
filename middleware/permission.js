@@ -177,11 +177,11 @@ module.exports = function (req, res, next) {
   // 发布要求有集群权限
   if (pathToRegex('/api/app/publish').test(pathname)) {
     const clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
-    const isPermitted = user.containsCluster(clusterCode);
+    const isPermitted = config.publishAdminOnly ? user.isClusterAdmin(clusterCode) : user.containsCluster(clusterCode);
 
-    isPermitted ? next() : res.status(401).json({
+    isPermitted ? next() : res.status(403).json({
       code: 'Error',
-      message: 'Unauthorized'
+      message: 'admin role required'
     });
 
     return;
