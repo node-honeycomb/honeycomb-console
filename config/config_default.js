@@ -29,6 +29,8 @@ module.exports = {
   defaultUser: '',
   defaultPassword: '',
   registerSecret: 'hc-console',
+  // 是否只有管理员才能发布，true仅管理员可以发布，false，普通成员可以发布
+  publishAdminOnly: false,
   /**
    * 初始化集群信息, 结构是一个对象，key是cluster的code和name, value是一个字符串用逗号隔开，对应集群中的ip
    * 例如 cluster: {dtboost: '127.0.0.1,127.0.0.2'}
