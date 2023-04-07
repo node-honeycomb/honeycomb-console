@@ -387,7 +387,7 @@ const LogPanel = (props) => {
                 } else {
                   pidstr = '';
                 }
-                let contentstr = log.substr(offset).trim();
+                const contentstr = log.substr(offset).trim();
 
                 return (
                   <pre className={`log-code log-${_.lowerCase(level)}`} key={ind}>
