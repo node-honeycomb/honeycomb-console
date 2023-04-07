@@ -382,12 +382,12 @@ const LogPanel = (props) => {
                 let pidstr = log.substr(offset).match(/^\s*#\d+(-\d+)?/);
 
                 if (pidstr) {
-                  offset += pidstr[0];
-                  pidstr = pidstr[0];
+                  offset += pidstr[0].length;
+                  pidstr = pidstr[0].trim();
                 } else {
                   pidstr = '';
                 }
-                const contentstr = log.substring(offset).trim();
+                let contentstr = log.substr(offset).trim();
 
                 return (
                   <pre className={`log-code log-${_.lowerCase(level)}`} key={ind}>
