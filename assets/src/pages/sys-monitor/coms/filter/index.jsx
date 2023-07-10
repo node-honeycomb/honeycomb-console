@@ -114,6 +114,9 @@ const Filter = (props) => {
               value={filter.apps}
               onChange={onSetFilter('apps')}
             >
+              <Option key="__MASTER__" value="__MASTER__">
+                 __MASTER__
+              </Option>
               {
                 apps.map(appId => {
                   return (

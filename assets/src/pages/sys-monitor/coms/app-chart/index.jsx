@@ -64,8 +64,6 @@ const AppChart = (props) => {
 
   const onSetFilter = (filter) => {
     setFilter(filter);
-    // app.push()
-    filter.apps.push('__MASTER__');
     storage.update(cardKey, filter.apps);
   };
 
