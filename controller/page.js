@@ -51,7 +51,8 @@ exports.pages = function (req, callback) {
         publishPages: Array.isArray(config.publishPages) ? config.publishPages : [],
         hideUpload: config.hideUpload,
         docUrl: config.docUrl,
-        envName: config.envName
+        envName: config.envName,
+        enableStorage: !!((config.storage && config.storage.driver === 'oss'))
       }
     }, 'html');
   });

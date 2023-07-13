@@ -14,6 +14,7 @@ const getPercent = (a, b) => {
   return ((a / b) * 100).toFixed(2) + '%';
 };
 
+const enableStorage = window.CONFIG.enableStorage;
 
 const UploadModal = (props) => {
   const {file, onFinish, clusterName, clusterCode} = props;
@@ -48,11 +49,22 @@ const UploadModal = (props) => {
     setLoading(true);
     try {
       setError(null);
+      if (enableStorage) {
+        console.log('prepare upload', file);
+        // 获取临时提交地址
+        const data = await api.appApi.getTmpUploadUrl(file);
 
-      await api.appApi.upload(clusterCode, file, onProgress);
-
+        console.log('>>> get tmp url', data);
+        // 发起提交
+        await api.appApi.uploadTmpPkg(data.url, file, onProgress);
+        console.log('>>> upload tmp package successfully');
+        // call tmp publish api
+        await api.appApi.publishTmp(clusterCode, data.pkgKey);
+        console.log('>>> publish tmp package successfully');
+      } else {
+        await api.appApi.upload(clusterCode, file, onProgress);
+      }
       message.success('应用发布成功！');
-
       onCancel();
       onFinish();
     } catch (e) {

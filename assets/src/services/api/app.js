@@ -62,6 +62,64 @@ export const del = (clusterCode, appName) => {
 };
 
 /**
+ * 获取上传临时文件url
+ * @param  {String} file
+ */
+export const getTmpUploadUrl = async (file) => {
+  return request.get(`/api/app/getUploadTmpUrl`, {params: {fileName: file.name}});
+};
+/**
+ * 上传文件到临时上传地址
+ */
+export const uploadTmpPkg = async (url, file, onProgress) => {
+  /*
+  const form = new FormData();
+  form.append('pkg', file);
+  request.put(url, form, {
+    headers: {
+      'Content-Disposition': `attachment;filename=${encodeURIComponent(file.name)}`,
+      'Content-Type': 'application/gzip'
+    },
+    onUploadProgress: (progressEvt) => {
+      const {loaded, total} = progressEvt;
+
+      onProgress(loaded, total);
+    }
+  });
+  */
+  const p = new Promise((resolve, reject) => {
+    const name = encodeURIComponent(file.name);
+    var xhr = new XMLHttpRequest();
+
+    xhr.open('PUT', url, true);
+    xhr.setRequestHeader('Content-Disposition', `attachment;filename=${name}`);
+    xhr.setRequestHeader('Content-Type', 'application/gzip');
+    xhr.upload.addEventListener('progress', event => {
+      if (event.lengthComputable) {
+        onProgress(event.loaded, event.total);
+      }
+    });
+    xhr.onreadystatechange = function (e) {
+      if (this.readyState === 4) {
+        if (xhr.status === 200) {
+          resolve();
+        } else {
+          reject(e);
+        }
+      } else {
+        console.log('uploading', e);
+      }
+    };
+    xhr.send(file);
+  });
+
+  return p;
+};
+
+export const publishTmp = async (clusterCode, fileName) => {
+  return request.post(`/api/app/publishThroughTmp`, {clusterCode, file: fileName});
+};
+/**
  * 上传发布应用
  * @param {String} clusterCode 集群code
  * @param {File} file 需要发布应用
@@ -71,7 +129,6 @@ export const upload = async (clusterCode, file, onProgress) => {
   const params = {
     clusterCode,
   };
-
 
   const form = new FormData();
 

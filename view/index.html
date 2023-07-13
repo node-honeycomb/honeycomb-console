@@ -19,7 +19,8 @@
       appManageConfig: JSON.parse('<%- JSON.stringify(appManageConfig) || "{}" %>'),
       hideUpload: '<%=hideUpload%>',
       docUrl: '<%= docUrl %>',
-      envName: '<%= envName %>'
+      envName: '<%= envName %>',
+      enableStorage: <%= enableStorage %>
     };
   </script>
   <script src="<%= prefix %>/assets/app.js"></script>

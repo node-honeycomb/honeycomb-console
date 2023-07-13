@@ -22,6 +22,39 @@ exports.init = function (cb) {
   }
   cb();
 };
+
+/**
+ * 获取包的上传临时地址
+ */
+exports.getPackageTmpUrl = (pkg) => {
+  if (storage && storage.genTmpPutUrl) {
+    return storage.genTmpPutUrl(pkg);
+  } else {
+    return null;
+  }
+};
+
+/**
+ * 下载临时包
+ */
+exports.getTmpPackage = (pkg, tmpFile, cb) => {
+  if (storage) {
+    storage.get(pkg, tmpFile, cb);
+  } else {
+    cb(new Error('unsupport tmp package publish'));
+  }
+};
+/**
+ * 删除临时包
+ */
+exports.deleteTmpPackage = (pkg, cb) => {
+  if (storage) {
+    storage.delete(pkg, cb);
+  } else {
+    cb(null);
+  }
+};
+
 /**
  * 保存pkg到数据库
  */
