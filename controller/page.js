@@ -52,7 +52,7 @@ exports.pages = function (req, callback) {
         hideUpload: config.hideUpload,
         docUrl: config.docUrl,
         envName: config.envName,
-        enableStorage: !!((config.storage && config.storage.driver === 'oss'))
+        enableStorage: !!((config.storage && config.storage.driver === 'oss' && config.enableOssPublish))
       }
     }, 'html');
   });

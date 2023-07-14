@@ -18,8 +18,17 @@ module.exports = {
     database : 'my_db'
     */
   },
-  logs: {
-  },
+  /**
+   * 发布存储及记录
+   * @type {Object} 发布的包的存储设置，支持oss、minio
+   */
+  storage: null,
+  /**
+   * 设置是否开启通过Oss来实现publish的上传功能
+   * @type {Boolean}
+   */
+  enableOssPublish: false,
+  logs: {},
   salt: null,
   /**
    * 集群自动检测，默认关闭
