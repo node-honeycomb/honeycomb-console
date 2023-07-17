@@ -175,7 +175,11 @@ module.exports = function (req, res, next) {
   }
 
   // 发布要求有集群权限
-  if (pathToRegex('/api/app/publish').test(pathname)) {
+  if (
+    pathToRegex('/api/app/publish').test(pathname) ||
+    pathToRegex('/api/app/getUploadTmpUrl').test(pathname) ||
+    pathToRegex('/api/app/publishThroughTmp').test(pathname)
+  ) {
     const clusterCode = req.query.clusterCode || req.body.clusterCode || req.body.cluster_code;
     const isPermitted = config.publishAdminOnly ? user.isClusterAdmin(clusterCode) : user.containsCluster(clusterCode);
 
