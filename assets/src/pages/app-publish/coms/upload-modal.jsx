@@ -50,10 +50,9 @@ const UploadModal = (props) => {
     try {
       setError(null);
       if (enableStorage) {
-        console.log('prepare upload', file);
+        // console.log('prepare upload', file);
         // 获取临时提交地址
-        const data = await api.appApi.getTmpUploadUrl(file);
-
+        const data = await api.appApi.getTmpUploadUrl(clusterCode, file);
         console.log('>>> get tmp url', data);
         // 发起提交
         await api.appApi.uploadTmpPkg(data.url, file, onProgress);

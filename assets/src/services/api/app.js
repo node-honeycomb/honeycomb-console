@@ -65,8 +65,11 @@ export const del = (clusterCode, appName) => {
  * 获取上传临时文件url
  * @param  {String} file
  */
-export const getTmpUploadUrl = async (file) => {
-  return request.get(`/api/app/getUploadTmpUrl`, {params: {fileName: file.name}});
+export const getTmpUploadUrl = async (clusterCode, file) => {
+  return request.get(`/api/app/getUploadTmpUrl`, {params: {
+    fileName: file.name,
+    clusterCode
+  }});
 };
 /**
  * 上传文件到临时上传地址
