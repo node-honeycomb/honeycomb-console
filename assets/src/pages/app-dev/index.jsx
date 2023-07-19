@@ -6,7 +6,7 @@ import {connect} from 'dva';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {withRouter} from 'dva/router';
-import {Spin, Tooltip, Menu, Dropdown, Drawer} from 'antd';
+import {Spin, Tooltip, Menu, Dropdown, Drawer, Modal} from 'antd';
 import {SettingOutlined, DeleteOutlined, CheckCircleOutlined} from '@ant-design/icons';
 
 import api from '@api/index';
@@ -25,6 +25,7 @@ import App from './coms/app';
 import SimpleApp from './coms/simple-app';
 import Usages, {MODE} from './coms/usages';
 import SimpleTitle from './coms/simple-title';
+import AppChart from '../sys-monitor/coms/app-chart';
 import {
   getClusterUsages,
   getCurrentWorking,
@@ -68,7 +69,6 @@ const AppDev = (props) => {
       if (!currentClusterCode) {
         return [];
       }
-
       return await api.clusterApi.status(currentClusterCode);
     },
     onError: (err) => {
@@ -90,9 +90,7 @@ const AppDev = (props) => {
 
     try {
       const {success} = await api.appApi.appList(currentClusterCode);
-
       setAppList(success);
-
       return success;
     } catch (e) {
       setErrCount(errCount + 1);
@@ -175,6 +173,12 @@ const AppDev = (props) => {
     </Menu>
   );
 
+  const [isAppUsageModalOpen, setIsAppUsageModalOpen] = useState(false);
+  const [appUsageAppId, setAppUsageAppId] = useState([]);
+  const cancelAppUsageModal = () => {
+    setIsAppUsageModalOpen(false);
+  };
+
   const {total: totalVersion, errorCount, errorApps} = getAppExpceptStatistics(appList);
 
   return (
@@ -247,6 +251,8 @@ const AppDev = (props) => {
                 const props = {
                   key: app.name,
                   app: app,
+                  setAppUsageAppId,
+                  setIsAppUsageModalOpen,
                   usage: appUsgae[app.name] || {},
                   zIndex: appList.length - ind,
                   currentClusterCode: currentClusterCode,
@@ -265,6 +271,13 @@ const AppDev = (props) => {
           </Spin>
         </BannerCard>
       </div>
+      <Modal title="App Usage" width={700} visible={isAppUsageModalOpen} onOk={cancelAppUsageModal} onCancel={cancelAppUsageModal}>
+        <AppChart
+          cardKey={appUsageAppId[0]}
+          currentClusterCode={currentClusterCode}
+          apps={appUsageAppId}
+        />
+      </Modal>
       <OnlineListModal
         visible={clearListVisible}
         onClose={() => setClearListVisible(false)}

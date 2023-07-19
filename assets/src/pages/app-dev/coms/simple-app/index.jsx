@@ -11,6 +11,8 @@ import api from '@api/index';
 import PAGES from '@lib/pages';
 import {getStatus} from '@lib/util';
 import {ADMIN_APP_CODE} from '@lib/consts';
+import {useRequest} from '@lib/hooks';
+import {useSysUsages, useUpdate} from '../../../sys-monitor/hooks';
 
 
 import AppK from './app-k';
@@ -46,7 +48,7 @@ const isOfflineMixed = (versions) => {
 };
 
 const SimpleApp = (props) => {
-  const {app, zIndex, currentClusterCode, usage, onAppCfg} = props;
+  const {app, zIndex, currentClusterCode, usage, onAppCfg, setAppUsageAppId, setIsAppUsageModalOpen} = props;
   const {name, versions} = app;
   const isAdminApp = ADMIN_APP_CODE === name;
   const [allVisible, setAllVisible] = useState(false);
@@ -54,6 +56,11 @@ const SimpleApp = (props) => {
   const workingApp = getCurrentWorking(versions);
   const [avgMem, avgCpu] = getAvgUsage(usage);
   const [memK, cpuK] = getUsageK(usage);
+
+  function showAppUsageModal(appId) {
+    setAppUsageAppId([appId]);
+    setIsAppUsageModalOpen(true);
+  }
 
   const onAppAction = async (key, appName) => {
     if (!appName) {
@@ -196,7 +203,7 @@ const SimpleApp = (props) => {
                     clusterCode={currentClusterCode}
                   />
                 </span>
-                <span className="cpu">
+                <span className="cpu" onClick={() => {showAppUsageModal(appId, currentClusterCode)}}>
                   {
                     isCurrWorking && (
                       <React.Fragment>
@@ -205,7 +212,7 @@ const SimpleApp = (props) => {
                     )
                   }
                 </span>
-                <span className="mem">
+                <span className="mem" onClick={() => {showAppUsageModal(appId, currentClusterCode)}}>
                   {
                     isCurrWorking && (
                       <React.Fragment>

@@ -138,7 +138,6 @@ const SysMonitor = (props) => {
                 >
                   <AppChart
                     cardKey={card.key}
-                    machines={machines}
                     currentClusterCode={currentClusterCode}
                     apps={card.apps}
                   />

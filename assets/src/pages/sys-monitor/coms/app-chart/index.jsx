@@ -11,12 +11,12 @@ import {useSysUsages} from '../../hooks';
 import * as storage from '../add-chart/storage';
 
 const AppChart = (props) => {
-  const {cardKey, machines, currentClusterCode, apps} = props;
+  const {cardKey, currentClusterCode, apps} = props;
 
   const [filter, setFilter] = useState({
     machine: [],
     time: moment().startOf('hour'),
-    rangeType: 1,
+    rangeType: 3,
     continuous: false,
     apps: []
   });
@@ -33,15 +33,14 @@ const AppChart = (props) => {
   };
 
   useEffect(() => {
-    filter.machine = machines.map(m => m.ip);
-
+    filter.machine = Object.keys(usages);
     setFilter({...filter});
-  }, [machines]);
+  }, [usages]);
 
   useEffect(() => {
     filter.apps = apps || [];
     setFilter({...filter});
-  }, []);
+  }, [apps]);
 
   const appSelected = filter.apps.length !== 0;
   let appMemUsage = [];
@@ -73,7 +72,7 @@ const AppChart = (props) => {
       <Filter
         filter={filter}
         setFilter={onSetFilter}
-        machines={machines}
+        machines={Object.keys(usages)}
         app={true}
         onQuery={onQuery}
         loading={loading}

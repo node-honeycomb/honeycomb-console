@@ -10,7 +10,7 @@ import PAGES from '@lib/pages';
 const getTitle = (title, app, clusterCode) => {
   return (
     <span>
-      {title} <Link to={PAGES.SYS_MONITOR + `?clusterCode=${clusterCode}&app=${app}`}>详情</Link>
+      {title} 详情
     </span>
   );
 };

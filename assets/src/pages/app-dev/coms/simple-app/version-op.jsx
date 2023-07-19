@@ -7,7 +7,7 @@ import {MENU_ACTIONS} from '../app/app-op';
 
 const AButton = (props) => {
   // eslint-disable-next-line
-  if (props.loading) {
+  if (props.loading === "true") {
     return (
       <span className="loading-btn">
         <LoadingOutlined />
@@ -24,6 +24,7 @@ const AButton = (props) => {
     </span>
   );
 };
+
 
 const VersionOp = (props) => {
   const {status, onAction, appId} = props;
@@ -60,7 +61,7 @@ const VersionOp = (props) => {
         <AButton
           className="delete"
           onClick={() => onClick(MENU_ACTIONS.DELETE, '删除')}
-          loading={loading === MENU_ACTIONS.DELETE}
+          loading={loading === MENU_ACTIONS.DELETE ? "true" : "false"}
         >
           删除
         </AButton>
@@ -68,7 +69,7 @@ const VersionOp = (props) => {
         <AButton
           color="blue"
           onClick={() => onClick(MENU_ACTIONS.START, '启动')}
-          loading={loading === MENU_ACTIONS.START}
+          loading={loading === MENU_ACTIONS.START ? "true": "false"}
         >
           启动
         </AButton>
