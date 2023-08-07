@@ -62,7 +62,8 @@ OpLog.getOpLog = (clusterCode, startTime, endTime, callback) => {
         return callback(err);
       } else {
         callback(null, data.map(log => {
-          log.detail && (log.detail = parseValue(log.detail));
+          // log.detail && (log.detail = parseValue(log.detail));
+          log.detail = {};
           log.extends && (log.extends = parseValue(log.extends));
           log.socket && (log.socket = parseValue(log.socket));
 

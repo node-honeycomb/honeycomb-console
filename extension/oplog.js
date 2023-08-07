@@ -1,4 +1,5 @@
 const moment = require('moment');
+const _ = require("lodash");
 const oplog = require('../model/oplog');
 const utils = require('../common/utils');
 const emitOplog = require('../monitor/emit-op-log');
@@ -9,6 +10,10 @@ module.exports = function (app) {
     const clusterCode = this.query.clusterCode || this.body.clusterCode ||
      '_system_manage';
 
+    let body = _.cloneDeep(this.body);
+    if (body.token) {
+      body.token = '***********************';
+    }
     oplog.add({
       gmtCreate: moment().format('YYYY-MM-DD HH:mm:ss'),
       username: (user && user.name) || 'unkown',
