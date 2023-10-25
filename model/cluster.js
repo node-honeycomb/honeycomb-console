@@ -628,7 +628,12 @@ function callremoteWithRetry(queryPath, options, callback, retry) {
       const okList = results.data.success;
 
       okList.forEach((node) => {
-        okips.push(node.ip);
+        if (node.data) {
+          okips.push(node.ip);
+        } else {
+          // cluster not match
+          errips.push(node.ip);
+        }
       });
       const errips = [];
 
