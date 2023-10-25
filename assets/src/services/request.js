@@ -25,7 +25,7 @@ const instance = axios.create({
         const result = JSON.parse(response);
 
         if (result.code !== 'SUCCESS') {
-          throw error(result);
+          console.error(result);
         }
 
         return result;

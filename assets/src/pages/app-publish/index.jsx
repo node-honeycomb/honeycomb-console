@@ -5,6 +5,7 @@ import {withRouter} from 'dva/router';
 import PropTypes from 'prop-types';
 import qs from 'query-string';
 
+import api from '@api/index';
 import Publish from './coms/publish';
 import './index.less';
 
@@ -33,6 +34,9 @@ const AppPublish = (props) => {
   const {currentClusterCode, currentCluster} = props;
   const query = qs.parse(location.search);
   const hcConsoleEndpoint = encodeURIComponent(window.location.protocol + '//' + window.location.hostname + window.CONFIG.prefix + '/api/oplog/log');
+
+  // fix cluster nodes
+  api.clusterApi.fixCluster(currentClusterCode);
 
   return (
     <div className="app-publish">

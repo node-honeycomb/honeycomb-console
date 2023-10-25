@@ -611,7 +611,6 @@ exports.saveSnapShot2 = function (clusterCode, callback) {
 
 function callremoteWithRetry(queryPath, options, callback, retry) {
   let count = 0;
-  const okips = [];
 
   retry = retry || 3;
 
@@ -627,15 +626,21 @@ function callremoteWithRetry(queryPath, options, callback, retry) {
       const errList = results.data.error;
       const okList = results.data.success;
 
+      const okips = [];
+      const errips = [];
+
       okList.forEach((node) => {
-        if (node.data) {
-          okips.push(node.ip);
+        if (config.clusterCheckStrict) {
+          if (node.data === true) {
+            okips.push(node.ip);
+          } else {
+            // cluster not match
+            errips.push(node.ip);
+          }
         } else {
-          // cluster not match
-          errips.push(node.ip);
+          okips.push(node.ip);
         }
       });
-      const errips = [];
 
       errList.forEach((node) => {
         errips.push(node.ip);
