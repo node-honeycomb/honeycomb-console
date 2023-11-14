@@ -260,14 +260,14 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.endpoint,
     b.id,
     a.status,
-    group_concat(a.ip) as ip,
+    WM_CONCAT(a.ip) as ip,
     b.env,
     b.monitor
   from
     hc_console_system_cluster b
   join
     hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
-  group by b.name, b.code, b.token, b.id, a.status`;
+  group by b.name, b.code, b.token, b.id, b.endpoint, b.env, b.monitor, a.status`;
 
 function adpater2cluster(data) {
   data = data || [];

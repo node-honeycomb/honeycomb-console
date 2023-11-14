@@ -11,6 +11,9 @@ switch (meta.driver) {
   case 'sql.js':
     module.exports = require('./sql.js');
     break;
+  case 'dmdb':
+    module.exports = require('./dmdb');
+    break;
   default:
     throw new Error('unknow driver, meta config error');
 }
