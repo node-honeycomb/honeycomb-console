@@ -61,7 +61,7 @@ const VersionOp = (props) => {
         <AButton
           className="delete"
           onClick={() => onClick(MENU_ACTIONS.DELETE, '删除')}
-          loading={loading === MENU_ACTIONS.DELETE ? "true" : "false"}
+          loading={loading === MENU_ACTIONS.DELETE ? 'true' : 'false'}
         >
           删除
         </AButton>
@@ -69,7 +69,7 @@ const VersionOp = (props) => {
         <AButton
           color="blue"
           onClick={() => onClick(MENU_ACTIONS.START, '启动')}
-          loading={loading === MENU_ACTIONS.START ? "true": "false"}
+          loading={loading === MENU_ACTIONS.START ? 'true' : 'false'}
         >
           启动
         </AButton>

@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = async (connection) => {};
+module.exports = async () => {};

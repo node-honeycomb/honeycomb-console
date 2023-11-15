@@ -1,13 +1,10 @@
 import React from 'react';
 import {connect} from 'dva';
 import {Tooltip} from 'antd';
-import {Link} from 'dva/router';
 import PropTypes from 'prop-types';
 import {RiseOutlined, FallOutlined, AlignLeftOutlined} from '@ant-design/icons';
 
-import PAGES from '@lib/pages';
-
-const getTitle = (title, app, clusterCode) => {
+const getTitle = (title) => {
   return (
     <span>
       {title} 详情
