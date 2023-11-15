@@ -17,3 +17,7 @@ switch (meta.driver) {
   default:
     throw new Error('unknow driver, meta config error');
 }
+
+if (!module.exports.quoteIdentifier) {
+  module.exports.quoteIdentifier = identifier => identifier;
+}

@@ -4,7 +4,7 @@ const db = require('../common/db');
 const AppConfig = {};
 
 const INSERT_APP_CFG = `INSERT INTO
-  hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, user, gmt_create)
+  hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, ${db.quoteIdentifier('user')}, gmt_create)
   VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
 AppConfig.save = (appCfg, callback) => {
@@ -36,7 +36,7 @@ AppConfig.save = (appCfg, callback) => {
  */
 const GET_APP_CFG = `
   SELECT 
-    cluster_code, app, config, version, user, gmt_create
+    cluster_code, app, config, version, ${db.quoteIdentifier('user')}, gmt_create
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and type = ? and app = ? 
   ORDER BY id desc 
@@ -68,7 +68,7 @@ AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
  */
 const GET_APP_CFG_HIS = `
   SELECT 
-    cluster_code, app, config, version, user, gmt_create
+    cluster_code, app, config, version, ${db.quoteIdentifier('user')}, gmt_create
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and app = ? order by version desc limit 100
 `;

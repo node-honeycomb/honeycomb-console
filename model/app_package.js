@@ -7,7 +7,6 @@ const log = require('../common/log');
 const db = require('../common/db');
 const config = require('../config');
 
-
 let storage = false;
 
 exports.init = function (cb) {
@@ -58,8 +57,8 @@ exports.deleteTmpPackage = (pkg, cb) => {
 /**
  * 保存pkg到数据库
  */
-const INSERT_APP_PKG = `REPLACE INTO
-    hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, user, gmt_create)
+const INSERT_APP_PKG = `INSERT INTO
+    hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, ${db.quoteIdentifier('user')}, gmt_create)
   VALUES(?, ?, ?, ?, ?, ?, ?)`;
 
 exports.savePackage = (data, callback) => {

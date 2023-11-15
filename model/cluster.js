@@ -542,10 +542,10 @@ exports.cleanSnapshot = (clusterCode, cb) => {
   });
 };
 
-const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshort 
-(cluster_code, info, md5, user, gmt_create) 
-values 
-(?, ?, ?, ?, ?)`;
+const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshort
+    (cluster_code, info, md5, ${db.quoteIdentifier('user')}, gmt_create)
+  values
+    (?, ?, ?, ?, ?)`;
 
 exports.saveSnapshot = (obj, cb) => {
   const info = JSON.stringify(obj.info);

@@ -87,7 +87,7 @@ User.listUser = function (cb) {
  * 获取系统用户数
  */
 User.countUser = function (cb) {
-  db.query('select count(1) as count from hc_console_system_user', (err, data) => {
+  db.query(`select count(1) as ${db.quoteIdentifier('count')} from hc_console_system_user`, (err, data) => {
     if (err) {
       return cb(err);
     }
