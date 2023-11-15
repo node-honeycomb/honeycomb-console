@@ -25,11 +25,8 @@ async function getDataFromReadableStream(readableStream) {
 }
 
 let pool;
-
 let readyFn;
 let flagReady = false;
-
-
 
 exports.ready = async function (cb) {
   if (flagReady) {
@@ -57,8 +54,6 @@ exports.ready = async function (cb) {
     statments = statments.split(/\n\n/);
     for (const i in statments) {
       const sql = statments[i];
-
-      console.log('init sql', sql);
       await conn.execute(sql);
     }
 
