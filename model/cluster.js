@@ -14,6 +14,7 @@ const userAcl = require('./user_acl');
 const config = require('../config');
 const utils = require('../common/utils');
 const callremote = utils.callremote;
+const driverType = config.meta.driver;
 
 const INSERT_SYSTEM_CLUSTER = `
   INSERT INTO hc_console_system_cluster
@@ -260,7 +261,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     b.endpoint,
     b.id,
     a.status,
-    WM_CONCAT(a.ip) as ip,
+    ${driverType === 'dmdb' ? 'WM_CONCAT' : 'group_concat'}(a.ip) as ip,
     b.env,
     b.monitor
   from
@@ -331,7 +332,7 @@ const SELECT_MONITED_CLUSTER_WORKER = `
     b.endpoint,
     b.id,
     a.status,
-    group_concat(a.ip) as ip,
+    ${driverType === 'dmdb' ? 'WM_CONCAT' : 'group_concat'}(a.ip) as ip,
     b.env,
     b.monitor
   from
