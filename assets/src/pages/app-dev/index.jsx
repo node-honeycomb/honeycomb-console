@@ -69,6 +69,7 @@ const AppDev = (props) => {
       if (!currentClusterCode) {
         return [];
       }
+
       return await api.clusterApi.status(currentClusterCode);
     },
     onError: (err) => {
@@ -90,7 +91,9 @@ const AppDev = (props) => {
 
     try {
       const {success} = await api.appApi.appList(currentClusterCode);
+
       setAppList(success);
+
       return success;
     } catch (e) {
       setErrCount(errCount + 1);

@@ -22,7 +22,7 @@ OpLog.add = (msg, callback = noop) => {
   const values = Object.values(msg).map(v => typeof v === 'object' ?
     JSON.stringify(v) : v);
 
-  const INSERT_OPLOG = util.format(`
+  const INSERT_OPLOG = db.genSqlWithParamPlaceholder(util.format(`
   INSERT INTO
     hc_console_system_oplog (%s)
   VALUES
@@ -31,7 +31,7 @@ OpLog.add = (msg, callback = noop) => {
     )`,
   keys.join(','),
   values.map(() => '?').join(',')
-  );
+  ));
 
   db.query(INSERT_OPLOG, values, callback);
 };
@@ -39,13 +39,13 @@ OpLog.add = (msg, callback = noop) => {
 /**
  * 获取一定时间范围的操作日志
  */
-const GET_OPLOG = `
+const GET_OPLOG = db.genSqlWithParamPlaceholder(`
   SELECT 
     *
   FROM hc_console_system_oplog
   WHERE cluster_code = ? and gmt_create >= ? and gmt_create <= ? 
   ORDER BY gmt_create desc
-`;
+`);
 
 OpLog.getOpLog = (clusterCode, startTime, endTime, callback) => {
   db.query(

@@ -11,9 +11,6 @@ import api from '@api/index';
 import PAGES from '@lib/pages';
 import {getStatus} from '@lib/util';
 import {ADMIN_APP_CODE} from '@lib/consts';
-import {useRequest} from '@lib/hooks';
-import {useSysUsages, useUpdate} from '../../../sys-monitor/hooks';
-
 
 import AppK from './app-k';
 import VersionOp from './version-op';
@@ -203,7 +200,9 @@ const SimpleApp = (props) => {
                     clusterCode={currentClusterCode}
                   />
                 </span>
-                <span className="cpu" onClick={() => {showAppUsageModal(appId, currentClusterCode)}}>
+                <span className="cpu" onClick={() => {
+                  showAppUsageModal(appId, currentClusterCode);
+                }}>
                   {
                     isCurrWorking && (
                       <React.Fragment>
@@ -212,7 +211,9 @@ const SimpleApp = (props) => {
                     )
                   }
                 </span>
-                <span className="mem" onClick={() => {showAppUsageModal(appId, currentClusterCode)}}>
+                <span className="mem" onClick={() => {
+                  showAppUsageModal(appId, currentClusterCode);
+                }}>
                   {
                     isCurrWorking && (
                       <React.Fragment>
@@ -271,7 +272,9 @@ SimpleApp.propTypes = {
   usage: PropTypes.object,
   zIndex: PropTypes.number,
   currentClusterCode: PropTypes.string,
-  onAppCfg: PropTypes.func
+  onAppCfg: PropTypes.func,
+  setAppUsageAppId: PropTypes.func,
+  setIsAppUsageModalOpen: PropTypes.func,
 };
 
 export default SimpleApp;

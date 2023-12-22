@@ -3,9 +3,9 @@ const db = require('../common/db');
 
 const AppConfig = {};
 
-const INSERT_APP_CFG = `INSERT INTO
-  hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, user, gmt_create)
-  VALUES(?, ?, ?, ?, ?, ?, ?)`;
+const INSERT_APP_CFG = db.genSqlWithParamPlaceholder(`INSERT INTO
+  hc_console_system_cluster_apps_config (cluster_code, type, app, config, version, ${db.quoteIdentifier('user')}, gmt_create)
+  VALUES(?, ?, ?, ?, ?, ?, ?)`);
 
 AppConfig.save = (appCfg, callback) => {
   const d = new Date();
@@ -34,14 +34,14 @@ AppConfig.save = (appCfg, callback) => {
 /**
  * 获取app的当前最新配置
  */
-const GET_APP_CFG = `
+const GET_APP_CFG = db.genSqlWithParamPlaceholder(`
   SELECT 
-    cluster_code, app, config, version, user, gmt_create
+    cluster_code, app, config, version, ${db.quoteIdentifier('user')}, gmt_create
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and type = ? and app = ? 
   ORDER BY id desc 
   LIMIT 1
-`;
+`);
 
 AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
   db.query(
@@ -66,12 +66,12 @@ AppConfig.getAppConfig = (clusterCode, type, app, callback) => {
 /**
  * 获取app的历史配置版本
  */
-const GET_APP_CFG_HIS = `
+const GET_APP_CFG_HIS = db.genSqlWithParamPlaceholder(`
   SELECT 
-    cluster_code, app, config, version, user, gmt_create
+    cluster_code, app, config, version, ${db.quoteIdentifier('user')}, gmt_create
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? and app = ? order by version desc limit 100
-`;
+`);
 
 AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
   db.query(
@@ -96,13 +96,13 @@ AppConfig.getAppConfigAllHistory = (appCfg, callback) => {
 /**
  * 获取集群下所有的app配置
  */
-const GET_CLUSTER_APP_CFGS = `
+const GET_CLUSTER_APP_CFGS = db.genSqlWithParamPlaceholder(`
   SELECT 
     cluster_code, app, config, max(version)
   FROM hc_console_system_cluster_apps_config
   WHERE cluster_code = ? 
   GROUP by cluster_code, app, config
-`;
+`);
 
 AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   db.query(
@@ -124,7 +124,7 @@ AppConfig.getClusterAppConfigs = (appCfg, callback) => {
   );
 };
 
-const DELETE_APPS_CONFIG = `
+const DELETE_APPS_CONFIG = db.genSqlWithParamPlaceholder(`
   delete from hc_console_system_cluster_apps_config
   where cluster_code = ? and type = ? and app = ? and id < (
     select min(id) as id from (
@@ -134,7 +134,7 @@ const DELETE_APPS_CONFIG = `
       order by id desc limit 10
     ) topids
   )
-`;
+`);
 
 AppConfig.cleanAppConfig = (clusterCode, type, app, callback) => {
   db.query(DELETE_APPS_CONFIG, [clusterCode, type, app, clusterCode, type, app], (err) => {
