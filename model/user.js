@@ -16,9 +16,9 @@ class User {
 /**
  * 新建用户
  */
-const INSERT_SYSTEM_USER = `INSERT INTO
-    hc_console_system_user (name, password, status, role, gmt_create, gmt_modified)
-  VALUES(?, ?, ?, ?, ?, ?)`;
+const INSERT_SYSTEM_USER = db.genSqlWithParamPlaceholder(`INSERT INTO
+hc_console_system_user (name, password, status, role, gmt_create, gmt_modified)
+VALUES(?, ?, ?, ?, ?, ?)`);
 
 User.addUser = function (name, pwd, status, role, callback) {
   const d = new Date();
@@ -39,12 +39,12 @@ User.addUser = function (name, pwd, status, role, callback) {
   );
 };
 
-const UPDATE_SYSTEM_USER = `
+const UPDATE_SYSTEM_USER = db.genSqlWithParamPlaceholder(`
   UPDATE
     hc_console_system_user
   SET status = ?, password = ?, role = ?, gmt_modified = ?
   WHERE name = ?
-`;
+`);
 
 User.updateUser = function (name, pwd, status, role, callback) {
   const d = new Date();
@@ -66,7 +66,7 @@ User.updateUser = function (name, pwd, status, role, callback) {
 };
 
 
-const LIST_USER = `
+const LIST_USER = db.genSqlWithParamPlaceholder(`
   SELECT
     name,
     role,
@@ -77,7 +77,7 @@ const LIST_USER = `
   WHERE
     status = 1
   limit 10000
-`;
+`);
 
 User.listUser = function (cb) {
   db.query(LIST_USER, cb);
@@ -98,13 +98,13 @@ User.countUser = function (cb) {
 /**
  * 获取用户信息，根据用户 name
  */
-const QUERY_SYSTEM_USER = `
-  SELECT
-    *
-  FROM
-    hc_console_system_user
-  WHERE
-    name = ?`;
+const QUERY_SYSTEM_USER = db.genSqlWithParamPlaceholder(`
+SELECT
+  *
+FROM
+  hc_console_system_user
+WHERE
+  name = ?`);
 
 User.getUser = function (name, callback) {
   db.query(
@@ -127,11 +127,11 @@ User.getUser = function (name, callback) {
 /**
  * 废除用户
  */
-const DELETE_SYSTEM_USER = `
+const DELETE_SYSTEM_USER = db.genSqlWithParamPlaceholder(`
   UPDATE
     hc_console_system_user
   SET status = 0, gmt_modified = ?
-  WHERE name = ?`;
+  WHERE name = ?`);
 
 User.deleteUser = function (name, callback) {
   const d = new Date();
@@ -151,10 +151,10 @@ User.deleteUser = function (name, callback) {
   );
 };
 
-const UPDATE_SYSTEM_USER_ROLE = `UPDATE
+const UPDATE_SYSTEM_USER_ROLE = db.genSqlWithParamPlaceholder(`UPDATE
     hc_console_system_user
     SET role = ?
-    WHERE name = ? AND status = 1`;
+    WHERE name = ? AND status = 1`);
 
 User.updateUserRole = function (name, role, callback) {
   db.query(

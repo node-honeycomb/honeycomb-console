@@ -57,9 +57,9 @@ exports.deleteTmpPackage = (pkg, cb) => {
 /**
  * 保存pkg到数据库
  */
-const INSERT_APP_PKG = `INSERT INTO
+const INSERT_APP_PKG = db.genSqlWithParamPlaceholder(`INSERT INTO
     hc_console_system_cluster_app_pkgs (cluster_code, app_id, app_name, weight, package, ${db.quoteIdentifier('user')}, gmt_create)
-  VALUES(?, ?, ?, ?, ?, ?, ?)`;
+  VALUES(?, ?, ?, ?, ?, ?, ?)`);
 
 exports.savePackage = (data, callback) => {
   const d = new Date();
@@ -109,7 +109,7 @@ exports.savePackage = (data, callback) => {
 /**
  * 删除包
  */
-const DELETE_APP_PKG = `delete from hc_console_system_cluster_app_pkgs where cluster_code = ? and app_id = ?`;
+const DELETE_APP_PKG = db.genSqlWithParamPlaceholder(`delete from hc_console_system_cluster_app_pkgs where cluster_code = ? and app_id = ?`);
 
 exports.deletePackage = (clusterCode, appId, callback) => {
   db.query(
@@ -142,7 +142,7 @@ exports.deletePackage = (clusterCode, appId, callback) => {
 /**
  * 根据集群和appName获取最新pkg到临时文件
  */
-const GET_APP_PKG = `
+const GET_APP_PKG = db.genSqlWithParamPlaceholder(`
   SELECT 
     cluster_code as clusterCode, 
     app_id as appId, 
@@ -151,7 +151,7 @@ const GET_APP_PKG = `
     package
   FROM hc_console_system_cluster_app_pkgs
   WHERE cluster_code = ? and app_id = ?
-`;
+`);
 
 exports.getPackage = (clusterCode, appId, callback) => {
   db.query(

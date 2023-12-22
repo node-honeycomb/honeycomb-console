@@ -16,11 +16,11 @@ const utils = require('../common/utils');
 const callremote = utils.callremote;
 const driverType = config.meta.driver;
 
-const INSERT_SYSTEM_CLUSTER = `
+const INSERT_SYSTEM_CLUSTER = db.genSqlWithParamPlaceholder(`
   INSERT INTO hc_console_system_cluster
     (name, code, token, endpoint, env, monitor, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?, ?, ?, ?, ?)`;
+    (?, ?, ?, ?, ?, ?, ?, ?)`);
 
 exports.addCluster = function (
   name, code, token, endpoint,
@@ -49,11 +49,11 @@ exports.addCluster = function (
   );
 };
 
-const UPDATE_SYSTEM_CLUSTER = `
+const UPDATE_SYSTEM_CLUSTER = db.genSqlWithParamPlaceholder(`
   UPDATE hc_console_system_cluster
   SET status = 1, name = ?, token = ?, endpoint = ?, env = ?, monitor = ?, gmt_modified = ?
   WHERE code = ?;
-`;
+`);
 
 exports.updateCluster = function (
   name, code, token, endpoint,
@@ -82,11 +82,11 @@ exports.updateCluster = function (
   );
 };
 
-const UPDATE_SYSTEM_CLUSTER_ENDPOINT = `
+const UPDATE_SYSTEM_CLUSTER_ENDPOINT = db.genSqlWithParamPlaceholder(`
   UPDATE hc_console_system_cluster
     SET endpoint = ?, gmt_modified = ?
   WHERE code = ?;
-`;
+`);
 
 exports.updateClusterEndpoint = function (code, endpoint, callback) {
   callback = callback || function () {};
@@ -104,10 +104,10 @@ exports.updateClusterEndpoint = function (code, endpoint, callback) {
   });
 };
 
-const DELETE_SYSTEM_CLUSTER = `
+const DELETE_SYSTEM_CLUSTER = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_cluster
-  WHERE code = ?;`;
+  WHERE code = ?;`);
 
 exports.deleteCluster = function (code, callback) {
   db.query(DELETE_SYSTEM_CLUSTER, [code], function (err) {
@@ -122,11 +122,11 @@ exports.deleteCluster = function (code, callback) {
   });
 };
 
-const INSERT_SYSTEM_WORKER = `
+const INSERT_SYSTEM_WORKER = db.genSqlWithParamPlaceholder(`
   INSERT INTO hc_console_system_worker
     (ip, cluster_code, gmt_create, gmt_modified)
   VALUES
-    (?, ?, ?, ?);`;
+    (?, ?, ?, ?);`);
 
 exports.addWorker = function (ipAddress, clusterCode, callback) {
   const d = new Date();
@@ -144,14 +144,14 @@ exports.addWorker = function (ipAddress, clusterCode, callback) {
   });
 };
 
-const INSERT_SYSTEM_WORKER_TMP = `
+const INSERT_SYSTEM_WORKER_TMP = db.genSqlWithParamPlaceholder(`
   INSERT INTO hc_console_system_worker_tmp
     (ip, cluster_code, gmt_create)
   VALUES
-    (?, ?, ?);`;
-const CHECK_SYSTEM_WORKER_TMP = `
+    (?, ?, ?);`);
+const CHECK_SYSTEM_WORKER_TMP = db.genSqlWithParamPlaceholder(`
   select count(*) as cc from hc_console_system_worker_tmp where ip=? and cluster_code=?
-`;
+`);
 
 exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
   const d = new Date();
@@ -178,20 +178,20 @@ exports.addTmpWorker = function (ipAddress, clusterCode, callback) {
   });
 };
 
-const DELETE_SYSTEM_WORKER = `
+const DELETE_SYSTEM_WORKER = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_worker
   WHERE
     ip = ? and cluster_code = ?;
-`;
+`);
 
 exports.deleteWorker = function (ipAddress, clusterCode, callback) {
   db.query(DELETE_SYSTEM_WORKER, [ipAddress, clusterCode], callback);
 };
 
-const UPDATE_SYSTEM_WORKER_BY_CLUSTER = `
+const UPDATE_SYSTEM_WORKER_BY_CLUSTER = db.genSqlWithParamPlaceholder(`
   update hc_console_system_worker set status = ? where ip in (?) and cluster_code = ?
-`;
+`);
 
 exports.updateWorker = function (status, ipAddress, clusterCode, callback) {
   if (!Array.isArray(ipAddress)) {
@@ -209,51 +209,51 @@ exports.updateWorker = function (status, ipAddress, clusterCode, callback) {
   );
 };
 
-const DELETE_SYSTEM_WORKER_BY_CLUSTER = `
+const DELETE_SYSTEM_WORKER_BY_CLUSTER = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_worker
   WHERE
     cluster_code = ?;
-`;
+`);
 
 exports.deleteWorkersByClusterCode = function (clusterCode, callback) {
   callback = callback || function () {};
   db.query(DELETE_SYSTEM_WORKER_BY_CLUSTER, [clusterCode], callback);
 };
 
-const DELETE_SYSTEM_WORKER_TMP = `
+const DELETE_SYSTEM_WORKER_TMP = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_worker
   WHERE
     id = ?;
-`;
+`);
 
 exports.deleteTmpWorker = function (id, callback) {
   db.query(DELETE_SYSTEM_WORKER_TMP, [id], callback);
 };
 
-const DELETE_SYSTEM_WORKERS = `
+const DELETE_SYSTEM_WORKERS = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_worker
   WHERE
     cluster_code = ?;
-`;
+`);
 
 exports.deleteWorkers = function (clusterCode, callback) {
   db.query(DELETE_SYSTEM_WORKERS, [clusterCode], callback);
 };
 
-const QUERY_SYSTEM_WORKER = `
+const QUERY_SYSTEM_WORKER = db.genSqlWithParamPlaceholder(`
   SELECT ip
   FROM hc_console_system_worker
   WHERE
-    cluster_code = ? AND status = 1`;
+    cluster_code = ? AND status = 1`);
 
 exports.queryWorker = function (clusterCode, callback) {
   db.query(QUERY_SYSTEM_WORKER, [clusterCode], callback);
 };
 
-const SELECT_SYSTEM_CLUSTER_WOKER = `
+const SELECT_SYSTEM_CLUSTER_WOKER = db.genSqlWithParamPlaceholder(`
   select
     b.name,
     b.code,
@@ -268,7 +268,7 @@ const SELECT_SYSTEM_CLUSTER_WOKER = `
     hc_console_system_cluster b
   join
     hc_console_system_worker a on b.status = 1 and a.cluster_code = b.code
-  group by b.name, b.code, b.token, b.id, b.endpoint, b.env, b.monitor, a.status`;
+  group by b.name, b.code, b.token, b.id, b.endpoint, b.env, b.monitor, a.status`);
 
 function adpater2cluster(data) {
   data = data || [];
@@ -324,7 +324,7 @@ exports.getClusterCfg = function (cb) {
   });
 };
 
-const SELECT_MONITED_CLUSTER_WORKER = `
+const SELECT_MONITED_CLUSTER_WORKER = db.genSqlWithParamPlaceholder(`
   select
     b.name,
     b.code,
@@ -342,7 +342,7 @@ const SELECT_MONITED_CLUSTER_WORKER = `
   where
     b.monitor is not null
   group by b.name, b.code, b.token, b.id, a.status
-`;
+`);
 
 /**
  * 获取所有填写了有监控机器人的集群
@@ -363,14 +363,14 @@ exports.getMonitedClusterCfg = function (cb) {
   });
 };
 
-const GET_CLUSTER_MONITOR_BY_CODE = `
+const GET_CLUSTER_MONITOR_BY_CODE = db.genSqlWithParamPlaceholder(`
   select
     monitor, name
   from
     hc_console_system_cluster
   where
     code = ?
-`;
+`);
 
 /**
  * 获取集群监控机器人地址
@@ -429,22 +429,22 @@ exports.getClusterCfgByCode = function (clusterCode) {
   }
 };
 
-const QUERY_ALL_SYSTEM_WORKER = `
+const QUERY_ALL_SYSTEM_WORKER = db.genSqlWithParamPlaceholder(`
   SELECT *
   FROM hc_console_system_worker
   WHERE
-    status = 1`;
+    status = 1`);
 
 exports.queryAllWorker = function (callback) {
   db.query(QUERY_ALL_SYSTEM_WORKER, [], callback);
 };
 
-const DELETE_SYSTEM_WORKER_BY_IP = `
+const DELETE_SYSTEM_WORKER_BY_IP = db.genSqlWithParamPlaceholder(`
   DELETE FROM
     hc_console_system_worker
   WHERE
     ip in (?)
-`;
+`);
 
 exports.deleteWorkerByIp = function (ip, callback) {
   if (!Array.isArray(ip)) {
@@ -457,7 +457,7 @@ exports.deleteWorkerByIp = function (ip, callback) {
   );
 };
 
-const SQL_QUERY_CLUSTER_SNAPSHOT = `
+const SQL_QUERY_CLUSTER_SNAPSHOT = db.genSqlWithParamPlaceholder(`
   select 
     cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
   from 
@@ -466,7 +466,7 @@ const SQL_QUERY_CLUSTER_SNAPSHOT = `
     cluster_code = ?
   order by id desc
   limit 1
-`;
+`);
 
 exports.getSnapshot = (clusterCode, cb) => {
   db.query(SQL_QUERY_CLUSTER_SNAPSHOT, [clusterCode], (err, data) => {
@@ -481,7 +481,7 @@ exports.getSnapshot = (clusterCode, cb) => {
   });
 };
 
-const SQL_LIST_CLUSTER_SNAPSHOT = `
+const SQL_LIST_CLUSTER_SNAPSHOT = db.genSqlWithParamPlaceholder(`
   select 
     id, cluster_code as clusterCode, info, md5, gmt_create as gmtCreate
   from 
@@ -489,7 +489,7 @@ const SQL_LIST_CLUSTER_SNAPSHOT = `
   where 
     cluster_code = ?
   order by id desc
-`;
+`);
 
 
 exports.listSnapshot = (clusterCode, cb) => {
@@ -510,9 +510,9 @@ exports.listSnapshot = (clusterCode, cb) => {
 };
 
 
-const SQL_DELETE_CLUSTER_SNAPSHOTS = `
+const SQL_DELETE_CLUSTER_SNAPSHOTS = db.genSqlWithParamPlaceholder(`
   delete from hc_console_system_cluster_snapshort where cluster_code = ? and id = ?
-`;
+`);
 
 exports.deleteSnapshot = (clusterCode, snapshotId, cb) => {
   db.query(SQL_DELETE_CLUSTER_SNAPSHOTS, [clusterCode, snapshotId], (err, data) => {
@@ -524,7 +524,7 @@ exports.deleteSnapshot = (clusterCode, snapshotId, cb) => {
 };
 
 
-const SQL_CLEAN_CLUSTER_SNAPSHOTS = `
+const SQL_CLEAN_CLUSTER_SNAPSHOTS = db.genSqlWithParamPlaceholder(`
   delete from hc_console_system_cluster_snapshort where cluster_code = ? and id < (
     select min(id) from (
       select id from hc_console_system_cluster_snapshort where cluster_code = ?
@@ -532,7 +532,7 @@ const SQL_CLEAN_CLUSTER_SNAPSHOTS = `
       limit 3
     ) topids
   )
-`;
+`);
 
 exports.cleanSnapshot = (clusterCode, cb) => {
   db.query(SQL_CLEAN_CLUSTER_SNAPSHOTS, [clusterCode, clusterCode], (err, data) => {
@@ -543,10 +543,10 @@ exports.cleanSnapshot = (clusterCode, cb) => {
   });
 };
 
-const SQL_INSERT_CLUSTER_SNAPSHOT = `insert into hc_console_system_cluster_snapshort
+const SQL_INSERT_CLUSTER_SNAPSHOT = db.genSqlWithParamPlaceholder(`insert into hc_console_system_cluster_snapshort
     (cluster_code, info, md5, ${db.quoteIdentifier('user')}, gmt_create)
   values
-    (?, ?, ?, ?, ?)`;
+    (?, ?, ?, ?, ?)`);
 
 exports.saveSnapshot = (obj, cb) => {
   const info = JSON.stringify(obj.info);
