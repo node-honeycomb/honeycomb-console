@@ -13,7 +13,7 @@
     "async": "3.2.0",
     "async-validator": "1.8.1",
     "editor-json-parser": "1.1.1",
-    "formidable": "2.0.1",
+    "formidable": "3.2.4",
     "formstream": "1.1.1",
     "hc-bee": "1.0.10",
     "hc-signature-auth": "1.0.7",
