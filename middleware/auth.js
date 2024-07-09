@@ -22,6 +22,12 @@ module.exports = function (app, options) {
     }
     // if already login
     if (req.session && req.session.username) {
+      if (config.userWhiteList && !config.userWhiteList[req.session.username]) {
+        return res.status(403).json({
+          code: 'FORBIDDEN',
+          message: 'Forbidden'
+        });
+      }
       if (path === '/logout') {
         req.session.user = null;
         req.session = null;

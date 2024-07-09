@@ -24,10 +24,20 @@ module.exports = {
    */
   storage: null,
   /**
+   * 白名单，如需限制用户访问，设置这个列表
+   *  {"username": true, "username2": true}
+   */
+  userWhiteList: null,
+  /**
    * 设置是否开启通过Oss来实现publish的上传功能
    * @type {Boolean}
    */
   enableOssPublish: false,
+  /**
+   * 开启cluster检查严格模式，fixCluster的时候会检查clusterCode是否相等
+   * 注意 honeycomb-server侧记得配置 config.cluster=${clusterCode}，否则机器会被踢出集群
+   */
+  clusterCheckStrict: false,
   logs: {},
   salt: null,
   /**
