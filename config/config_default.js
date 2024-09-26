@@ -17,6 +17,14 @@ module.exports = {
     password : 'secret',
     database : 'my_db'
     */
+
+    /**
+    driver: 'dmdb',
+    host: 'localhost',
+    port: 5236,
+    user: 'user',
+    password: 'password',
+     */
   },
   /**
    * 发布存储及记录

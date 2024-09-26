@@ -21,8 +21,8 @@ exports.createAcl = function (req, callback) {
     }
   ], function (err) {
     log.warn('createAcl', user, req.body);
-    log.error(err);
     if (err) {
+      log.error(err);
       callback({code: 'ERROR', message: '添加权限异常'});
     } else {
       callback();

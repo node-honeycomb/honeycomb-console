@@ -3,18 +3,18 @@
 const log = require('../common/log');
 const db = require('../common/db');
 
-const QUERY_SYSTEM_USER_ACL = `
+const QUERY_SYSTEM_USER_ACL = db.genSqlWithParamPlaceholder(`
   SELECT
     *
   FROM
     hc_console_system_user_acl
   WHERE
-   name = ?`;
+   name = ?`);
 
-const QUERY_ALL_CLUSTER = `SELECT *
+const QUERY_ALL_CLUSTER = db.genSqlWithParamPlaceholder(`SELECT *
   FROM hc_console_system_cluster
   WHERE
-    status = 1`;
+    status = 1`);
 
 exports.getUserAcl = function (user, callback) {
   if (user.role === 1) {
@@ -62,13 +62,13 @@ exports.getUserAcl = function (user, callback) {
   }
 };
 
-const QUERY_CLUSTER_ACL = `
+const QUERY_CLUSTER_ACL = db.genSqlWithParamPlaceholder(`
   SELECT
     *
   FROM
     hc_console_system_user_acl
   WHERE
-    cluster_code in (?)`;
+    cluster_code in (?)`);
 
 exports.getClusterAcl = function (user, callback) {
   var clusterCodeList = [];
@@ -113,11 +113,11 @@ exports.getClusterAcl = function (user, callback) {
   );
 };
 
-const INSERT_USER_ACL = `INSERT INTO
+const INSERT_USER_ACL = db.genSqlWithParamPlaceholder(`INSERT INTO
   hc_console_system_user_acl
   (name, cluster_id, cluster_code, cluster_name, cluster_admin, apps, gmt_create, gmt_modified)
   VALUES(?, ?, ?, ?, ?, ?, ?, ?)
-`;
+`);
 
 exports.addUserAcl = function (
   name, clusterId, clusterCode,
@@ -151,9 +151,9 @@ exports.addUserAcl = function (
   );
 };
 
-const UPDATE_USER_ACL = `UPDATE hc_console_system_user_acl
+const UPDATE_USER_ACL = db.genSqlWithParamPlaceholder(`UPDATE hc_console_system_user_acl
   SET name = ? , cluster_admin = ? , apps = ?
-  WHERE id = ?`;
+  WHERE id = ?`);
 
 exports.updateClusterAcl = function (userAcl, callback) {
   if (!userAcl.apps) userAcl.apps = '["*"]';
@@ -179,8 +179,8 @@ exports.updateClusterAcl = function (userAcl, callback) {
     });
 };
 
-const DELETE_USER_ACL = `DELETE FROM hc_console_system_user_acl
-  WHERE name = ? and cluster_id = ? and cluster_code = ?`;
+const DELETE_USER_ACL = db.genSqlWithParamPlaceholder(`DELETE FROM hc_console_system_user_acl
+  WHERE name = ? and cluster_id = ? and cluster_code = ?`);
 
 exports.deleteClusterAcl = function (userAcl, callback) {
   db.query(DELETE_USER_ACL,
@@ -197,8 +197,8 @@ exports.deleteClusterAcl = function (userAcl, callback) {
     });
 };
 
-const DELETE_USER_ALL_ACL = `DELETE FROM hc_console_system_user_acl
-  WHERE cluster_code = ?`;
+const DELETE_USER_ALL_ACL = db.genSqlWithParamPlaceholder(`DELETE FROM hc_console_system_user_acl
+  WHERE cluster_code = ?`);
 
 exports.deleteClusterAllAcl = function (clusterCode, callback) {
   db.query(DELETE_USER_ALL_ACL,
